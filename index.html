@@ -209,6 +209,11 @@ body.dark .mshare .amt{color:var(--gold);}
 <main>
 <!-- ================= PAGE: HOME ================= -->
 <section class="page active" id="pg-home">
+  <div class="card" id="updateCard" style="display:none;border:2px solid var(--gold);background:#fff8e1">
+    <div style="font-weight:700">🎉 Naya version available hai!</div>
+    <div class="note">Nai features ke liye app update karein</div>
+    <a href="https://jilanapps.github.io/rah-e-noor/rah-e-noor.apk" class="btn gold" style="display:inline-block;margin-top:8px;text-decoration:none">📥 Update Download Karein</a>
+  </div>
   <div class="card">
     <div class="label">Current Prayer • <span class="ur">موجودہ نماز</span></div>
     <div class="big" id="curPrayer">—</div>
@@ -388,6 +393,20 @@ body.dark .mshare .amt{color:var(--gold);}
   <button data-pg="pg-more"><span class="ic">☰</span>More<span class="ur"><br>مزید</span></button>
 </nav>
 <script>
+/* ================= App Update Checker ================= */
+const APP_VERSION='2.1';
+async function checkUpdate(){
+  try{
+    const r=await fetch('version.json?t='+Date.now());
+    if(!r.ok) return;
+    const v=await r.json();
+    if(v.version && v.version!==APP_VERSION){
+      $('updateCard').style.display='block';
+    }
+  }catch(e){}
+}
+setTimeout(checkUpdate,3000);
+
 /* ================= Helpers ================= */
 const $=id=>document.getElementById(id);
 const store={get:(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch(e){return d;}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
