@@ -442,11 +442,12 @@ function prayerState(){
   const f=toDate(PT.Fajr); f.setDate(f.getDate()+1);
   return{cur:'Isha',next:'Fajr',nextD:f};
 }
+function fmt12(t){var p=t.split(':'),h=+p[0],m=p[1],ap=h>=12?'PM':'AM';h=h%12;if(h===0)h=12;return h+':'+m+' '+ap;}
 function renderPrayers(){
   const s=prayerState();
   $('curPrayer').textContent=s.cur; $('nextPrayer').textContent=s.next;
   $('ptimeGrid').innerHTML=ORDER.map(k=>
-    `<div class="ptime${k===s.next?' next':''}">${k}<span class="t">${PT[k]}</span></div>`).join('');
+    `<div class="ptime${k===s.next?' next':''}">${k}<span class="t">${fmt12(PT[k])}</span></div>`).join('');
   const tickCd=()=>{const ms=prayerState().nextD-new Date();if(ms<0){renderPrayers();return;}
     const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),sec=Math.floor(ms%6e4/1e3);
     $('countdown').textContent=`⏳ ${h}h ${m}m ${sec}s left`;};
