@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Rah-e-Noor — Islamic App</title>
+<link rel="icon" href="islamic-app/media-generation-islamic-app-icon-0-ea291869-3f1d-4f32-af4d-ac0b2263a518.webp">
+<meta name="theme-color" content="#0d5c3f">
+<style>
+/* ============ Rah-e-Noor — All-in-one Islamic App ============ */
+:root{
+  --bg:#faf5e9; --card:#fffdf6; --gold:#b8860b; --gold-soft:#e8d9a8;
+  --green:#0d5c3f; --green-deep:#083d2a; --text:#2c2519; --muted:#8a7c60;
+  --border:#e5d9b8; --shadow:0 2px 12px rgba(13,92,63,.10);
+  --nav-bg:#fffdf6;
+}
+body.dark{
+  --bg:#14110b; --card:#1e1a12; --gold:#d4af37; --gold-soft:#4a3f1e;
+  --green:#3fa37c; --green-deep:#0d5c3f; --text:#f0e7d2; --muted:#a89a7c;
+  --border:#3a3222; --shadow:0 2px 12px rgba(0,0,0,.4); --nav-bg:#1e1a12;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+body{margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); transition:background .3s,color .3s;}
+h1,h2,h3{font-family:Georgia,'Times New Roman',serif; color:var(--green); margin:.4em 0;}
+body.dark h1,body.dark h2,body.dark h3{color:var(--gold);}
+.ar{font-family:'Scheherazade New','Traditional Arabic',serif; direction:rtl; font-size:1.35em; line-height:2;}
+.ur{font-family:'Jameel Noori Nastaleeq','Urdu Typesetting',serif; direction:rtl;}
+
+/* Header */
+header{position:sticky; top:0; z-index:10; background:linear-gradient(135deg,var(--green-deep),var(--green));
+  color:#fff; padding:14px 16px 18px; border-radius:0 0 22px 22px; box-shadow:var(--shadow);}
+header .row{display:flex; align-items:center; justify-content:space-between;}
+header h1{color:#fff; margin:0; font-size:1.4em;}
+header .sub{font-size:.8em; opacity:.85;}
+#clock{font-size:1.9em; font-weight:700; letter-spacing:1px; margin-top:6px;}
+.icon-btn{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); color:#fff;
+  border-radius:50%; width:40px; height:40px; font-size:1.2em; cursor:pointer;}
+
+/* Layout */
+main{padding:14px 14px 92px; max-width:560px; margin:0 auto;}
+.page{display:none; animation:fade .25s;}
+.page.active{display:block;}
+@keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1;}}
+.card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; margin:12px 0; box-shadow:var(--shadow);}
+.card h3{margin-top:0; font-size:1.05em;}
+.label{font-size:.78em; color:var(--muted); text-transform:uppercase; letter-spacing:1px;}
+.big{font-size:1.5em; font-weight:700; color:var(--green);}
+body.dark .big{color:var(--gold);}
+
+/* Prayer times grid */
+.ptimes{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px;}
+.ptime{background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:8px 4px; text-align:center; font-size:.82em;}
+.ptime.next{background:var(--green); color:#fff; border-color:var(--green);}
+.ptime.next .t{color:#ffe9a8;}
+.ptime .t{font-weight:700; color:var(--green); display:block; margin-top:2px;}
+body.dark .ptime .t{color:var(--gold);}
+.countdown{font-size:1.1em; font-weight:700; color:var(--gold);}
+
+/* Buttons & inputs */
+button{font-family:inherit;}
+.btn{background:var(--green); color:#fff; border:none; border-radius:12px; padding:12px 18px; font-size:1em; cursor:pointer; font-weight:600;}
+.btn:active{transform:scale(.97);}
+.btn.gold{background:var(--gold);}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap;}
+input[type=number],input[type=text]{width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px;
+  background:var(--bg); color:var(--text); font-size:1em; margin:6px 0;}
+select{padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text);}
+
+/* Tasbeeh */
+#tapBtn{width:200px; height:200px; border-radius:50%; border:6px solid var(--gold-soft);
+  background:radial-gradient(circle at 35% 30%, var(--green), var(--green-deep)); color:#fff;
+  font-size:3em; font-weight:800; cursor:pointer; display:block; margin:10px auto;
+  box-shadow:0 6px 20px rgba(13,92,63,.35); user-select:none;}
+#tapBtn:active{transform:scale(.95);}
+.preset{display:inline-block; margin:4px; padding:8px 12px; border:1px solid var(--border); border-radius:20px;
+  background:var(--bg); cursor:pointer; font-size:.9em;}
+.preset.sel{background:var(--green); color:#fff; border-color:var(--green);}
+
+/* Compass */
+#dial{width:190px; height:190px; border-radius:50%; border:4px solid var(--gold); margin:10px auto; position:relative;
+  background:radial-gradient(circle,var(--card) 60%,var(--gold-soft));}
+#needle{position:absolute; left:50%; top:50%; width:6px; height:150px; margin:-75px 0 0 -3px; transform-origin:50% 50%;}
+#needle .n{position:absolute; top:0; left:-9px; width:24px; height:70px; background:var(--green); clip-path:polygon(50% 0,100% 100%,0 100%);}
+#needle .s{position:absolute; bottom:0; left:-9px; width:24px; height:70px; background:var(--muted); clip-path:polygon(0 0,100% 0,50% 100%);}
+.tick{position:absolute; left:50%; top:4px; transform-origin:50% 91px; font-size:.7em; color:var(--muted);}
+
+/* Checklist */
+.chk{display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--border); cursor:pointer;}
+.chk:last-child{border-bottom:none;}
+.chk input{width:22px; height:22px; accent-color:var(--green);}
+.chk.done .nm{text-decoration:line-through; color:var(--muted);}
+.pts{margin-left:auto; color:var(--gold); font-weight:700; font-size:.9em;}
+.progress{height:12px; background:var(--border); border-radius:8px; overflow:hidden; margin:8px 0;}
+.progress>div{height:100%; background:linear-gradient(90deg,var(--gold),var(--green)); width:0%; transition:width .4s;}
+
+/* Dua list */
+.dua{border-bottom:1px solid var(--border); padding:12px 2px;}
+.dua:last-child{border-bottom:none;}
+.dua .tr{font-style:italic; color:var(--muted); margin:4px 0;}
+.dua .cat{font-size:.72em; background:var(--gold-soft); color:var(--text); padding:2px 10px; border-radius:12px;}
+
+/* Bottom nav */
+nav{position:fixed; bottom:0; left:0; right:0; background:var(--nav-bg); border-top:1px solid var(--border);
+  display:flex; padding:8px 4px calc(8px + env(safe-area-inset-bottom)); z-index:10;}
+nav button{flex:1; background:none; border:none; color:var(--muted); font-size:.72em; cursor:pointer; padding:6px;}
+nav button .ic{font-size:1.7em; display:block;}
+nav button.on{color:var(--green); font-weight:700;}
+body.dark nav button.on{color:var(--gold);}
+.note{font-size:.8em; color:var(--muted); margin-top:8px;}
+.result{background:var(--bg); border:1px dashed var(--gold); border-radius:10px; padding:10px; margin-top:10px;}
+
+/* QA accordion */
+.qa{border-bottom:1px solid var(--border); padding:10px 2px;}
+.qa:last-child{border-bottom:none;}
+.qa .q{font-weight:700; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px;}
+.qa .q .arrow{color:var(--gold); transition:transform .2s; flex-shrink:0;}
+.qa .a{display:none; margin-top:6px; font-size:.92em;}
+.qa .a .au{margin-top:4px;}
+.qa.open .a{display:block;}
+.qa.open .q .arrow{transform:rotate(90deg);}
+
+/* Library books */
+.book{border-bottom:1px solid var(--border); padding:10px 2px;}
+.book:last-child{border-bottom:none;}
+.book .t{font-weight:700;}
+.book .au{font-size:.85em; color:var(--muted);}
+.book .d{font-size:.9em; margin:4px 0;}
+.tag{font-size:.72em; background:var(--gold-soft); color:var(--text); padding:2px 10px; border-radius:12px;}
+
+/* Mirath calculator */
+.mrow{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0;}
+.mshare{display:flex; justify-content:space-between; gap:8px; padding:8px 2px; border-bottom:1px solid var(--border); font-size:.92em;}
+.mshare:last-child{border-bottom:none;}
+.mshare .amt{font-weight:700; color:var(--green); white-space:nowrap;}
+body.dark .mshare .amt{color:var(--gold);}
+.chkline{display:flex; align-items:center; gap:8px; margin:8px 0; cursor:pointer;}
+.chkline input{width:20px; height:20px; accent-color:var(--green); flex-shrink:0;}
+
+/* Namaz guides */
+.guide{border:1px solid var(--border); border-radius:12px; margin:10px 0; overflow:hidden;}
+.guide .gh{background:var(--bg); padding:12px; font-weight:700; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px;}
+.guide .gh .arrow{color:var(--gold); transition:transform .2s; flex-shrink:0;}
+.guide.open .gh .arrow{transform:rotate(90deg);}
+.guide .gb{display:none; padding:4px 12px 12px;}
+.guide.open .gb{display:block;}
+.step{border-top:1px solid var(--border); padding:10px 2px;}
+.step .sn{display:inline-block; background:var(--green); color:#fff; width:24px; height:24px; border-radius:50%; text-align:center; font-size:.8em; line-height:24px; margin-right:6px;}
+.step .st{font-weight:700;}
+.step .sd{font-size:.9em; margin:4px 0;}
+.step .sdu{font-size:.9em; margin:4px 0;}
+.maslak{font-size:.78em; color:var(--muted); background:var(--gold-soft); border-radius:8px; padding:6px 10px; margin:8px 0;}
+/* Chat */
+#chatBox{max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px 2px;}
+.msg{max-width:90%; padding:10px 12px; border-radius:14px; font-size:.92em; line-height:1.55;}
+.msg.bot{background:var(--bg); border:1px solid var(--border); align-self:flex-start; border-bottom-left-radius:4px;}
+.msg.user{background:var(--green); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
+.msg .au{margin-top:4px;}
+.chips{display:flex; gap:6px; overflow-x:auto; padding:6px 2px;}
+.chip{white-space:nowrap; font-size:.8em; border:1px solid var(--gold); color:var(--gold); background:transparent; border-radius:16px; padding:6px 12px; cursor:pointer;}
+.chatrow{display:flex; gap:8px; margin-top:8px;}
+.chatrow input{flex:1; margin:0;}
+/* Adhkar */
+.adhkar{border-bottom:1px solid var(--border); padding:10px 2px;}
+.adhkar:last-child{border-bottom:none;}
+.adhkar .cnt{font-size:.75em; background:var(--green); color:#fff; padding:2px 10px; border-radius:12px;}
+.adhkar .tr{font-style:italic; color:var(--muted); margin:3px 0;}
+/* Reader overlay */
+#readerOv{position:fixed; inset:0; background:var(--bg); z-index:50; display:none; flex-direction:column;}
+#readerOv.open{display:flex;}
+.rdr-head{position:sticky; top:0; background:linear-gradient(135deg,var(--green-deep),var(--green)); color:#fff;
+  padding:12px 14px; display:flex; align-items:center; gap:10px; border-radius:0 0 18px 18px; box-shadow:var(--shadow);}
+.rdr-head .bk{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); color:#fff;
+  border-radius:10px; padding:8px 14px; font-size:.95em; cursor:pointer; font-weight:700; flex-shrink:0;}
+.rdr-head .tt{font-weight:700; font-size:1.05em; flex:1;}
+#rdrBody{flex:1; overflow-y:auto; padding:14px 14px 40px; max-width:560px; margin:0 auto; width:100%;}
+.tappable{cursor:pointer;}
+.surah{display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border); padding:10px 2px; cursor:pointer;}
+.surah:last-child{border-bottom:none;}
+.surah .num{background:var(--green); color:#fff; width:34px; height:34px; border-radius:50%;
+  text-align:center; line-height:34px; font-size:.85em; flex-shrink:0;}
+.surah .nm{font-weight:700;}
+.surah .mt{font-size:.8em; color:var(--muted);}
+.surah .an{margin-left:auto; font-size:1.4em; flex-shrink:0;}
+.ayah{border-bottom:1px solid var(--border); padding:12px 2px;}
+.ayah:last-child{border-bottom:none;}
+.ayah .an{font-size:.75em; background:var(--gold-soft); border-radius:50%; width:26px; height:26px;
+  display:inline-flex; align-items:center; justify-content:center; margin-left:8px; color:var(--text); vertical-align:middle;}
+.bismillah{text-align:center; font-size:1.5em; margin:12px 0; padding:12px; background:var(--gold-soft); border-radius:12px;}
+.hadith{border:1px solid var(--border); border-radius:12px; padding:12px; margin:10px 0; background:var(--card);}
+.hadith .en{font-weight:700; margin:8px 0 4px;}
+.hadith .uh{font-size:.92em; color:var(--muted);}
+.tap-hint{font-size:.75em; color:var(--gold); font-weight:700;}
+</style>
+</head>
+<body>
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="row">
+    <div>
+      <h1>🕌 Rah-e-Noor <span class="ur" style="font-size:.7em">راہِ نور</span></h1>
+      <div class="sub">Islamic App • <span class="ur">اسلامی ایپ</span></div>
+    </div>
+    <button class="icon-btn" id="darkBtn" title="Dark mode">🌙</button>
+  </div>
+  <div id="clock">--:--:--</div>
+  <div class="sub"><span id="gregDate"></span> • <span id="hijriDate" class="ur"></span></div>
+</header>
+
+<main>
+<!-- ================= PAGE: HOME ================= -->
+<section class="page active" id="pg-home">
+  <div class="card">
+    <div class="label">Current Prayer • <span class="ur">موجودہ نماز</span></div>
+    <div class="big" id="curPrayer">—</div>
+    <div class="label" style="margin-top:8px">Next Prayer • <span class="ur">اگلی نماز</span></div>
+    <div class="big" id="nextPrayer">—</div>
+    <div class="countdown" id="countdown">—</div>
+    <div class="note" id="prayerSrc">Loading prayer times…</div>
+  </div>
+  <div class="card">
+    <h3>🕋 Prayer Times • <span class="ur">نماز کے اوقات</span> <span class="note">(Lahore)</span></h3>
+    <div class="ptimes" id="ptimeGrid"></div>
+  </div>
+  <div class="card">
+    <h3>✅ Daily Checklist • <span class="ur">روزانہ چیک لسٹ</span></h3>
+    <div><span id="chkCount">0/7</span> • <span class="pts"><span id="chkPts">0</span> pts</span></div>
+    <div class="progress"><div id="chkBar"></div></div>
+    <div id="chkList"></div>
+  </div>
+</section>
+
+<!-- ================= PAGE: DUAS ================= -->
+<section class="page" id="pg-duas">
+  <div class="card">
+    <h3>📖 Dua Library • <span class="ur">دعاؤں کی لائبریری</span></h3>
+    <input type="text" id="duaSearch" placeholder="Search duas… / تلاش کریں">
+    <div id="duaList"></div>
+  </div>
+</section>
+
+<!-- ================= PAGE: TASBEEH ================= -->
+<section class="page" id="pg-tasbeeh">
+  <div class="card" style="text-align:center">
+    <h3>📿 Tasbeeh Counter • <span class="ur">تسبیح</span></h3>
+    <div id="dhikrAr" class="ar">سُبْحَانَ اللَّهِ</div>
+    <div class="note" id="dhikrEn">SubhanAllah — Glory be to Allah</div>
+    <button id="tapBtn">0</button>
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn" id="resetBtn">Reset</button>
+      <select id="targetSel" title="Target">
+        <option value="33">Target: 33</option>
+        <option value="100" selected>Target: 100</option>
+        <option value="500">Target: 500</option>
+        <option value="1000">Target: 1000</option>
+      </select>
+    </div>
+    <div class="note">Lifetime total: <b id="lifeTotal">0</b></div>
+  </div>
+  <div class="card">
+    <h3>Dhikr Presets • <span class="ur">اذکار</span></h3>
+    <div id="presets"></div>
+  </div>
+</section>
+
+<!-- ================= PAGE: NAMAZ ================= -->
+<section class="page" id="pg-namaz">
+  <div class="card">
+    <h3>🕌 Namaz Guides • <span class="ur">نماز کی رہنمائی</span></h3>
+    <div class="maslak">📜 Hanafi maslak ke mutabiq • <span class="ur">تمام طریقے حنفی مسلک (دعوت اسلامی) کے مطابق ہیں</span></div>
+    <div id="guides"></div>
+  </div>
+</section>
+
+<!-- ================= PAGE: MORE ================= -->
+<section class="page" id="pg-more">
+  <div class="card">
+    <h3>🧭 Qibla Direction • <span class="ur">قبلہ</span></h3>
+    <div id="dial"><div id="needle"><div class="n"></div><div class="s"></div></div></div>
+    <div style="text-align:center">
+      <div class="big"><span id="qiblaDeg">—</span>°</div>
+      <div class="note" id="qiblaNote">from your location</div>
+      <div class="btn-row" style="justify-content:center; margin-top:8px">
+        <button class="btn" id="locBtn">📍 Use my location</button>
+        <button class="btn gold" id="compassBtn">🧭 Enable live compass</button>
+      </div>
+      <div class="note">Live compass needs motion-sensor permission on your phone. The green needle points toward the Kaaba.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>💰 Zakat Calculator • <span class="ur">زکوٰۃ کیلکولیٹر</span></h3>
+    <label class="label">Cash (PKR)</label><input type="number" id="zCash" placeholder="0">
+    <label class="label">Gold (grams)</label><input type="number" id="zGold" placeholder="0">
+    <label class="label">Silver (grams)</label><input type="number" id="zSilver" placeholder="0">
+    <div class="btn-row">
+      <div style="flex:1"><label class="label">Gold price/g (PKR)</label><input type="number" id="zGoldP" value="26500"></div>
+      <div style="flex:1"><label class="label">Silver price/g (PKR)</label><input type="number" id="zSilvP" value="320"></div>
+    </div>
+    <button class="btn gold" id="zCalc" style="margin-top:8px">Calculate Zakat</button>
+    <div class="result" id="zResult" style="display:none"></div>
+    <div class="note">Nisab: 87.48g gold or 612.36g silver. Zakat = 2.5% if your wealth reaches nisab and a lunar year passed. Prices are editable — update per market.</div>
+  </div>
+  <div class="card">
+    <h3>⚖️ Inheritance Calculator • <span class="ur">میراث کیلکولیٹر</span></h3>
+    <label class="label">Total estate value (PKR) • <span class="ur">کل ترکہ</span></label>
+    <input type="number" id="mEstate" placeholder="e.g. 1000000" min="0">
+    <label class="label">Spouse • <span class="ur">شریک حیات</span></label>
+    <select id="mSpouse" style="width:100%;margin:6px 0">
+      <option value="none">No spouse • کوئی نہیں</option>
+      <option value="husband">Husband • شوہر</option>
+      <option value="wife">Wife • بیوی</option>
+    </select>
+    <div class="mrow">
+      <div><label class="label">Sons • <span class="ur">بیٹے</span></label><input type="number" id="mSons" value="0" min="0"></div>
+      <div><label class="label">Daughters • <span class="ur">بیٹیاں</span></label><input type="number" id="mDau" value="0" min="0"></div>
+    </div>
+    <label class="chkline"><input type="checkbox" id="mFather"> Father alive • <span class="ur">والد حیات ہیں</span></label>
+    <label class="chkline"><input type="checkbox" id="mMother"> Mother alive • <span class="ur">والدہ حیات ہیں</span></label>
+    <button class="btn gold" id="mCalc" style="margin-top:8px">Calculate Shares • <span class="ur">حساب کریں</span></button>
+    <div class="result" id="mResult" style="display:none"></div>
+  </div>
+  <div class="card">
+    <h3>❓ Islamic Q&A Helper • <span class="ur">اسلامی سوال جواب</span></h3>
+    <div class="maslak">📜 Hanafi maslak ke mutabiq • <span class="ur">حنفی مسلک کے مطابق</span></div>
+    <div id="chatBox"></div>
+    <div class="chips" id="chatChips"></div>
+    <div class="chatrow">
+      <input type="text" id="chatInput" placeholder="Ask a question… / سوال لکھیں">
+      <button class="btn" id="chatSend">Send</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📚 Islamic Library • <span class="ur">اسلامی لائبریری</span></h3>
+    <div class="book tappable" data-book="quran" style="border:2px solid var(--gold); border-radius:12px; padding:12px; margin-bottom:10px;">
+      <div class="t">📖 Holy Quran • <span class="ur">قرآن کریم</span> <span class="tap-hint">Tap to read ›</span></div>
+      <div class="d">114 Surahs • 6,236 Ayat — the final revelation and guidance for all mankind. <span class="ur">آخری وحی — تمام انسانیت کے لیے ہدایت۔</span></div>
+      <span class="tag">Quran</span>
+    </div>
+    <div class="label">Hadith Collections • <span class="ur">احادیث کے مجموعے</span></div>
+    <div class="book tappable" data-book="bukhari"><div class="t">Sahih al-Bukhari • <span class="ur">صحیح بخاری</span> <span class="tap-hint">›</span></div><div class="au">Imam Muhammad al-Bukhari</div><div class="d">7,563 Ahadith — the most authentic hadith collection.</div><span class="tag">Hadith</span></div>
+    <div class="book tappable" data-book="muslim"><div class="t">Sahih Muslim • <span class="ur">صحیح مسلم</span> <span class="tap-hint">›</span></div><div class="au">Imam Muslim ibn al-Hajjaj</div><div class="d">7,470 Ahadith — the second most authentic collection.</div><span class="tag">Hadith</span></div>
+    <div class="book tappable" data-book="abudawud"><div class="t">Sunan Abu Dawud • <span class="ur">سنن ابی داؤد</span> <span class="tap-hint">›</span></div><div class="au">Imam Abu Dawud</div><div class="d">5,274 Ahadith — focused on fiqh rulings.</div><span class="tag">Hadith</span></div>
+    <div class="label" style="margin-top:10px">✨ Pur Noor Duas • <span class="ur">پر نور دعائیں</span></div>
+    <div class="note">25 Quranic &amp; Prophetic duas — open the <b>Duas</b> tab to read and search them all. <span class="ur">25 قرآنی و مسنون دعائیں — دعائیں والے ٹیب میں پڑھیں۔</span></div>
+    <div class="label" style="margin-top:10px">Daily Adhkar • <span class="ur">روزانہ کے اذکار</span></div>
+    <div class="qa"><div class="q"><span>🌅 Morning Adhkar • <span class="ur" style="font-weight:400;font-size:.85em">صبح کے اذکار</span></span><span class="arrow">▶</span></div><div class="a" id="adhkarMorning"></div></div>
+    <div class="qa"><div class="q"><span>🌙 Evening Adhkar • <span class="ur" style="font-weight:400;font-size:.85em">شام کے اذکار</span></span><span class="arrow">▶</span></div><div class="a" id="adhkarEvening"></div></div>
+    <div class="label" style="margin-top:10px">More Books • <span class="ur">مزید کتب</span></div>
+    <input type="text" id="libSearch" placeholder="Search books… / تلاش کریں">
+    <div id="libList"></div>
+    <div class="note">Summaries only — please refer to authentic published editions for full texts.<br><span class="ur">صرف تعارف — مکمل متن کے لیے مستند مطبوعہ نسخوں سے رجوع کریں۔</span></div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="note">Rah-e-Noor — by Jilan Apps<br><span class="ur">جیلان ایپس</span></div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e5d9bd">
+      <div style="font-size:.85em">📞 <a href="https://wa.me/923007379385" style="color:#1a5c3f;font-weight:700">0300 7379385</a> (WhatsApp)</div>
+      <div class="note" style="margin-top:4px">Apni app banwane ke liye rabta karein — Jilan Apps<br><span class="ur">اپنی ایپ بنوانے کے لیے رابطہ کریں</span></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ================= READER OVERLAY ================= -->
+<div id="readerOv">
+  <div class="rdr-head">
+    <button class="bk" id="rdrBack">← Back <span class="ur">واپس</span></button>
+    <div class="tt" id="rdrTitle"></div>
+  </div>
+  <div id="rdrBody"></div>
+</div>
+
+<!-- ================= BOTTOM NAV ================= -->
+<nav>
+  <button class="on" data-pg="pg-home"><span class="ic">🏠</span>Home<span class="ur"><br>ہوم</span></button>
+  <button data-pg="pg-duas"><span class="ic">📖</span>Duas<span class="ur"><br>دعائیں</span></button>
+  <button data-pg="pg-tasbeeh"><span class="ic">📿</span>Tasbeeh<span class="ur"><br>تسبیح</span></button>
+  <button data-pg="pg-namaz"><span class="ic">🕌</span>Namaz<span class="ur"><br>نماز</span></button>
+  <button data-pg="pg-more"><span class="ic">☰</span>More<span class="ur"><br>مزید</span></button>
+</nav>
+<script>
+/* ================= Helpers ================= */
+const $=id=>document.getElementById(id);
+const store={get:(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch(e){return d;}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+
+/* ================= Clock & Dates ================= */
+function tick(){
+  const now=new Date();
+  $('clock').textContent=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  $('gregDate').textContent=now.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  try{$('hijriDate').textContent=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(now);}
+  catch(e){$('hijriDate').textContent='';}
+}
+tick(); setInterval(tick,1000);
+
+/* ================= Prayer Times ================= */
+const FALLBACK={Fajr:'05:00',Sunrise:'06:25',Dhuhr:'12:05',Asr:'15:45',Maghrib:'17:50',Isha:'19:20'};
+let PT=FALLBACK, ptOK=false;
+const ORDER=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+function clean(t){return String(t).replace(/[^0-9:]/g,'').slice(0,5);}
+function toDate(hm){const[a,b]=hm.split(':').map(Number);const d=new Date();d.setHours(a,b,0,0);return d;}
+async function loadPrayers(){
+  try{
+    const r=await fetch('https://api.aladhan.com/v1/timingsByCity?city=Lahore&country=Pakistan&method=1');
+    const j=await r.json(); const t=j.data.data.timings;
+    PT={Fajr:clean(t.Fajr),Sunrise:clean(t.Sunrise),Dhuhr:clean(t.Dhuhr),Asr:clean(t.Asr),Maghrib:clean(t.Maghrib),Isha:clean(t.Isha)};
+    ptOK=true; $('prayerSrc').textContent='Live times via Aladhan • Lahore';
+  }catch(e){$('prayerSrc').textContent='Offline — showing approximate Lahore times';}
+  renderPrayers();
+}
+function prayerState(){
+  const now=new Date(), times=ORDER.map(k=>({k,d:toDate(PT[k])}));
+  for(let i=0;i<times.length;i++){
+    if(now<times[i].d){
+      const prev=i===0?{k:'Isha',d:toDate(PT.Isha)}:times[i-1];
+      const cur=i===0?'Isha (night)':prev.k;
+      return{cur,next:times[i].k,nextD:times[i].d};
+    }
+  }
+  const f=toDate(PT.Fajr); f.setDate(f.getDate()+1);
+  return{cur:'Isha',next:'Fajr',nextD:f};
+}
+function renderPrayers(){
+  const s=prayerState();
+  $('curPrayer').textContent=s.cur; $('nextPrayer').textContent=s.next;
+  $('ptimeGrid').innerHTML=ORDER.map(k=>
+    `<div class="ptime${k===s.next?' next':''}">${k}<span class="t">${PT[k]}</span></div>`).join('');
+  const tickCd=()=>{const ms=prayerState().nextD-new Date();if(ms<0){renderPrayers();return;}
+    const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),sec=Math.floor(ms%6e4/1e3);
+    $('countdown').textContent=`⏳ ${h}h ${m}m ${sec}s left`;};
+  tickCd(); clearInterval(window._cd); window._cd=setInterval(tickCd,1000);
+}
+loadPrayers(); setInterval(loadPrayers,30*60*1000);
+
+/* ================= Daily Checklist ================= */
+const CHK=[['fajr','Fajr','نماز فجر',20],['dhuhr','Dhuhr','نماز ظہر',20],['asr','Asr','نماز عصر',20],
+['maghrib','Maghrib','نماز مغرب',20],['isha','Isha','نماز عشاء',20],['quran','Quran Recitation','تلاوت قرآن',15],['dhikr','Dhikr','ذکر',15]];
+function chkState(){const s=store.get('chk',{date:'',done:[]});const today=new Date().toDateString();
+  if(s.date!==today)return{date:today,done:[]};return s;}
+function renderChk(){const s=chkState();
+  $('chkList').innerHTML=CHK.map(([id,en,ur,pts])=>
+    `<label class="chk${s.done.includes(id)?' done':''}"><input type="checkbox" data-id="${id}" ${s.done.includes(id)?'checked':''}>
+     <span class="nm">${en} <span class="ur" style="font-size:.85em">${ur}</span></span><span class="pts">+${pts}</span></label>`).join('');
+  const pts=CHK.filter(([id])=>s.done.includes(id)).reduce((a,[, , ,p])=>a+p,0);
+  $('chkCount').textContent=`${s.done.length}/${CHK.length}`; $('chkPts').textContent=pts;
+  $('chkBar').style.width=(s.done.length/CHK.length*100)+'%';
+  $('chkList').querySelectorAll('input').forEach(cb=>cb.onchange=()=>{const st=chkState();
+    st.done=cb.checked?[...new Set([...st.done,cb.dataset.id])]:st.done.filter(x=>x!==cb.dataset.id);
+    store.set('chk',st);renderChk();});
+}
+renderChk();
+
+/* ================= Dua Library ================= */
+const DUAS=[
+{t:'Rabbana Atina',c:'Quranic',ar:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',tr:'Rabbana atina fid-dunya hasanah, wa fil-akhirati hasanah, wa qina adhab an-nar.',en:'Our Lord, give us good in this world and good in the Hereafter, and shield us from the punishment of the Fire. (2:201)'},
+{t:'Beneficial Knowledge',c:'Morning',ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا',tr:"Allahumma inni as'aluka 'ilman nafi'an, wa rizqan tayyiban, wa 'amalan mutaqabbala.",en:'O Allah, I ask You for beneficial knowledge, wholesome provision, and accepted deeds.'},
+{t:'Before Eating',c:'Food',ar:'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ',tr:"Allahumma barik lana fima razaqtana wa qina adhab an-nar.",en:'O Allah, bless for us what You have provided and shield us from the punishment of the Fire.'},
+{t:'After Eating',c:'Food',ar:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ',tr:'Alhamdulillahilladhi at\'amana wa saqana wa ja\'alana muslimin.',en:'Praise be to Allah who fed us, gave us drink, and made us Muslims.'},
+{t:'Leaving Home',c:'Home',ar:'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',tr:"Bismillahi tawakkaltu 'alallah, wa la hawla wa la quwwata illa billah.",en:'In the name of Allah, I place my trust in Allah; there is no power nor might except with Allah.'},
+{t:'Entering Home',c:'Home',ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ',tr:"Allahumma inni as'aluka khairal-mawlaji wa khairal-makhraji.",en:'O Allah, I ask You for the best of entering and the best of leaving.'},
+{t:'For Parents',c:'Family',ar:'رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',tr:'Rabbir-hamhuma kama rabbayani saghira.',en:'My Lord, have mercy on them both as they raised me when I was small. (17:24)'},
+{t:'Dua of Yunus',c:'Hardship',ar:'لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ',tr:'La ilaha illa anta, subhanaka, inni kuntu minaz-zalimin.',en:'There is no god but You; glory be to You; indeed I have been of the wrongdoers. (21:87)'},
+{t:'Before Sleep',c:'Sleep',ar:'اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا',tr:'Allahumma bismika amutu wa ahya.',en:'O Allah, in Your name I die and I live.'},
+{t:'Waking Up',c:'Sleep',ar:'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',tr:"Alhamdulillahilladhi ahyana ba'da ma amatana wa ilaihin-nushur.",en:'Praise be to Allah who gave us life after death, and to Him is the resurrection.'},
+{t:'Increase in Knowledge',c:'Knowledge',ar:'رَبِّ زِدْنِي عِلْمًا',tr:"Rabbi zidni 'ilma.",en:'My Lord, increase me in knowledge. (20:114)'},
+{t:'Ease in Difficulty',c:'Hardship',ar:'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا',tr:"Allahumma la sahla illa ma ja'altahu sahla.",en:'O Allah, there is no ease except what You make easy.'},
+{t:'Istighfar',c:'Repentance',ar:'أَسْتَغْفِرُ اللَّهَ',tr:'Astaghfirullah.',en:"I seek Allah's forgiveness."},
+{t:'SubhanAllahi wa Bihamdihi',c:'Dhikr',ar:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',tr:'SubhanAllahi wa bihamdihi.',en:'Glory be to Allah and praise Him. (100x — sins forgiven)'},
+{t:'For All Believers',c:'Family',ar:'اللَّهُمَّ اغْفِرْ لِلْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ',tr:"Allahummaghfir lil-mu'minina wal-mu'minat.",en:'O Allah, forgive the believing men and believing women.'}
+];
+function renderDuas(q=''){q=q.toLowerCase();
+  const list=DUAS.filter(d=>(d.t+d.tr+d.en+d.c).toLowerCase().includes(q));
+  $('duaList').innerHTML=list.length?list.map(d=>
+    `<div class="dua"><b>${d.t}</b> <span class="cat">${d.c}</span><div class="ar">${d.ar}</div>
+     <div class="tr">${d.tr}</div><div>${d.en}</div></div>`).join('')
+    :'<div class="note">No duas found.</div>';
+}
+renderDuas(); $('duaSearch').oninput=e=>renderDuas(e.target.value);
+
+/* ================= Tasbeeh Counter ================= */
+const PRESETS=[
+{ar:'سُبْحَانَ اللَّهِ',tr:'SubhanAllah',en:'Glory be to Allah'},
+{ar:'الْحَمْدُ لِلَّهِ',tr:'Alhamdulillah',en:'All praise is for Allah'},
+{ar:'اللَّهُ أَكْبَرُ',tr:'Allahu Akbar',en:'Allah is Greatest'},
+{ar:'لَا إِلَهَ إِلَّا اللَّهُ',tr:'La ilaha illallah',en:'There is no god but Allah'},
+{ar:'أَسْتَغْفِرُ اللَّهَ',tr:'Astaghfirullah',en:"I seek Allah's forgiveness"},
+{ar:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',tr:'SubhanAllahi wa bihamdihi',en:'Glory be to Allah and praise Him'}];
+let tb=store.get('tasbeeh',{count:0,total:0,pi:0});
+function renderTb(){$('tapBtn').textContent=tb.count;$('lifeTotal').textContent=tb.total;
+  $('dhikrAr').textContent=PRESETS[tb.pi].ar;
+  $('dhikrEn').textContent=PRESETS[tb.pi].tr+' — '+PRESETS[tb.pi].en;
+  $('presets').innerHTML=PRESETS.map((p,i)=>`<span class="preset${i===tb.pi?' sel':''}" data-i="${i}">${p.tr}</span>`).join('');
+  $('presets').querySelectorAll('.preset').forEach(el=>el.onclick=()=>{tb.pi=+el.dataset.i;tb.count=0;store.set('tasbeeh',tb);renderTb();});
+}
+$('tapBtn').onclick=()=>{tb.count++;tb.total++;const tgt=+$('targetSel').value;
+  if(tb.count>=tgt){if(navigator.vibrate)navigator.vibrate(200);alert('🎉 Target '+tgt+' reached! MashaAllah');tb.count=0;}
+  store.set('tasbeeh',tb);renderTb();};
+$('resetBtn').onclick=()=>{tb.count=0;store.set('tasbeeh',tb);renderTb();};
+renderTb();
+
+/* ================= Qibla ================= */
+let qibla=267.6; // computed below for Lahore
+function qiblaBearing(lat,lon){const k={la:21.4225,lo:39.8262};
+  const dl=(k.lo-lon)*Math.PI/180,la1=lat*Math.PI/180,la2=k.la*Math.PI/180;
+  const y=Math.sin(dl),x=Math.cos(la1)*Math.tan(la2)-Math.sin(la1)*Math.cos(dl);
+  return(Math.atan2(y,x)*180/Math.PI+360)%360;}
+function setQibla(lat,lon,src){qibla=qiblaBearing(lat,lon);
+  $('qiblaDeg').textContent=qibla.toFixed(1);$('qiblaNote').textContent='from '+src;
+  $('needle').style.transform=`rotate(${qibla}deg)`;}
+setQibla(31.5497,74.3436,'Lahore (default)');
+$('locBtn').onclick=()=>{if(!navigator.geolocation)return alert('Geolocation not supported');
+  navigator.geolocation.getCurrentPosition(p=>setQibla(p.coords.latitude,p.coords.longitude,'your location'),
+    ()=>alert('Location denied — using Lahore default'));};
+$('compassBtn').onclick=async()=>{
+  const go=()=>{window.addEventListener('deviceorientationabsolute',hdl,true);
+    window.addEventListener('deviceorientation',hdl,true);alert('Compass on — rotate your phone. Green needle = Qibla.');};
+  const hdl=e=>{let hd=e.webkitCompassHeading; if(hd==null&&e.alpha!=null)hd=360-e.alpha;
+    if(hd!=null)$('needle').style.transform=`rotate(${qibla-hd}deg)`;};
+  try{if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission){
+    const r=await DeviceOrientationEvent.requestPermission(); if(r==='granted')go(); else alert('Permission denied');}
+    else go();}catch(e){go();}};
+
+/* ================= Zakat Calculator ================= */
+$('zCalc').onclick=()=>{
+  const cash=+$('zCash').value||0, g=+$('zGold').value||0, s=+$('zSilver').value||0;
+  const gp=+$('zGoldP').value||0, sp=+$('zSilvP').value||0;
+  const total=cash+g*gp+s*sp;
+  const nisab=Math.min(87.48*gp,612.36*sp);
+  const el=$('zResult'); el.style.display='block';
+  if(total<nisab){el.innerHTML=`Total zakatable wealth: <b>Rs ${total.toLocaleString()}</b><br>Nisab: <b>Rs ${Math.round(nisab).toLocaleString()}</b><br>❌ Below nisab — no zakat due.`;}
+  else{const z=total*0.025;el.innerHTML=`Total zakatable wealth: <b>Rs ${total.toLocaleString()}</b><br>
+    ✅ Nisab reached.<br><span class="big">Zakat due (2.5%): Rs ${Math.round(z).toLocaleString()}</span>`;}
+};
+
+/* ================= Mirath (Inheritance) Calculator ================= */
+$('mCalc').onclick=()=>{
+  const estate=+$('mEstate').value||0;
+  const sp=$('mSpouse').value;
+  const sons=Math.max(0,Math.floor(+$('mSons').value||0));
+  const dau=Math.max(0,Math.floor(+$('mDau').value||0));
+  const father=$('mFather').checked, mother=$('mMother').checked;
+  const children=sons+dau>0;
+  const el=$('mResult'); el.style.display='block';
+  if(estate<=0){el.innerHTML='⚠️ Please enter the estate value. <span class="ur">براہ کرم ترکہ کی رقم درج کریں۔</span>';return;}
+  if(sp==='none'&&!father&&!mother&&!children){el.innerHTML='⚠️ Please add at least one heir. <span class="ur">کم از کم ایک وارث شامل کریں۔</span>';return;}
+  const S=[];
+  if(sp==='husband')S.push({n:'Husband',u:'شوہر',f:children?1/4:1/2,t:children?'1/4':'1/2'});
+  if(sp==='wife')S.push({n:'Wife',u:'بیوی',f:children?1/8:1/4,t:children?'1/8':'1/4'});
+  if(mother)S.push({n:'Mother',u:'والدہ',f:children?1/6:1/3,t:children?'1/6':'1/3'});
+  let fatherAsaba=false;
+  if(father){if(children)S.push({n:'Father',u:'والد',f:1/6,t:'1/6'});else fatherAsaba=true;}
+  const fixed=S.reduce((a,s)=>a+s.f,0);
+  let rem=1-fixed;
+  const resid=[];
+  if(sons)resid.push({n:'Sons',u:'بیٹے',count:sons,parts:sons*2});
+  if(dau)resid.push({n:'Daughters',u:'بیٹیاں',count:dau,parts:dau});
+  if(fatherAsaba)resid.push({n:'Father',u:'والد',count:1,parts:1,asaba:true});
+  const totParts=resid.reduce((a,r)=>a+r.parts,0);
+  if(rem>1e-9&&totParts>0){
+    resid.forEach(r=>S.push({n:r.n+(r.count>1?' ('+r.count+')':''),u:r.u,f:rem*r.parts/totParts,
+      t:r.asaba?'Residuary (Asaba) • عصبہ':'Residuary 2:1 • عصبہ'}));
+  }else if(rem>1e-9&&fixed>0){
+    const k=1/fixed; S.forEach(s=>{s.f*=k;s.t+=' (radd adj.)';});
+  }else if(rem<-1e-9&&fixed>0){
+    const k=1/fixed; S.forEach(s=>{s.f*=k;s.t+=' (awl adj.)';});
+  }
+  let html=S.map(s=>`<div class="mshare"><span>${s.n}${s.n.includes('(')?'':' '}<span class="ur" style="font-size:.85em">${s.u}</span> <span class="note">${s.t}</span></span><span class="amt">Rs ${Math.round(estate*s.f).toLocaleString()}</span></div>`).join('');
+  html+='<div class="note" style="margin-top:8px">⚠️ Ye simplified hisab hai — asal taqseem ke liye mufti se ruju karein.<br>This is a simplified calculation — consult a mufti for the actual distribution.</div>';
+  el.innerHTML=html;
+};
+
+/* ================= Islamic Q&A Chat (offline) ================= */
+const QABANK=[
+{q:'How do I perform wudu?',qu:'وضو کیسے کریں؟',kw:['wudu','ablution','wash','wudhu'],a:'Wash hands, rinse mouth and nose, wash face, wash arms to elbows, wipe head and ears, then wash feet to ankles — each three times, starting with Bismillah and niyyah.',au:'ہاتھ دھوئیں، کلی اور ناک میں پانی ڈالیں، چہرہ دھوئیں، کہنیوں تک بازو دھوئیں، سر اور کانوں کا مسح کریں، پھر ٹخنوں تک پاؤں دھوئیں — بسم اللہ اور نیت کے ساتھ، ہر عضو تین بار۔'},
+{q:'What breaks wudu?',qu:'وضو کن چیزوں سے ٹوٹتا ہے؟',kw:['break','wudu','invalid','urine','wind','sleep'],a:'Natural discharges (urine, stool, wind), deep sleep, and loss of consciousness break wudu. Mere doubt does not break it.',au:'پیشاب، پاخانہ، ہوا کا خارج ہونا، گہری نیند اور بے ہوشی سے وضو ٹوٹ جاتا ہے۔ محض شک سے وضو نہیں ٹوٹتا۔'},
+{q:'How many rakats are in the five daily prayers?',qu:'پانچ نمازوں میں کتنی رکعتیں ہیں؟',kw:['rakat','rakats','five','daily','fajr','dhuhr','asr','maghrib','isha','prayers'],a:'Fajr: 2 fard; Dhuhr: 4; Asr: 4; Maghrib: 3; Isha: 4 — plus the emphasized sunnah rakats around them.',au:'فجر: 2 فرض، ظہر: 4، عصر: 4، مغرب: 3، عشاء: 4 — ان کے ساتھ سنت مؤکدہ رکعتیں بھی ہیں۔'},
+{q:'What breaks the fast?',qu:'روزہ کن چیزوں سے ٹوٹتا ہے؟',kw:['break','fast','roza','eating','drinking','ramadan'],a:'Eating, drinking, or intimacy during fasting hours breaks the fast and requires qaza. Forgetful eating does not break it.',au:'روزے کے اوقات میں کھانا، پینا یا مباشرت سے روزہ ٹوٹ جاتا ہے اور قضا لازم آتی ہے۔ بھول کر کھانے سے روزہ نہیں ٹوٹتا۔'},
+{q:'Who must pay zakat?',qu:'زکوٰۃ کس پر فرض ہے؟',kw:['zakat','pay','nisab','obligatory','wealth'],a:'Every sane adult Muslim whose zakatable wealth reaches the nisab (87.48g gold or 612.36g silver value) and a lunar year passes over it.',au:'ہر عاقل بالغ مسلمان جس کا مال نصاب (87.48 گرام سونا یا 612.36 گرام چاندی کی قیمت) کو پہنچے اور اس پر ایک قمری سال گزر جائے۔'},
+{q:'How do I perform ghusl?',qu:'غسل کیسے کریں؟',kw:['ghusl','bath','purification','janaba'],a:'Make niyyah, wash hands and private parts, perform wudu, then pour water over the whole body three times ensuring no spot stays dry.',au:'نیت کریں، ہاتھ اور ستر دھوئیں، وضو کریں، پھر پورے بدن پر تین بار پانی بہائیں کہ کوئی جگہ خشک نہ رہے۔'},
+{q:'I missed a prayer — what do I do?',qu:'نماز چھوٹ جائے تو کیا کریں؟',kw:['missed','qaza','qada','late','makeup','prayer'],a:'Pray its qaza as soon as possible with the same rakats and the intention of making up the missed prayer. Do not delay it further.',au:'جلد از جلد اس کی قضا پڑھیں — وہی رکعتیں اور قضا کی نیت کے ساتھ۔ مزید تاخیر نہ کریں۔'},
+{q:'What is Laylatul Qadr?',qu:'شب قدر کیا ہے؟',kw:['laylatul','qadr','decree','night','ramadan','thousand'],a:'The Night of Decree in the last ten nights of Ramadan — better than a thousand months. Seek it in the odd nights with prayer and dua.',au:'رمضان کے آخری عشرے کی وہ رات جو ہزار مہینوں سے بہتر ہے۔ طاق راتوں میں عبادت اور دعا سے اسے تلاش کریں۔'},
+{q:'Is Taraweeh obligatory?',qu:'کیا تراویح فرض ہے؟',kw:['taraweeh','obligatory','fard','ramadan','sunnah'],a:'Taraweeh is a strongly emphasized sunnah in Ramadan, not fard. Per Hanafi fiqh it is 20 rakats after Isha.',au:'تراویح رمضان میں سنت مؤکدہ ہے، فرض نہیں۔ حنفی مسلک میں یہ عشاء کے بعد 20 رکعت ہے۔'},
+{q:'What should I recite in sujood?',qu:'سجدے میں کیا پڑھیں؟',kw:['sujood','sajdah','recite','prostration'],a:"Recite 'Subhana Rabbiyal A'la' at least three times, then make personal duas — sujood is when a servant is closest to Allah.",au:'کم از کم تین بار سبحان ربی الاعلی پڑھیں، پھر ذاتی دعائیں مانگیں — سجدہ بندے کے اللہ سے قریب ترین لمحہ ہے۔'},
+{q:'Can women pray during menstruation?',qu:'کیا حیض کے دوران نماز پڑھ سکتی ہیں؟',kw:['women','menstruation','haiz','period','menses'],a:'No — prayer and fasting are exempted during menstruation. Missed prayers are not made up; missed Ramadan fasts are made up later.',au:'نہیں — حیض کے دوران نماز اور روزہ معاف ہیں۔ چھوٹی نمازوں کی قضا نہیں، البتہ رمضان کے روزوں کی قضا بعد میں رکھیں۔'},
+{q:'What is the niyyah for fasting?',qu:'روزے کی نیت کیسے کریں؟',kw:['niyyah','niyat','intention','fasting','roza'],a:'Intend in your heart before dawn that you are fasting for Allah. Spoken words are not required — the intention of the heart suffices.',au:'فجر سے پہلے دل میں نیت کر لیں کہ اللہ کے لیے روزہ رکھ رہے ہیں۔ زبان سے کہنا ضروری نہیں، دل کی نیت کافی ہے۔'},
+{q:'What is tayammum and when is it allowed?',qu:'تیمم کیا ہے اور کب جائز ہے؟',kw:['tayammum','dust','earth','water','unavailable','sick','travel'],a:'When water is unavailable or its use is harmful (illness, travel), strike clean earth twice with both hands: wipe the face, then both arms to the elbows — with niyyah. It substitutes wudu or ghusl.',au:'جب پانی نہ ہو یا استعمال نقصان دہ ہو (بیماری، سفر) تو پاک مٹی پر دو بار ہاتھ مار کر چہرے اور کہنیوں تک بازوؤں کا مسح کریں — یہ وضو یا غسل کا قائم مقام ہے۔'},
+{q:'How many rakats are Taraweeh?',qu:'تراویح کتنی رکعت ہے؟',kw:['taraweeh','rakats','20','ramadan','howmany'],a:'Per Hanafi fiqh, Taraweeh is 20 rakats (plus 3 witr), prayed in Ramadan after Isha — an emphasized sunnah.',au:'حنفی مسلک کے مطابق تراویح 20 رکعت (علاوہ 3 وتر) رمضان میں عشاء کے بعد — سنت مؤکدہ ہے۔'},
+{q:'How is Jummah prayer performed?',qu:'جمعہ کی نماز کیسے پڑھیں؟',kw:['jummah','friday','khutbah','sermon'],a:'Do ghusl, go to the masjid early, listen to the khutbah silently, then pray 2 fard rakats behind the imam, followed by sunnah rakats.',au:'غسل کریں، جلدی مسجد جائیں، خطبہ خاموشی سے سنیں، پھر امام کے پیچھے 2 فرض اور بعد میں سنتیں پڑھیں۔'},
+{q:'How is Eid prayer performed?',qu:'عید کی نماز کیسے پڑھیں؟',kw:['eid','fitr','adha','takbeer','takbir'],a:'2 rakats with 6 extra takbeers (Hanafi): 3 after Sana in the first rakat, 3 before ruku in the second — then the khutbah.',au:'2 رکعت، 6 زائد تکبیریں (حنفی): پہلی میں ثنا کے بعد 3، دوسری میں رکوع سے پہلے 3 — پھر خطبہ۔'},
+{q:'What is the kaffara for deliberately breaking a fast?',qu:'جان بوجھ کر روزہ توڑنے کا کفارہ کیا ہے؟',kw:['kaffara','kaffarah','deliberately','breaking','fast','fasting','60'],a:'Free a slave; if unable, fast 60 consecutive days; if unable, feed 60 poor people — plus qaza of that fast.',au:'غلام آزاد کریں، نہ ہو سکے تو مسلسل 60 روزے، ورنہ 60 مسکینوں کو کھانا کھلائیں — ساتھ اس روزے کی قضا بھی لازم۔'},
+{q:'What is Sadaqat-ul-Fitr?',qu:'صدقۃ الفطر کیا ہے؟',kw:['fitr','fitrana','sadaqat','charity','eid'],a:'Obligatory charity paid before Eid-ul-Fitr prayer — about 2.5kg wheat (or its value) per person, given to the poor.',au:'عید الفطر کی نماز سے پہلے واجب صدقہ — فی کس تقریباً 2.5 کلو گندم یا اس کی قیمت، غریبوں کو دیں۔'},
+{q:'What is mehr in nikah?',qu:'نکاح میں مہر کیا ہے؟',kw:['mehr','mahr','nikah','marriage','bridal'],a:'An obligatory bridal gift from the husband to the wife, fixed at the time of nikah. It is her exclusive right and must be paid.',au:'نکاح کے وقت شوہر کی طرف سے بیوی کے لیے واجب تحفہ — یہ اس کا خالص حق ہے اور ادا کرنا لازم ہے۔'},
+{q:'What is aqeeqa?',qu:'عقیقہ کیا ہے؟',kw:['aqeeqa','aqiqah','baby','birth','newborn','sacrifice'],a:'A sunnah sacrifice on the 7th day after birth — 2 goats for a boy, 1 for a girl — with shaving the head and giving silver equal to the hair weight in charity.',au:'پیدائش کے ساتویں دن سنت قربانی — لڑکے کے لیے 2 بکرے، لڑکی کے لیے 1 — سر منڈوا کر بالوں کے وزن کے برابر چاندی صدقہ کریں۔'},
+{q:'What is Witr prayer?',qu:'وتر کی نماز کیا ہے؟',kw:['witr','qunoot','isha','3','wajib'],a:'Per Hanafi fiqh, Witr is wajib: 3 rakats after Isha, with Dua-e-Qunoot recited in the final rakat.',au:'حنفی مسلک میں وتر واجب ہے: عشاء کے بعد 3 رکعت، آخری رکعت میں دعائے قنوت کے ساتھ۔'},
+{q:'What is the difference between fard, wajib and sunnah?',qu:'فرض، واجب اور سنت میں کیا فرق ہے؟',kw:['fard','farz','wajib','sunnah','sunnat','nafl','difference'],a:'Fard: proven by decisive evidence — denying it is disbelief. Wajib (Hanafi): necessary — leaving it without excuse is sinful. Sunnah: the Prophet\u2019s ﷺ practice — rewarded; leaving it loses reward.',au:'فرض قطعی دلیل سے ثابت — انکار کفر۔ واجب (حنفی) چھوڑنا بلا عذر گناہ۔ سنت نبی ﷺ کا طریقہ — ثواب ملتا ہے، چھوڑنے پر ثواب سے محرومی۔'},
+{q:'What is Tahajjud prayer?',qu:'تہجد کی نماز کیا ہے؟',kw:['tahajjud','night','qiyam','late'],a:'A voluntary night prayer in the last third of the night — minimum 2 rakats, a highly rewarded sunnah.',au:'رات کے آخری تہائی حصے میں نفلی نماز — کم از کم 2 رکعت، بڑے ثواب والی سنت۔'},
+{q:'What is Ishraq prayer?',qu:'اشراق کی نماز کیا ہے؟',kw:['ishraq','sunrise','chasht','morning'],a:'2\u20134 rakats prayed about 15\u201320 minutes after sunrise — its reward is like an accepted Hajj and Umrah, per hadith.',au:'طلوع آفتاب کے 15-20 منٹ بعد 2-4 رکعت — حدیث کے مطابق مقبول حج و عمرے جیسا ثواب۔'},
+{q:'What should I recite after fard prayer?',qu:'فرض نماز کے بعد کیا پڑھیں؟',kw:['after','fard','tasbih','tasbeehat','fatima'],a:'Recite Ayat-ul-Kursi, then 33x SubhanAllah, 33x Alhamdulillah, 34x Allahu Akbar (Tasbeehat-e-Fatima), then make dua.',au:'آیت الکرسی پڑھیں، پھر 33 بار سبحان اللہ، 33 بار الحمدللہ، 34 بار اللہ اکبر (تسبیحات فاطمہ)، پھر دعا مانگیں۔'},
+{q:'How should I reply to the adhan?',qu:'اذان کا جواب کیسے دیں؟',kw:['adhan','azan','azaan','reply','muazzin'],a:'Repeat the muazzin\u2019s words; at \u201chayya alas-salah\u201d say \u201cla hawla wa la quwwata illa billah\u201d. Then recite durood and the wasilah dua.',au:'موذن کے الفاظ دہرائیں؛ حی علی الصلاۃ پر لا حول ولا قوۃ الا باللہ کہیں۔ پھر درود اور وسیلے کی دعا پڑھیں۔'},
+{q:'What should I do when entering the masjid?',qu:'مسجد میں داخل ہوتے وقت کیا کریں؟',kw:['masjid','mosque','enter','entering','tahiyyat'],a:'Enter with the right foot, recite the entering dua, and pray 2 rakats Tahiyyat-ul-Masjid before sitting.',au:'دائیں پاؤں سے داخل ہوں، داخلے کی دعا پڑھیں، اور بیٹھنے سے پہلے 2 رکعت تحیۃ المسجد پڑھیں۔'},
+{q:'What is Shab-e-Barat?',qu:'شب برات کیا ہے؟',kw:['barat','shaban','shabaan','15','fifteenth','night'],a:'The 15th night of Sha\u2019ban — a blessed night of forgiveness. Spend it in prayer, dua and istighfar.',au:'شعبان کی 15ویں رات — مغفرت والی بابرکت رات۔ اسے نماز، دعا اور استغفار میں گزاریں۔'},
+{q:'Can I pray nafl after Asr or Fajr?',qu:'کیا عصر یا فجر کے بعد نفل پڑھ سکتے ہیں؟',kw:['nafl','asr','fajr','makruh','makrooh','disliked','time'],a:'Nafl is makrooh (disliked) after Fajr until sunrise, and after Asr until Maghrib. Pray qaza instead if needed.',au:'فجر کے بعد طلوع آفتاب تک اور عصر کے بعد مغرب تک نفل مکروہ ہیں۔ ضرورت ہو تو قضا پڑھیں۔'},
+{q:'What is Dua-e-Qunoot?',qu:'دعائے قنوت کیا ہے؟',kw:['qunoot','witr','dua'],a:'The supplication recited in the final rakat of Witr: \u201cAllahumma inna nasta\u2019inuka wa nastaghfiruka\u2026\u201d — its full Arabic text is in the Duas tab.',au:'وتر کی آخری رکعت میں پڑھی جانے والی دعا: اللھم انا نستعینک… — مکمل عربی متن دعاؤں والے ٹیب میں موجود ہے۔'}
+];
+const STOPW=new Set(['the','and','for','with','what','how','does','are','can','should','when','where','why','please','tell','about','your','you','from','into','than','then','there','their']);
+function addMsg(html,who){const b=$('chatBox');const d=document.createElement('div');d.className='msg '+who;d.innerHTML=html;b.appendChild(d);b.scrollTop=b.scrollHeight;}
+function botAnswer(text){
+  const words=text.toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).filter(w=>w.length>2&&!STOPW.has(w));
+  let best=null,bs=0;
+  for(const e of QABANK){
+    const ql=e.q.toLowerCase(),kl=' '+(e.kw||[]).join(' ').toLowerCase()+' ';let s=0;
+    for(const w of words){if(ql.indexOf(w)>=0)s+=3;else if(kl.indexOf(' '+w+' ')>=0||kl.indexOf(w)>=0)s+=2;}
+    if(s>bs){bs=s;best=e;}
+  }
+  if(best&&bs>0)addMsg('<b>'+best.q+'</b><div style="margin-top:4px">'+best.a+'</div><div class="au ur">'+best.au+'</div>','bot');
+  else addMsg('I couldn\'t find a matching answer. <span class="ur">کوئی مناسب جواب نہیں ملا۔</span><br>Please rephrase, or consult a qualified scholar for detailed rulings.','bot');
+}
+function chatInit(){
+  addMsg('🤖 <b>Assalamu alaikum!</b> I am the Rah-e-Noor Q&amp;A helper (works offline). Ask any everyday Islamic question — answers follow <b>Hanafi fiqh</b>.<div class="au ur">میں آپ کا اسلامی سوال جواب مددگار ہوں۔ جوابات حنفی مسلک کے مطابق ہیں۔</div><div class="note">⚠️ I am an AI helper, not a mufti. For fatwa or personal cases, consult a qualified scholar. <span class="ur">فتویٰ کے لیے مستند مفتی سے رجوع کریں۔</span></div>','bot');
+  const chips=['How do I perform wudu?','How many rakats are Taraweeh?','What is Witr prayer?','What is the kaffara for deliberately breaking a fast?','What is Dua-e-Qunoot?'];
+  $('chatChips').innerHTML=chips.map(c=>'<button class="chip">'+c+'</button>').join('');
+  $('chatChips').querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{addMsg(ch.textContent.replace(/</g,'&lt;'),'user');botAnswer(ch.textContent);});
+  const send=()=>{const v=$('chatInput').value.trim();if(!v)return;addMsg(v.replace(/</g,'&lt;'),'user');$('chatInput').value='';botAnswer(v);};
+  $('chatSend').onclick=send;
+  $('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
+}
+chatInit();
+
+/* ================= Islamic Library ================= */
+const BOOKS=[
+{t:'Sahih al-Bukhari',au:'Imam Muhammad al-Bukhari',c:'Hadith',d:'The most authentic hadith collection, compiled over sixteen years of travel and research.'},
+{t:'Sahih Muslim',au:'Imam Muslim ibn al-Hajjaj',c:'Hadith',d:'The second most authentic hadith collection, famed for its rigorous verification standards.'},
+{t:'Riyad-us-Saliheen',au:'Imam Yahya al-Nawawi',c:'Ethics',d:'Beloved hadith collection on worship, morals, and everyday Muslim life.'},
+{t:'Hisn-ul-Muslim',au:"Sa'id al-Qahtani",c:'Duas',d:'Fortress of the Muslim — authentic daily duas and supplications for every occasion.'},
+{t:'Tafheem-ul-Quran',au:'Syed Abul Ala Maududi',c:'Tafsir',d:'Six-volume Urdu commentary explaining the Quran as practical guidance for life.'},
+{t:'Bahar-e-Shariat',au:'Mufti Amjad Ali Aazmi',c:'Fiqh',d:'Comprehensive Hanafi fiqh encyclopedia in Urdu, widely referenced by scholars.'},
+{t:'Faizan-e-Sunnat',au:'Dawat-e-Islami',c:'Sunnah',d:'Practical guide to living by the Sunnah in daily life, published by Dawat-e-Islami.'},
+{t:'Seerat-un-Nabi',au:'Shibli Nomani & S. Sulaiman Nadvi',c:'Seerah',d:'Classic Urdu biography of the Prophet Muhammad ﷺ, rich in history and lessons.'},
+{t:'Tafsir Ibn Kathir',au:'Imam Ibn Kathir',c:'Tafsir',d:'Renowned classical Quran commentary grounded in hadith and early narrations.'},
+{t:'Bulugh al-Maram',au:'Ibn Hajar al-Asqalani',c:'Fiqh',d:'Concise hadith collection covering the rulings of Islamic jurisprudence.'}
+];
+function renderLib(q=''){q=q.toLowerCase();
+  const list=BOOKS.filter(b=>(b.t+b.au+b.c+b.d).toLowerCase().includes(q));
+  $('libList').innerHTML=list.length?list.map(b=>
+    `<div class="book"><div class="t">${b.t}</div><div class="au">${b.au}</div>
+     <div class="d">${b.d}</div><span class="tag">${b.c}</span></div>`).join('')
+    :'<div class="note">No books found. <span class="ur">کوئی کتاب نہیں ملی۔</span></div>';
+}
+renderLib();
+$('libSearch').oninput=e=>renderLib(e.target.value);
+
+/* ================= Namaz Guides (Hanafi) ================= */
+const GUIDES=[
+{t:'Prayer Method',u:'نماز کا طریقہ',steps:[
+{t:'Niyyah (Intention)',u:'نیت',d:'Stand facing the Qibla and make intention in your heart, e.g. "I intend to pray 2 rakats Fard of Fajr for Allah."',du:'قبلہ رخ کھڑے ہو کر دل میں نیت کریں، مثلاً: "میں اللہ تعالیٰ کے لیے فجر کے دو فرض پڑھنے کی نیت کرتا ہوں۔"'},
+{t:'Takbeer-e-Tahrima',u:'تکبیر تحریمہ',d:'Raise both hands to the ears, thumbs touching the earlobes, then say:',du:'دونوں ہاتھ کانوں تک اٹھائیں، انگوٹھے کانوں کی لو سے لگائیں، پھر کہیں:',ar:'اللَّهُ أَكْبَرُ',tr:'Allahu Akbar — Allah is Greatest.'},
+{t:'Qiyam',u:'قیام',d:'Fold your hands below the navel — right hand over left (Hanafi method) — and stand with dignity.',du:'ناف کے نیچے ہاتھ باندھیں — دایاں ہاتھ بائیں ہاتھ پر (حنفی طریقہ) — باوقار کھڑے رہیں۔'},
+{t:'Sana',u:'ثناء',d:'Recite:',du:'پڑھیں:',ar:'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلَهَ غَيْرُكَ',tr:'Subhanakallahumma wa bihamdika, wa tabarakasmuka, wa ta\u2019ala jadduka, wa la ilaha ghayruk.'},
+{t:'Ta\u2019awwuz',u:'تعوذ',d:'Recite:',du:'پڑھیں:',ar:'أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ',tr:'A\u2019udhu billahi minash-shaytanir-rajeem — I seek refuge in Allah from Satan, the rejected.'},
+{t:'Tasmiyah',u:'تسمیہ',d:'Recite:',du:'پڑھیں:',ar:'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',tr:'Bismillahir-Rahmanir-Raheem — In the name of Allah, the Most Merciful, the Most Compassionate.'},
+{t:'Surah Al-Fatiha',u:'سورۃ الفاتحہ',d:'Recite Surah Al-Fatiha in every rakat:',du:'ہر رکعت میں سورۃ الفاتحہ پڑھیں:',ar:'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ ﴿١﴾ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾ الرَّحْمَنِ الرَّحِيمِ ﴿٣﴾ مَالِكِ يَوْمِ الدِّينِ ﴿٤﴾ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ﴿٥﴾ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ﴿٦﴾ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ﴿٧﴾',tr:'All praise is for Allah, Lord of the worlds… (complete Surah Al-Fatiha)'},
+{t:'Qirat',u:'قراءت',d:'In the first two rakats, recite a short surah after Al-Fatiha, e.g. Surah Al-Ikhlas:',du:'پہلی دو رکعتوں میں الفاتحہ کے بعد کوئی چھوٹی سورت پڑھیں، مثلاً سورۃ الاخلاص:',ar:'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ قُلْ هُوَ اللَّهُ أَحَدٌ ﴿١﴾ اللَّهُ الصَّمَدُ ﴿٢﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾ وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ ﴿٤﴾',tr:'Say: He is Allah, the One… (Surah Al-Ikhlas)'},
+{t:'Ruku',u:'رکوع',d:'Bow with a straight back and hands on the knees, and recite at least 3 times:',du:'کمر سیدھی رکھ کر رکوع کریں، ہاتھ گھٹنوں پر، اور کم از کم 3 بار پڑھیں:',ar:'سُبْحَانَ رَبِّيَ الْعَظِيمِ',tr:'Subhana Rabbiyal-Azeem — Glory be to my Lord, the Magnificent.'},
+{t:'Qauma',u:'قومہ',d:'Rise straight and say:',du:'سیدھے کھڑے ہو کر کہیں:',ar:'سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ، رَبَّنَا لَكَ الْحَمْدُ',tr:'Sami\u2019allahu liman hamidah, Rabbana lakal-hamd — Allah hears the one who praises Him.'},
+{t:'Sajdah',u:'سجدہ',d:'Prostrate with forehead, nose, both hands, knees and toes on the ground, and recite at least 3 times:',du:'پیشانی، ناک، دونوں ہاتھ، گھٹنے اور پاؤں کی انگلیاں زمین پر رکھ کر سجدہ کریں اور کم از کم 3 بار پڑھیں:',ar:'سُبْحَانَ رَبِّيَ الْأَعْلَى',tr:'Subhana Rabbiyal-A\u2019la — Glory be to my Lord, the Most High.'},
+{t:'Jalsa',u:'جلسہ',d:'Sit upright between the two sajdahs. You may recite:',du:'دونوں سجدوں کے درمیان اطمینان سے بیٹھیں۔ پڑھ سکتے ہیں:',ar:'رَبِّ اغْفِرْ لِي',tr:'Rabbi-ghfir li — My Lord, forgive me.'},
+{t:'Second Sajdah',u:'دوسرا سجدہ',d:'Perform the second sajdah exactly like the first, then rise for the next rakat.',du:'پہلے سجدے کی طرح دوسرا سجدہ کریں، پھر اگلی رکعت کے لیے کھڑے ہوں۔'},
+{t:'Qada-e-Ula (Attahiyyat)',u:'قعدہ اولیٰ',d:'After every 2 rakats, sit and recite:',du:'ہر دو رکعت کے بعد بیٹھ کر پڑھیں:',ar:'التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ',tr:'All greetings, prayers and pure words are for Allah… (Attahiyyat)'},
+{t:'Durood-e-Ibrahim',u:'درود ابراہیمی',d:'In the final sitting, recite:',du:'آخری قعدے میں پڑھیں:',ar:'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ',tr:'O Allah, bless Muhammad and his family as You blessed Ibrahim… (Durood-e-Ibrahim)'},
+{t:'Dua',u:'دعا',d:'Make dua, e.g.:',du:'دعا مانگیں، مثلاً:',ar:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',tr:'Rabbana atina fid-dunya hasanah… (2:201)'},
+{t:'Salam',u:'سلام',d:'Turn your head to the right, then to the left, saying each time:',du:'دائیں طرف پھر بائیں طرف منہ پھیر کر ہر بار کہیں:',ar:'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ',tr:'Assalamu alaikum wa rahmatullah — Peace and Allah\u2019s mercy be upon you.'}
+]},
+{t:'Wudu Method',u:'وضو کا طریقہ',steps:[
+{t:'Niyyah & Bismillah',u:'نیت اور بسم اللہ',d:'Make intention for wudu and say:',du:'وضو کی نیت کریں اور کہیں:',ar:'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',tr:'Bismillahir-Rahmanir-Raheem.'},
+{t:'Wash Hands',u:'ہاتھ دھونا',d:'Wash both hands up to the wrists 3 times, rubbing between the fingers.',du:'دونوں ہاتھ کلائیوں تک 3 بار دھوئیں، انگلیوں کے درمیان خلال کریں۔'},
+{t:'Miswak',u:'مسواک',d:'Clean the teeth with a miswak — an emphasized sunnah.',du:'مسواک سے دانت صاف کریں — سنت مؤکدہ ہے۔'},
+{t:'Rinse Mouth',u:'کلی',d:'Rinse the mouth thoroughly 3 times.',du:'3 بار اچھی طرح کلی کریں۔'},
+{t:'Nose',u:'ناک',d:'Sniff water into the nose 3 times and clean it with the left hand.',du:'3 بار ناک میں پانی چڑھائیں اور بائیں ہاتھ سے ناک صاف کریں۔'},
+{t:'Face',u:'چہرہ',d:'Wash the entire face 3 times — from the hairline to the chin, ear to ear.',du:'پورا چہرہ 3 بار دھوئیں — پیشانی کے بالوں سے ٹھوڑی تک، ایک کان سے دوسرے کان تک۔'},
+{t:'Arms',u:'بازو',d:'Wash both arms up to and including the elbows 3 times — right arm first.',du:'دونوں بازو کہنیوں سمیت 3 بار دھوئیں — پہلے دایاں بازو۔'},
+{t:'Masah',u:'مسح',d:'With wet hands, wipe the whole head once, then inside and outside of the ears, then the back of the neck (not the throat).',du:'گلے ہاتھوں سے ایک بار پورے سر کا مسح کریں، پھر کانوں کے اندر باہر، پھر گردن کے پچھلے حصے کا (حلق کا نہیں)۔'},
+{t:'Feet',u:'پاؤں',d:'Wash both feet up to the ankles 3 times — right foot first, rubbing between the toes.',du:'دونوں پاؤں ٹخنوں تک 3 بار دھوئیں — پہلے دایاں پاؤں، انگلیوں کے درمیان خلال کریں۔'}
+]},
+{t:'Janaza Method',u:'نماز جنازہ',note:'⚠️ Janaza has no ruku or sujood. It is Fard Kifayah — if some Muslims perform it, the obligation is lifted from all. <span class="ur">نماز جنازہ میں رکوع سجدہ نہیں۔ یہ فرض کفایہ ہے۔</span>',steps:[
+{t:'First Takbeer + Sana',u:'پہلی تکبیر اور ثنا',d:'After the first takbeer, recite Sana with the extra praise:',du:'پہلی تکبیر کے بعد ثنا پڑھیں، اس اضافے کے ساتھ:',ar:'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَجَلَّ ثَنَاؤُكَ وَلَا إِلَهَ غَيْرُكَ',tr:'Subhanakallahumma… wa jalla thana\u2019uka…'},
+{t:'Second Takbeer + Durood',u:'دوسری تکبیر اور درود',d:'After the second takbeer, recite Durood-e-Ibrahim (the same as in prayer).',du:'دوسری تکبیر کے بعد درود ابراہیمی پڑھیں (نماز والا)۔'},
+{t:'Third Takbeer + Dua',u:'تیسری تکبیر اور دعا',d:'After the third takbeer, make dua for the deceased:',du:'تیسری تکبیر کے بعد میت کے لیے دعا کریں:',ar:'اللَّهُمَّ اغْفِرْ لِحَيِّنَا وَمَيِّتِنَا وَشَاهِدِنَا وَغَائِبِنَا وَصَغِيرِنَا وَكَبِيرِنَا وَذَكَرِنَا وَأُنْثَانَا، اللَّهُمَّ مَنْ أَحْيَيْتَهُ مِنَّا فَأَحْيِهِ عَلَى الْإِسْلَامِ وَمَنْ تَوَفَّيْتَهُ مِنَّا فَتَوَفَّهُ عَلَى الْإِيمَانِ',tr:'O Allah, forgive our living and our dead, our present and our absent…'},
+{t:'Fourth Takbeer',u:'چوتھی تکبیر',d:'Say the fourth takbeer, pause briefly, then end the prayer.',du:'چوتھی تکبیر کہیں، تھوڑا توقف کریں، پھر نماز ختم کریں۔'},
+{t:'Salam',u:'سلام',d:'Turn the head right and left with Salam, as in normal prayer.',du:'عام نماز کی طرح دائیں بائیں سلام پھیریں۔'}
+]}
+];
+function renderGuides(){
+  $('guides').innerHTML=GUIDES.map((g,gi)=>
+   '<div class="guide"><div class="gh"><span>'+g.t+' <span class="ur" style="font-weight:400;font-size:.85em">'+g.u+'</span></span><span class="arrow">▶</span></div>'+
+   '<div class="gb">'+(g.note?'<div class="maslak">'+g.note+'</div>':'')+g.steps.map((s,i)=>
+    '<div class="step"><span class="sn">'+(i+1)+'</span><span class="st">'+s.t+'</span> <span class="ur" style="font-size:.85em">'+s.u+'</span>'+
+    '<div class="sd">'+s.d+'</div><div class="sdu ur">'+s.du+'</div>'+
+    (s.ar?'<div class="ar">'+s.ar+'</div><div class="tr" style="font-style:italic;color:var(--muted);margin:3px 0">'+s.tr+'</div>':'')+'</div>').join('')+'</div></div>').join('');
+  document.querySelectorAll('#guides .gh').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open'));
+}
+renderGuides();
+
+/* ================= Daily Adhkar ================= */
+const ADH_M=[
+{t:'Ayat-ul-Kursi',c:'1x',ar:'اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ',tr:'Allahu la ilaha illa huwal-hayyul-qayyum… (2:255)',en:'Whoever recites it in the morning is protected till the evening.'},
+{t:'Surah Ikhlas, Falaq & Nas',c:'3x each',ar:'قُلْ هُوَ اللَّهُ أَحَدٌ … قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ … قُلْ أَعُوذُ بِرَبِّ النَّاسِ',tr:'Qul huwallahu ahad… Qul a\u2019udhu birabbil-falaq… Qul a\u2019udhu birabbin-nas…',en:'The three Quls — sufficient protection for the day.'},
+{t:'Morning Protection Dua',c:'3x',ar:'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',tr:'Bismillahilladhi la yadurru ma\u2019asmihi shay\u2019un…',en:'In Allah\u2019s name, with Whose name nothing on earth or heaven harms.'},
+{t:'Pleasure with Allah',c:'3x',ar:'رَضِيتُ بِاللَّهِ رَبًّا وَبِالْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا',tr:'Raditu billahi rabban, wa bil-islami dinan…',en:'I am pleased with Allah as Lord, Islam as religion, Muhammad ﷺ as Prophet.'},
+{t:'Morning Entrustment',c:'1x',ar:'اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ',tr:'Allahumma bika asbahna, wa bika amsayna…',en:'O Allah, by You we enter the morning and evening; to You is the resurrection.'},
+{t:'Sayyid-ul-Istighfar',c:'1x',ar:'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ خَلَقْتَنِي وَأَنَا عَبْدُكَ وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',tr:'Allahumma anta rabbi, la ilaha illa anta…',en:'The master of forgiveness — whoever says it in the morning with certainty and dies that day enters Paradise.'}
+];
+const ADH_E=[
+{t:'Ayat-ul-Kursi',c:'1x',ar:'اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ … وَهُوَ الْعَلِيُّ الْعَظِيمُ',tr:'Allahu la ilaha illa huwal-hayyul-qayyum… (2:255)',en:'Whoever recites it in the evening is protected till the morning.'},
+{t:'Evening Entrustment',c:'1x',ar:'اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ',tr:'Allahumma bika amsayna, wa bika asbahna…',en:'O Allah, by You we enter the evening and morning; to You is the return.'},
+{t:'Refuge in Allah\u2019s Words',c:'3x',ar:'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',tr:'A\u2019udhu bikalimatillah\u2019it-tammati min sharri ma khalaq.',en:'I seek refuge in Allah\u2019s perfect words from the evil of what He created.'},
+{t:'Sufficiency',c:'7x',ar:'حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ',tr:'Hasbiyallahu la ilaha illa huwa…',en:'Allah is sufficient for me — whoever says it 7x morning & evening, Allah suffices him.'},
+{t:'Protection from Hellfire',c:'7x',ar:'اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ',tr:'Allahumma ajirni minan-nar.',en:'O Allah, protect me from the Fire. (after Maghrib)'},
+{t:'Glorification',c:'100x',ar:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',tr:'SubhanAllahi wa bihamdihi.',en:'Glory be to Allah and praise Him — sins forgiven though like sea foam.'}
+];
+function adhkarHTML(list){return list.map(x=>'<div class="adhkar"><b>'+x.t+'</b> <span class="cnt">'+x.c+'</span><div class="ar">'+x.ar+'</div><div class="tr">'+x.tr+'</div><div style="font-size:.9em">'+x.en+'</div></div>').join('');}
+$('adhkarMorning').innerHTML=adhkarHTML(ADH_M);
+$('adhkarEvening').innerHTML=adhkarHTML(ADH_E);
+document.querySelectorAll('#pg-more .qa .q').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open'));
+
+/* ================= Extra Duas (toward 25) ================= */
+const DUAS2=[
+{t:'Dua-e-Qunoot',c:'Witr',ar:'اللَّهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنُؤْمِنُ بِكَ وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ وَنَشْكُرُكَ وَلَا نَكْفُرُكَ وَنَخْلَعُ وَنَتْرُكُ مَنْ يَفْجُرُكَ، اللَّهُمَّ إِيَّاكَ نَعْبُدُ وَلَكَ نُصَلِّي وَنَسْجُدُ وَإِلَيْكَ نَسْعَى وَنَحْفِدُ وَنَرْجُو رَحْمَتَكَ وَنَخْشَى عَذَابَكَ إِنَّ عَذَابَكَ بِالْكُفَّارِ مُلْحِقٌ',tr:'Allahumma inna nasta\u2019inuka wa nastaghfiruka…',en:'Recited in the final rakat of Witr (Hanafi method).'},
+{t:'Rabbana Zalamna',c:'Quranic',ar:'رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ',tr:'Rabbana zalamna anfusana…',en:'Our Lord, we wronged ourselves; if You do not forgive us and have mercy, we will be losers. (7:23)'},
+{t:'Rabbana Hablana',c:'Quranic',ar:'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا',tr:'Rabbana hablana min azwajina…',en:'Our Lord, grant us comfort in our spouses and offspring, and make us leaders of the righteous. (25:74)'},
+{t:'Protection from Hellfire',c:'Morning',ar:'اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ',tr:'Allahumma ajirni minan-nar.',en:'O Allah, protect me from the Fire. (7x after Fajr & Maghrib)'},
+{t:'Travel Dua',c:'Travel',ar:'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ',tr:'Subhanalladhi sakhkhara lana hadha…',en:'Glory to Him who subjected this for us… and to our Lord we shall return. (43:13-14)'},
+{t:'Entering Masjid',c:'Masjid',ar:'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',tr:'Allahummaftah li abwaba rahmatik.',en:'O Allah, open for me the doors of Your mercy.'},
+{t:'After Adhan',c:'Adhan',ar:'اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ وَالصَّلَاةِ الْقَائِمَةِ آتِ مُحَمَّدًا الْوَسِيلَةَ وَالْفَضِيلَةَ وَابْعَثْهُ مَقَامًا مَحْمُودًا الَّذِي وَعَدْتَهُ',tr:'Allahumma rabba hadhihid-da\u2019watit-tammah…',en:'O Allah, Lord of this perfect call… grant Muhammad the Wasilah and raise him to the praised station.'},
+{t:'Between Sajdahs',c:'Prayer',ar:'رَبِّ اغْفِرْ لِي رَبِّ اغْفِرْ لِي',tr:'Rabbi-ghfir li, Rabbi-ghfir li.',en:'My Lord, forgive me, my Lord, forgive me. (recited in Jalsa)'},
+{t:'Relief from Anxiety',c:'Hardship',ar:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ وَالْعَجْزِ وَالْكَسَلِ وَالْبُخْلِ وَالْجُبْنِ وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ',tr:'Allahumma inni a\u2019udhu bika minal-hammi wal-hazan…',en:'O Allah, I seek refuge in You from anxiety, grief, inability, laziness, miserliness, cowardice, debt and overpowering men.'},
+{t:'Morning Protection',c:'Morning',ar:'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',tr:'Bismillahilladhi la yadurru ma\u2019asmihi shay\u2019un…',en:'In Allah\u2019s name, with Whose name nothing on earth or heaven harms. (3x morning & evening)'}
+];
+DUAS.push(...DUAS2);
+renderDuas();
+
+/* ================= Dark mode & Nav ================= */
+function applyDark(d){document.body.classList.toggle('dark',d);$('darkBtn').textContent=d?'☀️':'🌙';store.set('dark',d);}
+applyDark(store.get('dark',false));
+$('darkBtn').onclick=()=>applyDark(!document.body.classList.contains('dark'));
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $(b.dataset.pg).classList.add('active');window.scrollTo(0,0);});
+
+/* ================= Reader Overlay ================= */
+function openOv(){$('readerOv').classList.add('open');document.body.style.overflow='hidden';}
+function closeOv(){$('readerOv').classList.remove('open');document.body.style.overflow='';}
+function rdrTitle(h){$('rdrTitle').innerHTML=h;}
+function rdrBody(h){$('rdrBody').innerHTML=h;$('rdrBody').scrollTop=0;}
+$('rdrBack').onclick=closeOv;
+
+/* ---- Quran reader (live API) ---- */
+let surahListCache=null; const surahCache={};
+async function openQuran(){
+  rdrTitle('📖 Holy Quran • <span class="ur">قرآن کریم</span>');
+  rdrBody('<input type="text" id="surahSearch" placeholder="Search surah… / تلاش کریں"><div id="surahList"><div class="note">Loading surahs…</div></div>');
+  openOv();
+  if(!surahListCache){
+    try{
+      const r=await fetch('https://api.alquran.cloud/v1/surah');
+      if(!r.ok) throw 0;
+      surahListCache=(await r.json()).data;
+    }catch(e){
+      $('surahList').innerHTML='<div class="note">Internet darkar hai. <span class="ur">سورۃ کی فہرست کے لیے انٹرنیٹ درکار ہے۔</span></div>';
+      return;
+    }
+  }
+  renderSurahList('');
+  $('surahSearch').oninput=e=>renderSurahList(e.target.value);
+}
+function renderSurahList(q){
+  q=q.toLowerCase();
+  const list=(surahListCache||[]).filter(s=>(s.englishName+' '+s.englishNameTranslation+' '+s.number).toLowerCase().includes(q));
+  $('surahList').innerHTML=list.length?list.map(s=>
+    '<div class="surah" data-s="'+s.number+'"><div class="num">'+s.number+'</div><div><div class="nm">'+s.englishName+'</div>'+
+    '<div class="mt">'+s.englishNameTranslation+' • '+s.numberOfAyahs+' ayat • '+s.revelationType+'</div></div>'+
+    '<div class="an ar">'+s.name+'</div></div>').join('')
+    :'<div class="note">No surah found. <span class="ur">کوئی سورت نہیں ملی۔</span></div>';
+  document.querySelectorAll('#surahList .surah').forEach(el=>el.onclick=()=>openSurah(+el.dataset.s));
+}
+async function openSurah(n){
+  rdrTitle('📖 Surah '+n);
+  if(surahCache[n]){renderSurah(surahCache[n]);return;}
+  rdrBody('<div class="note">Loading…</div>');
+  try{
+    const r=await fetch('https://api.alquran.cloud/v1/surah/'+n);
+    if(!r.ok) throw 0;
+    surahCache[n]=(await r.json()).data;
+    renderSurah(surahCache[n]);
+  }catch(e){
+    rdrBody('<div class="note">Internet darkar hai. <span class="ur">سورت پڑھنے کے لیے انٹرنیٹ درکار ہے۔</span></div>');
+  }
+}
+function renderSurah(d){
+  rdrTitle('📖 '+d.englishName+' <span class="ar" style="font-size:.9em">'+d.name+'</span>');
+  let h='';
+  h+='<div class="note" style="text-align:center">'+d.englishNameTranslation+' • '+d.numberOfAyahs+' Ayat • '+d.revelationType+'</div>';
+  h+=d.ayahs.map(a=>'<div class="ayah"><span class="ar">'+a.text+'</span><span class="an">'+a.numberInSurah+'</span></div>').join('');
+  rdrBody(h);
+}
+
+/* ---- Hadith book readers ---- */
+const HBOOKS={
+bukhari:{t:'Sahih al-Bukhari',u:'صحیح بخاری',au:'Imam Muhammad al-Bukhari (810–870 CE)',count:'7,563 Ahadith',
+ desc:'Compiled over sixteen years of travel and research, selected from more than 600,000 narrations. The most authentic book after the Holy Quran. <span class="ur">قرآن کریم کے بعد سب سے مستند کتاب۔</span>',
+ hadith:[
+  {ar:'إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى',en:'Actions are but by intentions, and every person shall have only what they intended.',ur:'اعمال کا دارومدار نیتوں پر ہے، اور ہر شخص کو وہی ملے گا جس کی اس نے نیت کی۔'},
+  {ar:'مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ',en:'Whoever believes in Allah and the Last Day should speak good or remain silent.',ur:'جو اللہ اور آخرت کے دن پر ایمان رکھتا ہے، اسے چاہیے کہ اچھی بات کہے یا خاموش رہے۔'},
+  {ar:'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ',en:'The best of you are those who learn the Quran and teach it.',ur:'تم میں سے بہترین وہ ہے جو قرآن سیکھے اور سکھائے۔'},
+  {ar:'إِنَّ اللَّهَ رَفِيقٌ يُحِبُّ الرِّفْقَ فِي الْأَمْرِ كُلِّهِ',en:'Allah is Gentle and loves gentleness in all matters.',ur:'بے شک اللہ نرم ہے اور ہر معاملے میں نرمی کو پسند کرتا ہے۔'}
+ ]},
+muslim:{t:'Sahih Muslim',u:'صحیح مسلم',au:'Imam Muslim ibn al-Hajjaj (815–875 CE)',count:'7,470 Ahadith',
+ desc:'Compiled by a devoted student of Imam Bukhari. Famous for strict verification standards and clear thematic arrangement. <span class="ur">سخت تحقیق اور بہترین ترتیب کے لیے مشہور۔</span>',
+ hadith:[
+  {ar:'لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ',en:'None of you truly believes until he loves for his brother what he loves for himself.',ur:'تم میں سے کوئی مومن نہیں ہو سکتا جب تک اپنے بھائی کے لیے وہی پسند نہ کرے جو اپنے لیے پسند کرتا ہے۔'},
+  {ar:'الطُّهُورُ شَطْرُ الْإِيمَانِ',en:'Purity is half of faith.',ur:'طہارت آدھا ایمان ہے۔'},
+  {ar:'لَيْسَ الشَّدِيدُ بِالصُّرَعَةِ إِنَّمَا الشَّدِيدُ الَّذِي يَمْلِكُ نَفْسَهُ عِنْدَ الْغَضَبِ',en:'The strong is not the one who overcomes people by wrestling; the strong is the one who controls himself in anger.',ur:'اصل طاقتور وہ نہیں جو کشتی میں غالب آئے، بلکہ وہ ہے جو غصے کے وقت اپنے نفس پر قابو رکھے۔'},
+  {ar:'مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ',en:'Whoever fasts Ramadan out of faith and hope for reward, his previous sins are forgiven.',ur:'جو رمضان کے روزے ایمان اور ثواب کی نیت سے رکھے، اس کے پچھلے گناہ معاف کر دیے جاتے ہیں۔'}
+ ]},
+abudawud:{t:'Sunan Abu Dawud',u:'سنن ابی داؤد',au:'Imam Abu Dawud as-Sijistani (817–889 CE)',count:'5,274 Ahadith',
+ desc:'Focused on hadith related to fiqh rulings and everyday practice. A key source for Hanafi jurisprudence. <span class="ur">فقہی احکام اور روزمرہ عمل پر مبنی احادیث کا مجموعہ۔</span>',
+ hadith:[
+  {ar:'إِنَّ مِنْ خِيَارِكُمْ أَحَاسِنَكُمْ أَخْلَاقًا',en:'The best among you are those with the best character.',ur:'تم میں سے بہترین وہ ہیں جن کے اخلاق سب سے اچھے ہیں۔'},
+  {ar:'مَنْ صَلَّى الْبَرْدَيْنِ دَخَلَ الْجَنَّةَ',en:'Whoever prays the two cool prayers (Fajr and Asr) will enter Paradise.',ur:'جو فجر اور عصر کی نماز پڑھے گا وہ جنت میں داخل ہوگا۔'},
+  {ar:'إِنَّ أَحَبَّ الْأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ',en:'The most beloved deeds to Allah are the most consistent, even if small.',ur:'اللہ کو سب سے پیارے اعمال وہ ہیں جو پابندی سے کیے جائیں، چاہے تھوڑے ہوں۔'},
+  {ar:'مَا مِنْ شَيْءٍ أَثْقَلُ فِي الْمِيزَانِ مِنْ حُسْنِ الْخُلُقِ',en:'Nothing is heavier on the Scale than good character.',ur:'میزان میں حسنِ اخلاق سے بھاری کوئی چیز نہیں۔'}
+ ]}
+};
+function openHadithBook(k){
+  const b=HBOOKS[k];
+  rdrTitle('📜 '+b.t+' <span class="ur" style="font-size:.85em">'+b.u+'</span>');
+  rdrBody('<div class="note">'+b.au+' • '+b.count+'</div>'+
+    '<div class="maslak" style="margin-top:8px">'+b.desc+'</div>'+
+    '<div class="label" style="margin-top:10px">Famous Ahadith • <span class="ur">مشہور احادیث</span></div>'+
+    b.hadith.map(h=>'<div class="hadith"><div class="ar">'+h.ar+'</div><div class="en">'+h.en+'</div><div class="uh ur">'+h.ur+'</div></div>').join(''));
+  openOv();
+}
+document.querySelectorAll('[data-book]').forEach(el=>el.onclick=()=>{
+  const k=el.dataset.book;
+  if(k==='quran') openQuran(); else openHadithBook(k);
+});
+</script>
+</body>
+</html>
