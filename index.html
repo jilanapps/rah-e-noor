@@ -386,20 +386,25 @@ function tick(){
   const now=new Date();
   $('clock').textContent=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   $('gregDate').textContent=now.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  try{$('hijriDate').textContent=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(now);}
-  catch(e){$('hijriDate').textContent='';}
+  try{
+    const parts=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'}).formatToParts(now);
+    const gp=n=>{const p=parts.find(x=>x.type===n);return p?p.value:'';};
+    const months=['','Muharram','Safar','Rabi-ul-Awwal','Rabi-ul-Aakhir','Jumada-ul-Ula','Jumada-ul-Ukhra','Rajab','Shaban','Ramadan','Shawwal','Zil-Qadah','Zil-Hajj'];
+    const mi=parseInt(gp('month'),10);
+    $('hijriDate').textContent=gp('day')+' '+(months[mi]||'')+' '+gp('year').replace(/[^0-9]/g,'')+' AH';
+  }catch(e){$('hijriDate').textContent='';}
 }
 tick(); setInterval(tick,1000);
 
 /* ================= Prayer Times ================= */
-const FALLBACK={Fajr:'05:00',Sunrise:'06:25',Dhuhr:'12:05',Asr:'15:45',Maghrib:'17:50',Isha:'19:20'};
+const FALLBACK={Fajr:'04:52',Sunrise:'06:10',Dhuhr:'12:00',Asr:'16:11',Maghrib:'17:50',Isha:'19:08'};
 let PT=FALLBACK, ptOK=false;
 const ORDER=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
 function clean(t){return String(t).replace(/[^0-9:]/g,'').slice(0,5);}
 function toDate(hm){const[a,b]=hm.split(':').map(Number);const d=new Date();d.setHours(a,b,0,0);return d;}
 async function loadPrayers(){
   try{
-    const r=await fetch('https://api.aladhan.com/v1/timingsByCity?city=Lahore&country=Pakistan&method=1');
+    const r=await fetch('https://api.aladhan.com/v1/timingsByCity?city=Lahore&country=Pakistan&method=1&school=1');
     const j=await r.json(); const t=j.data.data.timings;
     PT={Fajr:clean(t.Fajr),Sunrise:clean(t.Sunrise),Dhuhr:clean(t.Dhuhr),Asr:clean(t.Asr),Maghrib:clean(t.Maghrib),Isha:clean(t.Isha)};
     ptOK=true; $('prayerSrc').textContent='Live times via Aladhan • Lahore';
