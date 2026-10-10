@@ -789,21 +789,27 @@ function renderSurahList(q){
 async function openSurah(n){
   rdrTitle('📖 Surah '+n);
   if(surahCache[n]){renderSurah(surahCache[n]);return;}
-  rdrBody('<div class="note">Loading…</div>');
+  rdrBody('<div class="note">Loading… <span class="ur">لوڈ ہو رہا ہے…</span></div>');
   try{
-    const r=await fetch('https://api.alquran.cloud/v1/surah/'+n);
-    if(!r.ok) throw 0;
-    surahCache[n]=(await r.json()).data;
+    const[ra,ru]=await Promise.all([
+      fetch('https://api.alquran.cloud/v1/surah/'+n+'/quran-uthmani'),
+      fetch('https://api.alquran.cloud/v1/surah/'+n+'/ur.kanzuliman')
+    ]);
+    if(!ra.ok||!ru.ok) throw 0;
+    const da=(await ra.json()).data, du=(await ru.json()).data;
+    surahCache[n]={meta:da,ayahs:da.ayahs.map((a,i)=>({ar:a.text,ur:(du.ayahs[i]||{}).text||'',n:a.numberInSurah}))};
     renderSurah(surahCache[n]);
   }catch(e){
     rdrBody('<div class="note">Internet darkar hai. <span class="ur">سورت پڑھنے کے لیے انٹرنیٹ درکار ہے۔</span></div>');
   }
 }
 function renderSurah(d){
-  rdrTitle('📖 '+d.englishName+' <span class="ar" style="font-size:.9em">'+d.name+'</span>');
+  const m=d.meta;
+  rdrTitle('📖 '+m.englishName+' <span class="ar" style="font-size:.9em">'+m.name+'</span>');
   let h='';
-  h+='<div class="note" style="text-align:center">'+d.englishNameTranslation+' • '+d.numberOfAyahs+' Ayat • '+d.revelationType+'</div>';
-  h+=d.ayahs.map(a=>'<div class="ayah"><span class="ar">'+a.text+'</span><span class="an">'+a.numberInSurah+'</span></div>').join('');
+  h+='<div class="note" style="text-align:center">'+m.englishNameTranslation+' • '+m.numberOfAyahs+' Ayat • '+m.revelationType+'</div>';
+  h+='<div class="note" style="text-align:center;color:var(--gold)">Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span></div>';
+  h+=d.ayahs.map(a=>'<div class="ayah"><span class="ar">'+a.ar+'</span><span class="an">'+a.n+'</span><div class="ur" style="margin-top:6px;line-height:2">'+a.ur+'</div></div>').join('');
   rdrBody(h);
 }
 
