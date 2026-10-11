@@ -226,6 +226,45 @@ body.dark .kalima .kn{color:var(--gold);}
 .ttable tr.today td{background:var(--gold-soft); font-weight:700;}
 /* Ramadan */
 .ramadan-day{display:flex; align-items:center; gap:10px; padding:8px 2px; border-bottom:1px solid var(--border);}
+/* ============ Islamic Books Library ============ */
+.book-card{display:flex; gap:14px; align-items:flex-start; background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:12px; margin-top:10px;}
+.book-cover{flex:0 0 104px; width:104px; height:150px; border-radius:8px; background:linear-gradient(160deg,var(--green-deep),var(--green) 60%,#0a4a33); border:2px solid var(--gold); box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:8px 6px; color:#fff; position:relative; overflow:hidden;}
+.book-cover::before{content:""; position:absolute; inset:6px; border:1px solid rgba(212,175,55,.55); border-radius:5px; pointer-events:none;}
+.book-cover .bc-orn{font-size:1.3em; color:var(--gold); margin-bottom:4px;}
+.book-cover .bc-title{font-size:.72em; font-weight:700; line-height:1.7; color:#ffe9a8;}
+.book-cover .bc-author{font-size:.58em; margin-top:6px; opacity:.9; line-height:1.5;}
+.book-cover.lg{flex:0 0 150px; width:150px; height:216px;}
+.book-cover.lg .bc-orn{font-size:1.8em;}
+.book-cover.lg .bc-title{font-size:.95em;}
+.book-cover.lg .bc-author{font-size:.72em;}
+.book-info{flex:1; min-width:0;}
+.book-info h4{margin:0 0 4px; font-size:1em; color:var(--green);}
+body.dark .book-info h4{color:var(--gold);}
+.book-info .ur{font-size:.95em;}
+.badge{display:inline-block; font-size:.68em; background:var(--gold-soft); color:var(--text); border:1px solid var(--gold); border-radius:10px; padding:2px 9px; margin:2px 3px 2px 0;}
+.badge.pdf{background:#b3261e; color:#fff; border-color:#b3261e;}
+.book-desc{font-size:.85em; color:var(--muted); margin:6px 0;}
+/* PDF reader */
+#bookReader{display:none;}
+#bookReader.open{display:block;}
+.pdf-toolbar{position:sticky; top:0; z-index:5; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:8px; margin-bottom:8px;}
+.pdf-toolbar .row1{display:flex; align-items:center; gap:6px; justify-content:space-between;}
+.pdf-toolbar .row2{display:flex; align-items:center; gap:6px; justify-content:center; margin-top:8px; flex-wrap:wrap;}
+.tool-btn{background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:8px 12px; font-size:.9em; cursor:pointer; font-family:inherit;}
+.tool-btn:active{transform:scale(.95);}
+.tool-btn.on{background:var(--green); color:#fff; border-color:var(--green);}
+#pdfPageNum{font-weight:700; font-size:.95em; min-width:110px; text-align:center;}
+#pdfGo{width:64px; padding:8px 6px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-size:.9em; text-align:center;}
+#pdfCanvasWrap{position:relative; background:#fff; border:1px solid var(--border); border-radius:12px; overflow:auto; max-height:72vh; display:flex; justify-content:center;}
+#pdfCanvas{max-width:100%; height:auto; display:block;}
+#pdfCanvas.night{filter:invert(0.92) hue-rotate(180deg) brightness(1.05);}
+#pdfLoading{position:absolute; inset:0; display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center; background:rgba(255,253,246,.85); z-index:2; border-radius:12px;}
+body.dark #pdfLoading{background:rgba(20,17,11,.88);}
+.spinner{width:42px; height:42px; border:4px solid var(--gold-soft); border-top-color:var(--gold); border-radius:50%; animation:usp .8s linear infinite;}
+.pdf-nav{display:flex; gap:10px; margin-top:10px;}
+.pdf-nav .btn{flex:1;}
+#pdfReader:fullscreen{background:var(--bg); padding:12px; overflow:auto;}
+#pdfReader:fullscreen #pdfCanvasWrap{max-height:86vh;}
 </style>
 </head>
 <body>
@@ -300,6 +339,27 @@ body.dark .kalima .kn{color:var(--gold);}
       <div class="qa-item" data-go="namaz"><span class="ic">🕌</span>Namaz<br><span class="ur">نماز</span></div>
       <div class="qa-item" data-go="qibla"><span class="ic">🧭</span>Qibla<br><span class="ur">قبلہ</span></div>
       <div class="qa-item" data-go="ramadan"><span class="ic">🌙</span>Ramadan<br><span class="ur">رمضان</span></div>
+      <div class="qa-item" data-go="books"><span class="ic">📚</span>Books<br><span class="ur">کتابیں</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📚 Islamic Books • <span class="ur">اسلامی کتابیں</span></h3>
+    <div class="book-card">
+      <div class="book-cover" aria-label="Book cover">
+        <div class="bc-orn">☪️</div>
+        <div class="bc-title ur">تحفظِ عقیدۂ ختمِ نبوت<br>اور فتنۂ قادیانیت</div>
+        <div class="bc-author">ڈاکٹر محمد آصف امین عطاری</div>
+      </div>
+      <div class="book-info">
+        <h4>Tahaffuz-e-Aqeeda-e-Khatm-e-Nabuwat aur Fitna-e-Qadiyaniat</h4>
+        <div class="ur" style="color:var(--muted);font-size:.85em">ڈاکٹر محمد آصف امین عطاری</div>
+        <div style="margin-top:6px"><span class="badge pdf">PDF</span><span class="badge">516 pages</span><span class="badge">اردو</span></div>
+        <div class="book-desc">Khatm-e-Nabuwat ke aqeede ki hifazat aur Qadiyaniat ke fitne ka ilmi radd — Ahle Sunnat nuqta-e-nazar se.</div>
+        <div class="btn-row">
+          <button class="btn" id="homeReadBook">📖 Read Book</button>
+          <button class="btn gold" id="homeContinueBook" style="display:none">▶️ Continue Reading</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="card daily">
@@ -383,6 +443,7 @@ body.dark .kalima .kn{color:var(--gold);}
       <div class="qa-item" data-go="namaz"><span class="ic">🕌</span>Namaz<br><span class="ur">نماز</span></div>
       <div class="qa-item" data-go="kalima"><span class="ic">☪️</span>Kalimas<br><span class="ur">کلمات</span></div>
       <div class="qa-item" data-go="ramadan"><span class="ic">🌙</span>Ramadan<br><span class="ur">رمضان</span></div>
+      <div class="qa-item" data-go="books"><span class="ic">📚</span>Books<br><span class="ur">کتابیں</span></div>
     </div>
   </div>
   <div class="card" id="sec-kalima">
@@ -523,6 +584,65 @@ body.dark .kalima .kn{color:var(--gold);}
     <h3>📜 Hadith Collections • <span class="ur">احادیث کے مجموعے</span></h3>
     <div class="maslak">📜 Sahih collections — tap a book to read famous ahadith. <span class="ur">مستند مجموعے — پڑھنے کے لیے کتاب پر ٹیپ کریں۔</span></div>
     <div id="hadithBooks"></div>
+  </div>
+</section>
+
+<!-- ================= PAGE: BOOKS ================= -->
+<section class="page" id="pg-books">
+  <div id="bookDetails">
+    <div class="card">
+      <h3>📚 Islamic Books • <span class="ur">اسلامی کتابیں</span></h3>
+      <div class="book-card" style="margin-top:0">
+        <div class="book-cover lg" aria-label="Book cover">
+          <div class="bc-orn">☪️</div>
+          <div class="bc-title ur">تحفظِ عقیدۂ ختمِ نبوت<br>اور فتنۂ قادیانیت</div>
+          <div class="bc-author">ڈاکٹر محمد آصف امین عطاری</div>
+        </div>
+        <div class="book-info">
+          <h4>Tahaffuz-e-Aqeeda-e-Khatm-e-Nabuwat aur Fitna-e-Qadiyaniat</h4>
+          <div class="ur" style="color:var(--muted)">از: ڈاکٹر محمد آصف امین عطاری</div>
+          <div style="margin-top:6px"><span class="badge pdf">PDF</span><span class="badge">516 pages</span><span class="badge">اردو • Urdu</span><span class="badge" id="bookFavBadge" style="display:none">⭐ Saved</span></div>
+        </div>
+      </div>
+      <div class="book-desc" style="margin-top:10px">Khatm-e-Nabuwat ﷺ ke aqeede ki hifazat aur Qadiyaniat ke fitne ka tafseeli ilmi radd — Quran-o-Sunnat aur Ahle Sunnat (Barelvi) ulama ke dalail ki roshni me. <span class="ur">عقیدہ ختم نبوت ﷺ کی حفاظت اور فتنہ قادیانیت کا علمی رد۔</span></div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn" id="bookReadNow">📖 Read Now</button>
+        <button class="btn gold" id="bookContinue" style="display:none">▶️ Continue Reading</button>
+      </div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="tool-btn" id="bookFavBtn">⭐ Save to Library</button>
+        <a class="tool-btn" style="text-decoration:none;display:inline-block" href="books/tahaffuz-e-khatm-e-nabuwat.pdf" download="tahaffuz-e-khatm-e-nabuwat.pdf">⬇️ Download PDF</a>
+      </div>
+      <div class="note" id="bookProgressNote" style="margin-top:8px"></div>
+    </div>
+  </div>
+  <div id="bookReader">
+    <div id="pdfReader">
+      <div class="pdf-toolbar">
+        <div class="row1">
+          <button class="tool-btn" id="pdfBack">← <span class="ur">واپس</span></button>
+          <b id="pdfPageNum">Page — of 516</b>
+          <button class="tool-btn" id="pdfFull">⛶</button>
+        </div>
+        <div class="row2">
+          <button class="tool-btn" id="pdfZoomOut">A−</button>
+          <button class="tool-btn" id="pdfZoomIn">A+</button>
+          <button class="tool-btn" id="pdfFit">↔ Fit</button>
+          <button class="tool-btn" id="pdfNight">🌙</button>
+          <input type="number" id="pdfGo" min="1" max="516" placeholder="Page">
+          <button class="tool-btn" id="pdfGoBtn">Go</button>
+        </div>
+      </div>
+      <div id="pdfCanvasWrap">
+        <div id="pdfLoading"><div class="spinner"></div><div>Loading page… <span class="ur">صفحہ کھل رہا ہے…</span></div></div>
+        <canvas id="pdfCanvas"></canvas>
+      </div>
+      <div class="pdf-nav">
+        <button class="btn" id="pdfPrev">‹ Prev <span class="ur">پچھلا</span></button>
+        <button class="btn" id="pdfNext">Next <span class="ur">اگلا</span> ›</button>
+      </div>
+      <div class="note" style="text-align:center;margin-top:6px">Swipe left/right to turn pages. Progress saves automatically. <span class="ur">انگلی سے صفحہ پلٹیں۔</span></div>
+    </div>
   </div>
 </section>
 
@@ -1107,6 +1227,7 @@ document.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{
   else if(k==='kalima'){goPage('pg-more');setTimeout(()=>{const s=$('sec-kalima');if(s)s.scrollIntoView();},120);}
   else if(k==='ramadan'){goPage('pg-more');setTimeout(()=>{const s=$('sec-ramadan');if(s)s.scrollIntoView();},120);}
   else if(k==='qibla'){goPage('pg-more');setTimeout(()=>{const s=$('sec-qibla');if(s)s.scrollIntoView();},120);}
+  else if(k==='books'){goPage('pg-books');initBooksPage();}
 });
 
 /* ---- Quran page (embedded surah list + bookmarks) ---- */
@@ -1544,6 +1665,125 @@ renderTbHist();
 /* ---- Qibla calibration bearing mirror ---- */
 const _setQiblaOrig=setQibla;
 setQibla=function(lat,lon,src){_setQiblaOrig(lat,lon,src);const e=$('qiblaDeg2');if(e)e.textContent=qibla.toFixed(1);};
+
+/* ================= ISLAMIC BOOKS LIBRARY ================= */
+const BOOK={id:'tahaffuz-khatm-e-nabuwat',url:'books/tahaffuz-e-khatm-e-nabuwat.pdf',pages:516};
+function bookProgress(){return store.get('bookProgress:'+BOOK.id,1);}
+function setBookProgress(p){store.set('bookProgress:'+BOOK.id,Math.min(Math.max(1,p),BOOK.pages));}
+function bookFav(){return store.get('bookFav:'+BOOK.id,false);}
+function refreshBookUI(){
+  const p=bookProgress(),has=p>1;
+  const c1=$('homeContinueBook'),c2=$('bookContinue'),n=$('bookProgressNote');
+  if(c1)c1.style.display=has?'':'none';
+  if(c2)c2.style.display=has?'':'none';
+  if(n)n.innerHTML=has ? ('📑 Last read: <b>Page '+p+' of '+BOOK.pages+'</b>') : '';
+  const fb=$('bookFavBtn'); if(fb)fb.textContent=bookFav()?'⭐ Saved in Library':'⭐ Save to Library';
+  const bd=$('bookFavBadge'); if(bd)bd.style.display=bookFav()?'':'none';
+}
+function initBooksPage(){
+  refreshBookUI();
+  $('bookDetails').style.display='';
+  $('bookReader').classList.remove('open');
+}
+$('homeReadBook').onclick=()=>{goPage('pg-books');initBooksPage();setTimeout(()=>openBookReader(1),150);};
+$('homeContinueBook').onclick=()=>{goPage('pg-books');initBooksPage();setTimeout(()=>openBookReader(bookProgress()),150);};
+$('bookReadNow').onclick=()=>openBookReader(1);
+$('bookContinue').onclick=()=>openBookReader(bookProgress());
+$('bookFavBtn').onclick=()=>{store.set('bookFav:'+BOOK.id,!bookFav());refreshBookUI();};
+
+/* ---- PDF.js reader ---- */
+let pdfDoc=null,pdfPage=1,pdfScale=1.2,pdfRendering=false,pdfPending=null,pdfNight=false;
+function loadPdfJs(){
+  return new Promise((res,rej)=>{
+    if(window.pdfjsLib)return res();
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload=()=>{try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';res();}catch(e){rej(e);}};
+    s.onerror=()=>rej(new Error('PDF engine failed to load'));
+    document.head.appendChild(s);
+  });
+}
+function pdfShowLoading(show,msg){
+  const l=$('pdfLoading'); if(!l)return;
+  l.style.display=show?'flex':'none';
+  if(msg)l.querySelector('div:last-child').innerHTML=msg;
+}
+async function openBookReader(page){
+  $('bookDetails').style.display='none';
+  $('bookReader').classList.add('open');
+  window.scrollTo(0,0);
+  pdfShowLoading(true,'Loading book… <span class="ur">کتاب کھل رہی ہے…</span>');
+  try{
+    await loadPdfJs();
+    if(!pdfDoc){
+      pdfShowLoading(true,'Loading 516 pages… <span class="ur">صفحات لوڈ ہو رہے ہیں…</span>');
+      pdfDoc=await pdfjsLib.getDocument(BOOK.url).promise;
+    }
+    pdfShowLoading(false);
+    renderPdfPage(page||bookProgress());
+  }catch(e){
+    pdfShowLoading(true,'⚠️ Could not open the PDF. Check your internet, or use the Download button. <span class="ur">انٹرنیٹ چیک کریں۔</span>');
+  }
+}
+function fitPdfScale(){
+  const wrap=$('pdfCanvasWrap');
+  pdfScale=Math.max(0.6,Math.min(2.5,(wrap.clientWidth-24)/595*1.35));
+}
+async function renderPdfPage(n){
+  if(!pdfDoc)return;
+  n=Math.min(Math.max(1,n),pdfDoc.numPages);
+  if(pdfRendering){pdfPending=n;return;}
+  pdfRendering=true;
+  pdfShowLoading(true,'');
+  try{
+    const page=await pdfDoc.getPage(n);
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    const vp=page.getViewport({scale:pdfScale});
+    const canvas=$('pdfCanvas'),ctx=canvas.getContext('2d');
+    canvas.width=Math.floor(vp.width*dpr); canvas.height=Math.floor(vp.height*dpr);
+    canvas.style.width=Math.floor(vp.width)+'px'; canvas.style.height=Math.floor(vp.height)+'px';
+    canvas.classList.toggle('night',pdfNight);
+    await page.render({canvasContext:ctx,viewport:page.getViewport({scale:pdfScale*dpr})}).promise;
+    pdfPage=n; setBookProgress(n); refreshBookUI();
+    $('pdfPageNum').textContent='Page '+n+' of '+pdfDoc.numPages;
+    const g=$('pdfGo'); g.max=pdfDoc.numPages;
+  }catch(e){
+    pdfShowLoading(true,'⚠️ Page failed to load. Try again.');
+  }
+  pdfShowLoading(false);
+  pdfRendering=false;
+  if(pdfPending){const p=pdfPending;pdfPending=null;renderPdfPage(p);}
+}
+function closeBookReader(){
+  $('bookReader').classList.remove('open');
+  $('bookDetails').style.display='';
+  refreshBookUI(); window.scrollTo(0,0);
+}
+$('pdfBack').onclick=closeBookReader;
+$('pdfPrev').onclick=()=>renderPdfPage(pdfPage-1);
+$('pdfNext').onclick=()=>renderPdfPage(pdfPage+1);
+$('pdfZoomIn').onclick=()=>{pdfScale=Math.min(3,pdfScale+0.25);renderPdfPage(pdfPage);};
+$('pdfZoomOut').onclick=()=>{pdfScale=Math.max(0.5,pdfScale-0.25);renderPdfPage(pdfPage);};
+$('pdfFit').onclick=()=>{fitPdfScale();renderPdfPage(pdfPage);};
+$('pdfNight').onclick=function(){pdfNight=!pdfNight;this.classList.toggle('on',pdfNight);$('pdfCanvas').classList.toggle('night',pdfNight);};
+$('pdfGoBtn').onclick=()=>{const v=parseInt($('pdfGo').value,10);if(v>=1)renderPdfPage(v);};
+$('pdfGo').addEventListener('keydown',e=>{if(e.key==='Enter')$('pdfGoBtn').click();});
+$('pdfFull').onclick=()=>{
+  const el=$('pdfReader');
+  if(document.fullscreenElement)document.exitFullscreen();
+  else if(el.requestFullscreen)el.requestFullscreen();
+};
+/* swipe pages */
+(function(){
+  let sx=0;
+  const wrap=$('pdfCanvasWrap');
+  wrap.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+  wrap.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>70){ if(dx<0)renderPdfPage(pdfPage+1); else renderPdfPage(pdfPage-1); }
+  },{passive:true});
+})();
+refreshBookUI();
 </script>
 </body>
 </html>
