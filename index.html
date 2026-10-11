@@ -251,6 +251,23 @@ body.reader-open nav{display:none;}
 body.reader-open header{display:none;}
 .book-cover.clickable{cursor:pointer; transition:transform .2s;}
 .book-cover.clickable:active{transform:scale(.97);}
+/* ---- Book TOC (Fehrist) overlay ---- */
+#tocOverlay{display:none; position:fixed; inset:0; z-index:70; background:var(--bg); flex-direction:column;}
+#tocOverlay.open{display:flex;}
+.toc-head{position:sticky; top:0; background:linear-gradient(135deg,var(--green-deep),var(--green)); color:#fff; padding:12px; border-radius:0 0 18px 18px; box-shadow:var(--shadow);}
+.toc-head .t{font-weight:700; font-size:1em;}
+.toc-head .s{font-size:.78em; opacity:.9; margin-top:2px;}
+#tocSearch{width:100%; margin-top:8px; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.35); background:rgba(255,255,255,.14); color:#fff; font-size:.95em; font-family:inherit;}
+#tocSearch::placeholder{color:rgba(255,255,255,.7);}
+#tocList{flex:1; overflow-y:auto; padding:8px 12px 20px; -webkit-overflow-scrolling:touch;}
+.toc-item{display:flex; align-items:center; gap:10px; width:100%; text-align:right; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin:6px 0; cursor:pointer; font-family:inherit; color:var(--text); font-size:.92em; line-height:1.5;}
+.toc-item:active{transform:scale(.98);}
+.toc-item .pg{flex:0 0 auto; min-width:44px; text-align:center; background:var(--green); color:#fff; border-radius:10px; padding:6px 8px; font-weight:700; font-size:.85em;}
+.toc-item .tp{flex:1; direction:rtl;}
+.toc-item.current{border-color:var(--gold); box-shadow:0 0 0 2px var(--gold);}
+.toc-item.current .pg{background:var(--gold);}
+.toc-foot{padding:10px 12px; border-top:1px solid var(--border); background:var(--card);}
+.toc-count{text-align:center; font-size:.8em; opacity:.7; padding:6px;}
 .pdf-readhead{position:sticky; top:0; z-index:6; background:linear-gradient(135deg,var(--green-deep),var(--green)); color:#fff; padding:10px 12px; border-radius:0 0 18px 18px; box-shadow:var(--shadow);}
 .pdf-readhead .t{font-weight:700; font-size:.95em; line-height:1.3;}
 .pdf-readhead .p{font-size:.78em; opacity:.9; margin-top:2px;}
@@ -648,6 +665,7 @@ body.dark #pdfLoading{background:rgba(20,17,11,.92);}
           <button class="tool-btn" id="pdfZoomIn">A+</button>
           <button class="tool-btn" id="pdfFit">↔ Fit</button>
           <button class="tool-btn" id="pdfNight">🌙</button>
+          <button class="tool-btn" id="pdfToc">📑 <span class="ur">فہرست</span></button>
           <input type="number" id="pdfGo" min="1" max="516" placeholder="Page">
           <button class="tool-btn" id="pdfGoBtn">Go</button>
         </div>
@@ -663,6 +681,19 @@ body.dark #pdfLoading{background:rgba(20,17,11,.92);}
       <div class="note" style="text-align:center;margin:8px 12px 0">Swipe left/right to turn pages • Tap page number to jump • Progress saves automatically. <span class="ur">انگلی سے صفحہ پلٹیں۔</span></div>
     </div>
   </div>
+  <!-- Book Table of Contents (Fehrist) overlay -->
+  <div id="tocOverlay" role="dialog" aria-label="Book contents">
+    <div class="toc-head">
+      <div class="t">📑 فہرستِ مضامین <span style="font-weight:400">• Table of Contents</span></div>
+      <div class="s">کسی موضوع پر ٹیپ کریں — متعلقہ صفحہ فوراً کھل جائے گا</div>
+      <input type="search" id="tocSearch" placeholder="🔍 تلاش کریں… Search topics…" autocomplete="off">
+    </div>
+    <div id="tocList"></div>
+    <div class="toc-count" id="tocCount"></div>
+    <div class="toc-foot">
+      <button class="btn" id="tocClose" style="width:100%">← <span class="ur">واپس کتاب پر جائیں</span></button>
+    </div>
+  </div>
 </section>
 
 <!-- ================= BOTTOM NAV ================= -->
@@ -673,6 +704,7 @@ body.dark #pdfLoading{background:rgba(20,17,11,.92);}
   <button data-pg="pg-tasbeeh"><span class="ic">📿</span>Tasbeeh<span class="ur"><br>تسبیح</span></button>
   <button data-pg="pg-more"><span class="ic">☰</span>More<span class="ur"><br>مزید</span></button>
 </nav>
+<script src="book-toc.js"></script>
 <script>
 /* ================= App Update Checker ================= */
 const APP_VERSION='2.3';
@@ -1816,6 +1848,8 @@ function closeBookReader(){
   try{if(history.state&&history.state.rnReader)history.back();}catch(e){}
 }
 window.addEventListener('popstate',()=>{
+  const t=$('tocOverlay');
+  if(t&&t.classList.contains('open')){t.classList.remove('open');return;}
   if(document.body.classList.contains('reader-open'))closeBookReader();
 });
 function pdfJumpPrompt(){
@@ -1850,6 +1884,52 @@ $('pdfFull').onclick=()=>{
     if(Math.abs(dx)>70){ if(dx<0)renderPdfPage(pdfPage+1); else renderPdfPage(pdfPage-1); }
   },{passive:true});
 })();
+/* ---- Book TOC (Fehrist): clickable table of contents ---- */
+function tocCurrentIndex(){
+  if(typeof BOOK_TOC==='undefined')return -1;
+  let idx=-1;
+  for(let i=0;i<BOOK_TOC.length;i++){
+    if(BOOK_TOC[i].p<=pdfPage)idx=i; else break;
+  }
+  return idx;
+}
+function renderTocList(filter){
+  const list=$('tocList'); if(!list)return;
+  list.innerHTML='';
+  const q=(filter||'').trim();
+  let shown=0;
+  const cur=tocCurrentIndex();
+  BOOK_TOC.forEach((e,i)=>{
+    if(q && e.t.indexOf(q)<0 && String(e.p).indexOf(q)<0)return;
+    const b=document.createElement('button');
+    b.className='toc-item'+(i===cur?' current':'');
+    b.setAttribute('data-i',i);
+    const pg=document.createElement('span'); pg.className='pg'; pg.textContent=e.p;
+    const tp=document.createElement('span'); tp.className='tp'; tp.textContent=e.t;
+    b.appendChild(pg); b.appendChild(tp);
+    b.onclick=()=>{ closeToc(); renderPdfPage(e.p); };
+    list.appendChild(b); shown++;
+  });
+  const c=$('tocCount');
+  if(c)c.textContent=q ? (shown+' / '+BOOK_TOC.length+' موضوعات') : ('کل '+BOOK_TOC.length+' موضوعات • Total '+BOOK_TOC.length+' topics');
+  if(!q){
+    const cur2=list.querySelector('.toc-item.current');
+    if(cur2)cur2.scrollIntoView({block:'center'});
+  }
+}
+function openToc(){
+  if(typeof BOOK_TOC==='undefined'){alert('فہرست لوڈ نہیں ہو سکی۔');return;}
+  $('tocSearch').value='';
+  renderTocList('');
+  $('tocOverlay').classList.add('open');
+  try{history.pushState({rnToc:1},'');}catch(e){}
+}
+function closeToc(){
+  $('tocOverlay').classList.remove('open');
+}
+$('pdfToc').onclick=openToc;
+$('tocClose').onclick=closeToc;
+$('tocSearch').addEventListener('input',e=>renderTocList(e.target.value));
 refreshBookUI();
 </script>
 </body>
