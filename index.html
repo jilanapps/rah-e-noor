@@ -196,6 +196,12 @@ body.dark .mshare .amt{color:var(--gold);}
   text-align:center; font-size:.72em; cursor:pointer; color:var(--text);}
 .qa-item .ic{font-size:1.7em; display:block; margin-bottom:2px;}
 .qa-item:active{transform:scale(.96);}
+/* Hijri calendar */
+.hcal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;text-align:center;font-size:.85em}
+.hcal .hdw{font-weight:700;color:var(--muted);font-size:.72em;padding:4px 0}
+.hcal .hd{padding:7px 2px;border:1px solid var(--border);border-radius:8px;background:var(--bg)}
+.hcal .hd.today{background:var(--green);color:#fff;font-weight:700;border-color:var(--green)}
+.hcal .hsp{visibility:hidden}
 /* Daily cards */
 .daily{border-right:4px solid var(--gold);}
 /* Kalima cards */
@@ -394,6 +400,16 @@ body.dark .kalima .kn{color:var(--gold);}
     <div class="ramadan-day"><b>🌇 Iftar (Maghrib):</b><span class="pts" id="iftarTime">—</span></div>
     <div class="label" style="margin-top:8px">Fasting Checklist • <span class="ur">روزے کی چیک لسٹ</span></div>
     <div id="ramadanChk"></div>
+  </div>
+  <div class="card" id="sec-hijrical">
+    <h3>📅 Hijri Calendar • <span class="ur">ہجری کیلنڈر</span></h3>
+    <div class="note">Dates may vary by moon sighting in your area. <span class="ur">آپ کے علاقے میں چاند نظر آنے پر تاریخ میں فرق ہو سکتا ہے۔</span></div>
+    <div class="btn-row" style="justify-content:center;align-items:center;margin-top:6px">
+      <button class="tool-btn" id="hcPrev">‹ Prev</button>
+      <b id="hcTitle" style="min-width:170px;text-align:center"></b>
+      <button class="tool-btn" id="hcNext">Next ›</button>
+    </div>
+    <div class="hcal" id="hcGrid"></div>
   </div>
   <div class="card" id="sec-qibla">
     <h3>🧭 Qibla Direction • <span class="ur">قبلہ</span></h3>
@@ -1224,17 +1240,176 @@ HBOOKS.abudawud.hadith.push(
 const HBOOKS_PENDING=[
 {t:'Jami at-Tirmidhi',u:'جامع ترمذی',au:'Imam Muhammad at-Tirmidhi (824–892 CE)'},
 {t:'Sunan an-Nasa\u2019i',u:'سنن نسائی',au:'Imam Ahmad an-Nasa\u2019i (829–915 CE)'},
-{t:'Sunan Ibn Majah',u:'سنن ابن ماجہ',au:'Imam Ibn Majah (824–887 CE)'}
+{t:'Sunan Ibn Majah',u:'سنن ابن ماجہ',au:'Imam Ibn Majah (824–887 CE)'},
+{t:'Riyad-us-Saliheen',u:'ریاض الصالحین',au:'Imam Yahya an-Nawawi (1233–1277 CE)'}
 ];
+/* Full-library data files (lazy loaded) + REAL counts from dataset */
+const HLIB_FILES={bukhari:'data/bukhari.json',muslim:'data/muslim.json'};
+const HLIB_COUNTS={bukhari:7277,muslim:7459};
 function renderHadithBooks(){
   let h=Object.keys(HBOOKS).map(k=>{const b=HBOOKS[k];
-    return '<div class="book tappable" data-hbook="'+k+'"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span> <span class="tap-hint">›</span></div><div class="au">'+b.au+'</div><div class="d">'+b.count+' — '+b.hadith.length+' famous ahadith inside</div><span class="tag">Hadith</span></div>';}).join('');
+    const lib=HLIB_FILES[k]?'<div style="margin-top:8px"><button class="tool-btn" data-hlib="'+k+'">📚 Full Library — '+HLIB_COUNTS[k].toLocaleString()+' ahadith</button></div>':'';
+    return '<div class="book tappable" data-hbook="'+k+'"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span> <span class="tap-hint">›</span></div><div class="au">'+b.au+'</div><div class="d">'+b.count+' — '+b.hadith.length+' famous ahadith inside</div>'+lib+'<span class="tag">Hadith</span></div>';}).join('');
   h+='<div class="label" style="margin-top:10px">Coming Soon • <span class="ur">جلد آ رہا ہے</span></div>';
   h+=HBOOKS_PENDING.map(b=>'<div class="book"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span></div><div class="au">'+b.au+'</div><div class="d"><span class="tag">⏳ Pending verified content</span> — full text will be added after verification.</div></div>').join('');
   $('hadithBooks').innerHTML=h;
   $('hadithBooks').querySelectorAll('[data-hbook]').forEach(el=>el.onclick=()=>openHadithBook(el.dataset.hbook));
+  $('hadithBooks').querySelectorAll('[data-hlib]').forEach(el=>el.onclick=e=>{e.stopPropagation();openHadithLibrary(el.dataset.hlib);});
 }
 renderHadithBooks();
+
+/* ================= Full Hadith Library (lazy-loaded, real dataset) =================
+   Source: mohammed-2-5/islamic-library-data (hadith/*.json) — public domain classical
+   texts. Bukhari #1 verified: "The reward of deeds depends upon intentions…"  */
+const HLIB={};
+const HPAGE=15;
+let hlibFont=100;
+function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function hbmGet(){return store.get('hbm',{});}
+function hbmHas(k,id){const b=hbmGet();return (b[k]||[]).indexOf(id)>=0;}
+function hbmToggle(k,id,btn){
+  const b=hbmGet(); b[k]=b[k]||[];
+  const i=b[k].indexOf(id);
+  if(i>=0){b[k].splice(i,1);btn.innerHTML='🔖 Save';}else{b[k].push(id);btn.innerHTML='📌 Saved';}
+  store.set('hbm',b);
+}
+function hText(L,hh){
+  const en=((hh.english.narrator||'')+' '+(hh.english.text||'')).trim()||'(English translation not available in this dataset)';
+  return '📜 '+L.meta.t+' — Hadith #'+hh.idInBook+'\n\n'+hh.arabic+'\n\n'+en+'\n\n— '+L.meta.t+', Hadith '+hh.idInBook;
+}
+function hCopy(L,hh){
+  const t=hText(L,hh);
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>alert('✅ Copied! <span class="ur">کاپی ہو گیا</span>')).catch(()=>alert(escHtml(t)));}
+  else alert(t);
+}
+function hShare(L,hh){
+  const t=hText(L,hh);
+  if(navigator.share){navigator.share({title:L.meta.t+' #'+hh.idInBook,text:t}).catch(()=>{});}
+  else hCopy(L,hh);
+}
+function applyHFont(){
+  document.querySelectorAll('#rdrBody .htx.ar').forEach(el=>el.style.fontSize=(1.35*hlibFont/100)+'em');
+  document.querySelectorAll('#rdrBody .htx.en').forEach(el=>el.style.fontSize=(hlibFont/100)+'em');
+}
+async function openHadithLibrary(key,chId){
+  const meta={bukhari:{t:'Sahih al-Bukhari',u:'صحیح بخاری'},muslim:{t:'Sahih Muslim',u:'صحیح مسلم'}}[key];
+  if(!HLIB[key]){
+    rdrTitle('📚 '+meta.t);
+    rdrBody('<div class="note">⏳ Loading '+HLIB_COUNTS[key].toLocaleString()+' ahadith… <span class="ur">پہلی بار تھوڑا وقت لگے گا۔</span></div>');
+    openOv();
+    try{
+      const r=await fetch(HLIB_FILES[key]);
+      if(!r.ok)throw new Error('http '+r.status);
+      const j=await r.json();
+      const cmap={}; j.chapters.forEach(c=>cmap[c.id]=c);
+      const chCount={}; j.hadiths.forEach(h=>{chCount[h.chapterId]=(chCount[h.chapterId]||0)+1;});
+      HLIB[key]={chapters:j.chapters,hadiths:j.hadiths,cmap:cmap,chCount:chCount,meta:meta};
+    }catch(e){
+      rdrBody('<div class="note">⚠️ Data load nahi hua. Internet check karein aur dobara try karein. <span class="ur">انٹرنیٹ چیک کریں۔</span></div><div style="margin-top:8px"><button class="tool-btn" onclick="closeOv()">‹ Back</button></div>');
+      return;
+    }
+  }
+  if(chId)openHChapter(key,chId,1);
+  else renderHChapters(key,'');
+}
+function renderHChapters(key,q){
+  const L=HLIB[key];
+  const ql=(q||'').toLowerCase().trim();
+  const chs=L.chapters.filter(c=>!ql||(c.english+' '+c.arabic+' '+c.id).toLowerCase().includes(ql));
+  let h='<div class="note">📚 '+L.hadiths.length.toLocaleString()+' ahadith • '+L.chapters.length+' chapters • <span class="ur">مستند متن</span></div>';
+  h+='<input type="text" id="hchSearch" placeholder="Search chapters…" value="'+escHtml(q)+'">';
+  h+='<input type="text" id="hNumGo" inputmode="numeric" placeholder="Hadith # par jayein (e.g. 1)…" style="margin-top:6px">';
+  h+='<div class="btn-row" style="margin-top:6px"><input type="text" id="hTxtSearch" placeholder="Search hadith text…" style="flex:1"><button class="tool-btn" id="hTxtBtn">🔍</button></div><div id="hTxtRes"></div>';
+  h+='<div class="label" style="margin-top:8px">Chapters • <span class="ur">ابواب</span></div>';
+  h+=chs.map(c=>'<div class="book tappable" data-hch="'+c.id+'"><div class="t">'+c.id+'. '+escHtml(c.english)+' <span class="ur">'+escHtml(c.arabic)+'</span> <span class="tap-hint">›</span></div><div class="d">'+(L.chCount[c.id]||0)+' ahadith</div></div>').join('')
+    ||'<div class="note">No chapters found. <span class="ur">کوئی باب نہیں ملا۔</span></div>';
+  h+='<div style="margin-top:10px"><button class="tool-btn" id="hlibBack">‹ Back to collections</button></div>';
+  rdrTitle('📚 '+L.meta.t);
+  rdrBody(h);
+  const rb=$('rdrBody');
+  $('hchSearch').oninput=e=>renderHChapters(key,e.target.value);
+  $('hNumGo').onchange=e=>{const n=parseInt(e.target.value,10);if(!n)return;
+    const hh=L.hadiths.find(x=>x.idInBook===n);
+    if(hh){const list=L.hadiths.filter(x=>x.chapterId===hh.chapterId);const idx=list.findIndex(x=>x.idInBook===n);
+      openHChapter(key,hh.chapterId,Math.floor(idx/HPAGE)+1);}
+    else alert('⚠️ Hadith #'+n+' is collection me nahi mila.');};
+  $('hlibBack').onclick=()=>closeOv();
+  rb.querySelectorAll('[data-hch]').forEach(el=>el.onclick=()=>openHChapter(key,+el.dataset.hch,1));
+  const si=$('hchSearch'); si.focus(); si.setSelectionRange(si.value.length,si.value.length);
+  $('hTxtBtn').onclick=()=>{
+    const q=$('hTxtSearch').value.trim().toLowerCase(), res=$('hTxtRes');
+    if(q.length<3){res.innerHTML='<div class="note">Kam az kam 3 harf likhein.</div>';return;}
+    res.innerHTML='<div class="note">⏳ Searching…</div>';
+    setTimeout(()=>{
+      const hits=[];
+      for(const hh of L.hadiths){
+        const en=((hh.english.narrator||'')+' '+(hh.english.text||'')).toLowerCase();
+        if(hh.arabic.includes($('hTxtSearch').value.trim())||en.includes(q)){hits.push(hh);if(hits.length>=30)break;}
+      }
+      res.innerHTML=hits.length
+        ?'<div class="label">'+hits.length+' results'+(hits.length>=30?' (top 30)':'')+'</div>'+hits.map(hh=>
+          '<div class="book tappable" data-hhit="'+hh.idInBook+'"><div class="t">#'+hh.idInBook+' • '+escHtml(L.cmap[hh.chapterId].english)+' <span class="tap-hint">›</span></div><div class="d">'+escHtml((hh.english.text||hh.arabic).slice(0,90))+'…</div></div>').join('')
+        :'<div class="note">Kuch nahi mila. <span class="ur">کچھ نہیں ملا۔</span></div>';
+      res.querySelectorAll('[data-hhit]').forEach(el=>el.onclick=()=>{
+        const n=+el.dataset.hhit, hh=L.hadiths.find(x=>x.idInBook===n);
+        const list=L.hadiths.filter(x=>x.chapterId===hh.chapterId);
+        openHChapter(key,hh.chapterId,Math.floor(list.findIndex(x=>x.idInBook===n)/HPAGE)+1);
+      });
+    },30);
+  };
+}
+function hadithHTML(key,L,hh){
+  const saved=hbmHas(key,hh.idInBook);
+  const en=((hh.english.narrator||'')+' '+(hh.english.text||'')).trim();
+  return '<div class="hadith" data-hid="'+hh.idInBook+'">'
+    +'<div class="label">#'+hh.idInBook+' • '+escHtml(L.cmap[hh.chapterId].english)+'</div>'
+    +'<div class="ar htx">'+hh.arabic+'</div>'
+    +(en?'<div class="en htx"><b>'+escHtml(hh.english.narrator||'')+'</b> '+escHtml(hh.english.text||'')+'</div>'
+        :'<div class="note">English translation not available in this dataset.</div>')
+    +'<div class="btn-row" style="margin-top:8px">'
+    +'<button class="tool-btn" data-act="bm">'+(saved?'📌 Saved':'🔖 Save')+'</button>'
+    +'<button class="tool-btn" data-act="copy">📋 Copy</button>'
+    +'<button class="tool-btn" data-act="share">📤 Share</button>'
+    +'</div></div>';
+}
+function bindHadithBtns(key,L){
+  $('rdrBody').querySelectorAll('.hadith').forEach(el=>{
+    const id=+el.dataset.hid;
+    const hh=L.hadiths.find(x=>x.idInBook===id);
+    if(!hh)return;
+    el.querySelector('[data-act="bm"]').onclick=e=>hbmToggle(key,id,e.target);
+    el.querySelector('[data-act="copy"]').onclick=()=>hCopy(L,hh);
+    el.querySelector('[data-act="share"]').onclick=()=>hShare(L,hh);
+  });
+}
+function openHChapter(key,chId,page){
+  const L=HLIB[key], c=L.cmap[chId];
+  if(!c){renderHChapters(key,'');return;}
+  const list=L.hadiths.filter(h=>h.chapterId===chId);
+  const pages=Math.max(1,Math.ceil(list.length/HPAGE));
+  page=Math.min(Math.max(1,page||1),pages);
+  const slice=list.slice((page-1)*HPAGE,page*HPAGE);
+  let h='<div class="btn-row"><button class="tool-btn" id="hchBack">‹ Chapters</button>'
+    +'<button class="tool-btn" id="hFontD">A-</button><button class="tool-btn" id="hFontU">A+</button>'
+    +'<span class="note" style="align-self:center;margin-left:auto">Page '+page+'/'+pages+'</span></div>';
+  h+='<div class="label" style="margin-top:6px">'+c.id+'. '+escHtml(c.english)+' <span class="ur">'+escHtml(c.arabic)+'</span> • '+list.length+' ahadith</div>';
+  h+=slice.map(hh=>hadithHTML(key,L,hh)).join('');
+  h+='<div class="btn-row" style="margin-top:10px;justify-content:space-between">';
+  h+=(page>1?'<button class="tool-btn" id="hPrev">‹ Prev</button>':'<span></span>');
+  h+='<span class="note" style="align-self:center">'+page+' / '+pages+'</span>';
+  h+=(page<pages?'<button class="tool-btn" id="hNext">Next ›</button>':'<span></span>');
+  h+='</div>';
+  rdrTitle('📜 '+L.meta.t);
+  rdrBody(h);
+  applyHFont();
+  bindHadithBtns(key,L);
+  $('hchBack').onclick=()=>renderHChapters(key,'');
+  $('hFontD').onclick=()=>{hlibFont=Math.max(70,hlibFont-10);applyHFont();};
+  $('hFontU').onclick=()=>{hlibFont=Math.min(160,hlibFont+10);applyHFont();};
+  if(page>1)$('hPrev').onclick=()=>openHChapter(key,chId,page-1);
+  if(page<pages)$('hNext').onclick=()=>openHChapter(key,chId,page+1);
+  $('rdrBody').scrollTop=0;
+}
 
 /* ---- Daily Hadith & Dua ---- */
 const ALL_HADITH=[];
@@ -1281,6 +1456,44 @@ function renderRchk(){const s=rchkState();
     store.set('rchk',st);renderRchk();});
 }
 renderRchk();
+
+/* ---- Hijri Calendar (offline, via Intl islamic-umalqura) ---- */
+const HNAMES=['','Muharram','Safar','Rabi-ul-Awwal','Rabi-ul-Aakhir','Jumada-ul-Ula','Jumada-ul-Ukhra','Rajab',"Sha'ban",'Ramadan','Shawwal',"Zil-Qadah",'Zil-Hajj'];
+const _hfmt=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'});
+function hijriParts(dt){
+  const ps=_hfmt.formatToParts(dt);
+  const g=n=>{const p=ps.find(x=>x.type===n);return p?parseInt(String(p.value).replace(/[^0-9]/g,''),10)||0:0;};
+  return{y:g('year'),m:g('month'),d:g('day')};
+}
+function gregOfHijri(hy,hm,hd){
+  let lo=new Date(2000,0,1).getTime(), hi=new Date(2100,0,1).getTime(), mid=0;
+  for(let i=0;i<45;i++){
+    mid=(lo+hi)/2; const hp=hijriParts(new Date(mid));
+    const cmp=(hp.y-hy)||(hp.m-hm)||(hp.d-hd);
+    if(cmp===0)break;
+    if(cmp<0)lo=mid; else hi=mid;
+  }
+  const d=new Date(mid); d.setHours(12,0,0,0); return d;
+}
+let hcY=0,hcM=0;
+function renderHCal(){
+  if(!hcY){const h=hijriParts(new Date());hcY=h.y;hcM=h.m;}
+  const first=gregOfHijri(hcY,hcM,1);
+  let nm=hcM+1,ny=hcY; if(nm>12){nm=1;ny++;}
+  const days=Math.max(29,Math.round((gregOfHijri(ny,nm,1)-first)/864e5));
+  const todayH=hijriParts(new Date());
+  $('hcTitle').textContent=HNAMES[hcM]+' '+hcY+' AH';
+  let h=['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>'<div class="hdw">'+d+'</div>').join('');
+  for(let i=0;i<first.getDay();i++)h+='<div class="hsp">.</div>';
+  for(let d=1;d<=days;d++){
+    const isT=(todayH.y===hcY&&todayH.m===hcM&&todayH.d===d);
+    h+='<div class="hd'+(isT?' today':'')+'">'+d+'</div>';
+  }
+  $('hcGrid').innerHTML=h;
+}
+$('hcPrev').onclick=()=>{hcM--;if(hcM<1){hcM=12;hcY--;}renderHCal();};
+$('hcNext').onclick=()=>{hcM++;if(hcM>12){hcM=1;hcY++;}renderHCal();};
+try{renderHCal();}catch(e){$('hcGrid').innerHTML='<div class="note">Calendar unavailable on this browser.</div>';}
 
 /* ---- Monthly timetable ---- */
 $('timetableBtn').onclick=async()=>{
