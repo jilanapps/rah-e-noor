@@ -109,6 +109,11 @@ body.dark nav button.on{color:var(--gold);}
 .note{font-size:.8em; color:var(--muted); margin-top:8px;}
 .result{background:var(--bg); border:1px dashed var(--gold); border-radius:10px; padding:10px; margin-top:10px;}
 
+/* Daily Islamic Image (Rozana Tasveer) */
+#diCanvas{width:100%; max-width:480px; border-radius:14px; display:block; margin:10px auto; box-shadow:var(--shadow); border:2px solid var(--gold);}
+.di-badge{display:inline-block; background:linear-gradient(135deg,#0b6b3a,#14954f); color:#fff; font-weight:700; padding:6px 16px; border-radius:20px; margin:6px 0; font-size:.9em;}
+.di-badge .ur{color:#ffe9a8;}
+
 /* QA accordion */
 .qa{border-bottom:1px solid var(--border); padding:10px 2px;}
 .qa:last-child{border-bottom:none;}
@@ -359,12 +364,17 @@ body.dark #pdfLoading{background:rgba(20,17,11,.92);}
     <div style="font-weight:700" id="continueTxt"></div>
     <button class="btn" id="continueBtn" style="margin-top:8px">📖 Continue</button>
   </div>
+  <div class="card" data-go="dailyimg" style="border:2px solid var(--gold); cursor:pointer; text-align:center">
+    <div style="font-weight:700">🖼️ <span class="ur">آج کی اسلامی تصویر تیار ہے</span></div>
+    <div class="note" style="margin-top:4px">Rozana nayi Ayat / Hadith / Dua wali khubsurat tasveer — dekhein aur share karein</div>
+  </div>
   <div class="card">
     <h3>⚡ Quick Actions • <span class="ur">فوری رسائی</span></h3>
     <div class="qa-grid">
       <div class="qa-item" data-go="quran"><span class="ic">📖</span>Quran<br><span class="ur">قرآن</span></div>
       <div class="qa-item" data-go="hadith"><span class="ic">📜</span>Hadith<br><span class="ur">حدیث</span></div>
       <div class="qa-item" data-go="duas"><span class="ic">🤲</span>Duas<br><span class="ur">دعائیں</span></div>
+      <div class="qa-item" data-go="dailyimg"><span class="ic">🖼️</span>Daily Image<br><span class="ur">روزانہ تصویر</span></div>
       <div class="qa-item" data-go="tasbeeh"><span class="ic">📿</span>Tasbeeh<br><span class="ur">تسبیح</span></div>
       <div class="qa-item" data-go="kalima"><span class="ic">☪️</span>Kalimas<br><span class="ur">کلمات</span></div>
       <div class="qa-item" data-go="namaz"><span class="ic">🕌</span>Namaz<br><span class="ur">نماز</span></div>
@@ -422,6 +432,22 @@ body.dark #pdfLoading{background:rgba(20,17,11,.92);}
   </div>
 </section>
 
+<!-- ================= PAGE: DAILY ISLAMIC IMAGE ================= -->
+<section class="page" id="pg-dailyimg">
+  <div class="card" style="text-align:center">
+    <h3>🖼️ Daily Islamic Image • <span class="ur">روزانہ تصویر</span></h3>
+    <div><span class="di-badge" id="diBadge">✨ <span class="ur">آج کی تصویر</span> • Aaj ki tasveer</span></div>
+    <canvas id="diCanvas" width="1080" height="1080"></canvas>
+    <div class="note" id="diCaption"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:10px">
+      <button class="btn gold" id="diNew">🔄 <span class="ur">نئی تصویر</span></button>
+      <button class="btn" id="diDownload">📥 Download</button>
+      <button class="btn" id="diShare" style="background:#25D366">💬 <span class="ur">واٹس ایپ پر شیئر</span></button>
+    </div>
+    <div class="note"><span class="ur">تصویر صرف ایپ کھلنے پر بنتی ہے۔ شیئر دبانے پر واٹس ایپ کھلے گا — آپ خود بھیجیں گے۔</span><br>Image generates when the app is open. Share opens WhatsApp — you send it yourself.</div>
+  </div>
+</section>
+
 <!-- ================= PAGE: TASBEEH ================= -->
 <section class="page" id="pg-tasbeeh">
   <div class="card" style="text-align:center">
@@ -471,6 +497,7 @@ body.dark #pdfLoading{background:rgba(20,17,11,.92);}
     <h3>🔗 Quick Links • <span class="ur">فوری لنکس</span></h3>
     <div class="qa-grid">
       <div class="qa-item" data-go="duas"><span class="ic">🤲</span>Duas<br><span class="ur">دعائیں</span></div>
+      <div class="qa-item" data-go="dailyimg"><span class="ic">🖼️</span>Daily Image<br><span class="ur">روزانہ تصویر</span></div>
       <div class="qa-item" data-go="namaz"><span class="ic">🕌</span>Namaz<br><span class="ur">نماز</span></div>
       <div class="qa-item" data-go="kalima"><span class="ic">☪️</span>Kalimas<br><span class="ur">کلمات</span></div>
       <div class="qa-item" data-go="ramadan"><span class="ic">🌙</span>Ramadan<br><span class="ur">رمضان</span></div>
@@ -707,7 +734,7 @@ body.dark #pdfLoading{background:rgba(20,17,11,.92);}
 <script src="book-toc.js"></script>
 <script>
 /* ================= App Update Checker ================= */
-const APP_VERSION='2.3';
+const APP_VERSION='2.4';
 async function checkUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now());
@@ -1273,6 +1300,7 @@ document.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{
   if(k==='quran'){goPage('pg-quran');initQuranPage();}
   else if(k==='hadith'){goPage('pg-hadith');}
   else if(k==='duas')goPage('pg-duas');
+  else if(k==='dailyimg'){goPage('pg-dailyimg');initDailyImage();}
   else if(k==='tasbeeh')goPage('pg-tasbeeh');
   else if(k==='namaz')goPage('pg-namaz');
   else if(k==='kalima'){goPage('pg-more');setTimeout(()=>{const s=$('sec-kalima');if(s)s.scrollIntoView();},120);}
@@ -1930,6 +1958,225 @@ function closeToc(){
 $('pdfToc').onclick=openToc;
 $('tocClose').onclick=closeToc;
 $('tocSearch').addEventListener('input',e=>renderTocList(e.target.value));
+/* ================= Daily Islamic Image (Rozana Tasveer) v2.4 ================= */
+const DI_POOL=[
+/* --- AYAT-E-KARIMA --- */
+{t:'ayat',ar:'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',ur:'اللہ! اس کے سوا کوئی معبود نہیں، وہ زندہ قائم رہنے والا ہے',ref:'سورۃ البقرۃ 255 • آیت الکرسی'},
+{t:'ayat',ar:'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا',ur:'بے شک ہر مشکل کے ساتھ آسانی ہے',ref:'سورۃ الشرح 6'},
+{t:'ayat',ar:'وَقُل رَّبِّ زِدْنِي عِلْمًا',ur:'اور کہو: اے میرے رب! میرے علم میں اضافہ فرما',ref:'سورۃ طٰہٰ 114'},
+{t:'ayat',ar:'إِنَّ اللَّهَ مَعَ الصَّابِرِينَ',ur:'بے شک اللہ صبر کرنے والوں کے ساتھ ہے',ref:'سورۃ البقرۃ 153'},
+{t:'ayat',ar:'وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ',ur:'اور وہ تمہارے ساتھ ہے جہاں کہیں تم ہو',ref:'سورۃ الحدید 4'},
+{t:'ayat',ar:'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ',ur:'سن لو! اللہ کے ذکر سے دلوں کو اطمینان ملتا ہے',ref:'سورۃ الرعد 28'},
+{t:'ayat',ar:'وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا',ur:'جو اللہ سے ڈرتا ہے، اللہ اس کے لیے نکلنے کا راستہ بنا دیتا ہے',ref:'سورۃ الطلاق 2'},
+{t:'ayat',ar:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً',ur:'اے ہمارے رب! ہمیں دنیا میں بھی بھلائی دے اور آخرت میں بھی بھلائی دے',ref:'سورۃ البقرۃ 201'},
+{t:'ayat',ar:'إِنَّ اللَّهَ وَمَلَائِكَتَهُ يُصَلُّونَ عَلَى النَّبِيِّ',ur:'بے شک اللہ اور اس کے فرشتے نبی ﷺ پر درود بھیجتے ہیں',ref:'سورۃ الاحزاب 56'},
+{t:'ayat',ar:'وَاعْتَصِمُوا بِحَبْلِ اللَّهِ جَمِيعًا',ur:'سب مل کر اللہ کی رسی کو مضبوطی سے تھام لو',ref:'سورۃ آل عمران 103'},
+{t:'ayat',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ',ur:'اے ایمان والو! صبر اور نماز سے مدد مانگو',ref:'سورۃ البقرۃ 153'},
+{t:'ayat',ar:'قُلْ هُوَ اللَّهُ أَحَدٌ',ur:'کہو: وہ اللہ ایک ہے',ref:'سورۃ الاخلاص 1'},
+/* --- AHADITH-E-MUBARAKA --- */
+{t:'hadith',ar:'إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ',ur:'اعمال کا دارومدار نیتوں پر ہے',ref:'صحیح بخاری'},
+{t:'hadith',ar:'مَنْ صَلَّى عَلَيَّ صَلاَةً صَلَّى اللَّهُ عَلَيْهِ بِهَا عَشْرًا',ur:'جو مجھ پر ایک درود بھیجتا ہے، اللہ اس پر دس رحمتیں بھیجتا ہے',ref:'صحیح مسلم'},
+{t:'hadith',ar:'اَلْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ',ur:'اچھی بات کہنا بھی صدقہ ہے',ref:'صحیح بخاری و مسلم'},
+{t:'hadith',ar:'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ',ur:'تم میں سے بہتر وہ ہے جو قرآن سیکھے اور سکھائے',ref:'صحیح بخاری'},
+{t:'hadith',ar:'اَلْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ',ur:'مسلمان وہ ہے جس کی زبان اور ہاتھ سے دوسرے مسلمان محفوظ رہیں',ref:'صحیح بخاری و مسلم'},
+{t:'hadith',ar:'لاَ يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ',ur:'تم میں سے کوئی اس وقت تک کامل مومن نہیں ہو سکتا جب تک اپنے بھائی کے لیے وہی پسند نہ کرے جو اپنے لیے پسند کرتا ہے',ref:'صحیح بخاری و مسلم'},
+{t:'hadith',ar:'اَلطُّهُورُ شَطْرُ الإِيمَانِ',ur:'پاکی ایمان کا آدھا حصہ ہے',ref:'صحیح مسلم'},
+{t:'hadith',ar:'مَنْ غَشَّنَا فَلَيْسَ مِنَّا',ur:'جو ہمیں دھوکا دے وہ ہم میں سے نہیں',ref:'صحیح مسلم'},
+{t:'hadith',ar:'اَلدُّعَاءُ مُخُّ الْعِبَادَةِ',ur:'دعا عبادت کا مغز ہے',ref:'جامع ترمذی'},
+{t:'hadith',ar:'تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ صَدَقَةٌ',ur:'اپنے بھائی کے چہرے پر مسکرانا صدقہ ہے',ref:'جامع ترمذی'},
+{t:'hadith',ar:'إِنَّ اللَّهَ رَفِيقٌ يُحِبُّ الرِّفْقَ',ur:'بے شک اللہ نرم ہے اور نرمی کو پسند کرتا ہے',ref:'صحیح بخاری و مسلم'},
+{t:'hadith',ar:'مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ',ur:'جو علم حاصل کرنے کے لیے راستہ چلتا ہے، اللہ اس کے لیے جنت کا راستہ آسان کر دیتا ہے',ref:'صحیح مسلم'},
+/* --- MASNOON DUAS --- */
+{t:'dua',ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ',ur:'اے اللہ! میں تجھ سے معافی اور عافیت مانگتا ہوں',ref:'جامع ترمذی • مسنون دعا'},
+{t:'dua',ar:'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ',ur:'اے اللہ! اپنے ذکر، شکر اور اچھی عبادت پر میری مدد فرما',ref:'سنن ابی داؤد • مسنون دعا'},
+{t:'dua',ar:'يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ',ur:'اے دلوں کو پھیرنے والے! میرے دل کو اپنے دین پر ثابت قدم رکھ',ref:'جامع ترمذی • مسنون دعا'},
+{t:'dua',ar:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ زَوَالِ نِعْمَتِكَ',ur:'اے اللہ! میں تیری نعمت کے زوال سے تیری پناہ مانگتا ہوں',ref:'صحیح مسلم • مسنون دعا'},
+{t:'dua',ar:'رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي',ur:'اے میرے رب! میرا سینہ کھول دے اور میرا کام آسان کر دے',ref:'سورۃ طٰہٰ 25-26 • مسنون دعا'},
+{t:'dua',ar:'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا',ur:'اے اللہ! جو رزق تو نے ہمیں دیا اس میں برکت دے',ref:'مسنون دعا'},
+{t:'dua',ar:'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',ur:'میں اللہ کے مکمل کلمات کی پناہ مانگتا ہوں اس کی مخلوق کے شر سے',ref:'صحیح مسلم • مسنون دعا'},
+{t:'dua',ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا',ur:'اے اللہ! میں تجھ سے نفع بخش علم، پاکیزہ رزق اور مقبول عمل مانگتا ہوں',ref:'سنن ابن ماجہ • مسنون دعا'}
+];
+const DI_TYPE_LABEL={ayat:'آیتِ کریمہ',hadith:'حدیثِ مبارکہ ﷺ',dua:'مسنون دعا'};
+const DI_TYPE_EN={ayat:'Quranic Verse',hadith:'Hadith',dua:'Masnoon Dua'};
+
+function diTodayStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function diDayIndex(){
+  const d=new Date();
+  const start=new Date(d.getFullYear(),0,0);
+  return Math.floor((d-start)/864e5);
+}
+function diGetIndex(){
+  const today=diTodayStr();
+  const saved=store.get('rn_di_date','');
+  if(saved===today){
+    const i=store.get('rn_di_idx',0);
+    if(i>=0&&i<DI_POOL.length)return i;
+  }
+  const idx=diDayIndex()%DI_POOL.length;
+  store.set('rn_di_date',today);
+  store.set('rn_di_idx',idx);
+  return idx;
+}
+function diSetIndex(i){
+  store.set('rn_di_idx',((i%DI_POOL.length)+DI_POOL.length)%DI_POOL.length);
+}
+
+function diWrap(ctx,text,maxW){
+  const words=String(text).split(/\s+/);
+  const lines=[];let line='';
+  words.forEach(w=>{
+    const t=line?line+' '+w:w;
+    if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;}
+    else line=t;
+  });
+  if(line)lines.push(line);
+  return lines;
+}
+
+function diDrawStar(ctx,cx,cy,r,rot,color,lw){
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(rot||0);
+  ctx.strokeStyle=color;ctx.lineWidth=lw||2;ctx.beginPath();
+  for(let k=0;k<2;k++){
+    for(let i=0;i<=4;i++){
+      const a=(Math.PI/2)*i+(k?Math.PI/4:0);
+      const x=Math.cos(a)*r,y=Math.sin(a)*r;
+      if(i===0&&k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+  }
+  ctx.closePath();ctx.stroke();ctx.restore();
+}
+
+function diRender(idx){
+  const item=DI_POOL[idx];
+  const cv=$('diCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  const W=1080,H=1080;
+  /* background: deep green gradient */
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0a3527');g.addColorStop(.5,'#0d4a33');g.addColorStop(1,'#082a1f');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  /* subtle geometric pattern */
+  ctx.save();ctx.globalAlpha=.10;ctx.strokeStyle='#d4af37';
+  for(let y=70;y<H;y+=150)for(let x=70;x<W;x+=150)diDrawStar(ctx,x,y,46,0,'#d4af37',2);
+  ctx.restore();
+  /* gold double frame */
+  ctx.strokeStyle='#d4af37';ctx.lineWidth=10;ctx.strokeRect(28,28,W-56,H-56);
+  ctx.lineWidth=3;ctx.strokeRect(52,52,W-104,H-104);
+  /* corner ornaments */
+  [[76,76],[W-76,76],[76,H-76],[W-76,H-76]].forEach(p=>diDrawStar(ctx,p[0],p[1],30,Math.PI/4,'#d4af37',3));
+  ctx.direction='rtl';ctx.textAlign='center';ctx.textBaseline='middle';
+  let y=170;
+  /* brand */
+  ctx.fillStyle='#d4af37';ctx.font='700 56px serif';
+  ctx.fillText('راہِ نور',W/2,y);y+=70;
+  ctx.fillStyle='#f5e6b8';ctx.font='30px serif';ctx.direction='ltr';
+  ctx.fillText('R A H - E - N O O R',W/2,y);y+=70;ctx.direction='rtl';
+  /* type badge */
+  const label=DI_TYPE_LABEL[item.t];
+  ctx.font='700 40px serif';
+  const bw=ctx.measureText(label).width+90;
+  ctx.fillStyle='rgba(212,175,55,.16)';
+  ctx.strokeStyle='#d4af37';ctx.lineWidth=2;
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(W/2-bw/2,y-34,bw,68,34);ctx.fill();ctx.stroke();}
+  else{ctx.fillRect(W/2-bw/2,y-34,bw,68);ctx.strokeRect(W/2-bw/2,y-34,bw,68);}
+  ctx.fillStyle='#ffe9a8';ctx.fillText(label,W/2,y);y+=92;
+  /* Arabic + Urdu text: measure first, then fit & center vertically */
+  const DI_AR_FONT='"Noto Nastaliq Urdu","Jameel Noori Nastaleeq",serif';
+  function diMeasure(it,arPx,urPx,refPx){
+    ctx.font=arPx+'px '+DI_AR_FONT;
+    const arL=diWrap(ctx,it.ar,W-240);
+    ctx.font=urPx+'px '+DI_AR_FONT;
+    const urL=diWrap(ctx,it.ur,W-240);
+    const arLH=arPx*1.85,urLH=urPx*2.25;
+    const h=arL.length*arLH+44+56+urL.length*urLH+48+refPx*1.8;
+    return {arL:arL,urL:urL,arLH:arLH,urLH:urLH,h:h};
+  }
+  let arPx=64,urPx=46,refPx=40;
+  let mm=diMeasure(item,arPx,urPx,refPx);
+  const yTop=y+6,yMax=H-200;
+  let guard=0;
+  while(mm.h>(yMax-yTop)&&guard<12){arPx*=0.92;urPx*=0.92;refPx*=0.94;mm=diMeasure(item,arPx,urPx,refPx);guard++;}
+  let yy=yTop+Math.max(0,(yMax-yTop-mm.h)/2);
+  /* Arabic text */
+  ctx.fillStyle='#ffffff';ctx.font=Math.round(arPx)+'px '+DI_AR_FONT;
+  mm.arL.forEach((ln,i)=>{ctx.fillText(ln,W/2,yy+mm.arLH/2+i*mm.arLH);});
+  yy+=mm.arL.length*mm.arLH+44;
+  /* divider */
+  ctx.strokeStyle='#d4af37';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(W/2-180,yy);ctx.lineTo(W/2+180,yy);ctx.stroke();
+  diDrawStar(ctx,W/2,yy,16,0,'#d4af37',3);
+  yy+=56;
+  /* Urdu translation */
+  ctx.fillStyle='#f5e6b8';ctx.font=Math.round(urPx)+'px '+DI_AR_FONT;
+  mm.urL.forEach((ln,i)=>{ctx.fillText(ln,W/2,yy+mm.urLH/2+i*mm.urLH);});
+  yy+=mm.urL.length*mm.urLH+48;
+  /* reference */
+  ctx.fillStyle='#d4af37';ctx.font='700 '+Math.round(refPx)+'px serif';
+  ctx.fillText(item.ref,W/2,yy);
+  /* footer date */
+  try{
+    const dstr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+    ctx.fillStyle='rgba(245,230,184,.75)';ctx.font='32px serif';ctx.direction='ltr';
+    ctx.fillText(dstr+'  •  Rah-e-Noor',W/2,H-110);
+  }catch(e){}
+  /* caption under canvas */
+  const cap=$('diCaption');
+  if(cap)cap.innerHTML='<b>'+escHtml(DI_TYPE_EN[item.t])+'</b> • '+escHtml(item.ref);
+  /* badge text: today or custom */
+  const b=$('diBadge');
+  if(b){
+    const isToday=store.get('rn_di_date','')===diTodayStr();
+    b.innerHTML=isToday
+      ?'✨ <span class="ur">آج کی تصویر</span> • Aaj ki tasveer'
+      :'🖼️ <span class="ur">آپ کی منتخب تصویر</span> • Your selection';
+  }
+}
+
+function diDownload(){
+  const cv=$('diCanvas');if(!cv)return;
+  cv.toBlob(function(blob){
+    if(!blob){alert('Download failed');return;}
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='rah-e-noor-daily-'+diTodayStr()+'.png';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);
+  },'image/png');
+}
+
+async function diShare(){
+  const cv=$('diCanvas');if(!cv)return;
+  const item=DI_POOL[diGetIndex()];
+  const text='🖼️ *Rah-e-Noor* — '+DI_TYPE_LABEL[item.t]+'\n'+item.ar+'\n'+item.ur+'\n('+item.ref+')';
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+  try{
+    if(blob&&navigator.canShare){
+      const file=new File([blob],'rah-e-noor-daily.png',{type:'image/png'});
+      if(navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:'Rah-e-Noor — Rozana Tasveer',text:text});
+        return;
+      }
+    }
+  }catch(e){/* user cancelled or unsupported — fall through */}
+  /* fallback: download + open WhatsApp with text (user attaches image manually) */
+  diDownload();
+  setTimeout(()=>{
+    window.open('https://wa.me/?text='+encodeURIComponent(text+'\n\n(تصویر ڈاؤن لوڈ ہو گئی ہے — چیٹ میں منسلک کر کے بھیجیں)'),'_blank');
+  },800);
+}
+
+let diInitDone=false;
+function initDailyImage(){
+  diRender(diGetIndex());
+  if(diInitDone)return;diInitDone=true;
+  $('diNew').onclick=()=>{diSetIndex(diGetIndex()+1+Math.floor(Math.random()*(DI_POOL.length-1)));diRender(diGetIndex());};
+  $('diDownload').onclick=diDownload;
+  $('diShare').onclick=diShare;
+}
+
 refreshBookUI();
 </script>
 </body>
