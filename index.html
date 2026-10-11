@@ -190,6 +190,36 @@ body.dark .mshare .amt{color:var(--gold);}
 .hadith .en{font-weight:700; margin:8px 0 4px;}
 .hadith .uh{font-size:.92em; color:var(--muted);}
 .tap-hint{font-size:.75em; color:var(--gold); font-weight:700;}
+/* Quick actions grid */
+.qa-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px;}
+.qa-item{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:10px 4px;
+  text-align:center; font-size:.72em; cursor:pointer; color:var(--text);}
+.qa-item .ic{font-size:1.7em; display:block; margin-bottom:2px;}
+.qa-item:active{transform:scale(.96);}
+/* Daily cards */
+.daily{border-right:4px solid var(--gold);}
+/* Kalima cards */
+.kalima{border:1px solid var(--border); border-radius:12px; padding:12px; margin:10px 0; background:var(--card);}
+.kalima .kn{font-weight:700; color:var(--green); margin-bottom:6px;}
+body.dark .kalima .kn{color:var(--gold);}
+/* Reader toolbar */
+.rdr-tools{display:flex; gap:6px; flex-wrap:wrap; align-items:center; padding:8px 0;}
+.tool-btn{background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:6px 10px;
+  font-size:.85em; cursor:pointer; color:var(--text);}
+.tool-btn.on{background:var(--green); color:#fff; border-color:var(--green);}
+#rdrBody.night{background:#0d0b08; color:#e8dcc0;}
+#rdrBody.night .ar{color:#f5ecd4;}
+#rdrBody.night .ayah{border-color:#2a241a;}
+.audio-btn{background:var(--gold-soft); border:none; border-radius:50%; width:30px; height:30px;
+  cursor:pointer; font-size:.9em; vertical-align:middle; margin-right:6px;}
+.bm-btn{background:none; border:none; cursor:pointer; font-size:1em; float:left; margin-left:4px;}
+/* Timetable */
+.ttable{width:100%; border-collapse:collapse; font-size:.82em; margin-top:8px;}
+.ttable th,.ttable td{border:1px solid var(--border); padding:5px 3px; text-align:center;}
+.ttable th{background:var(--green); color:#fff; font-size:.75em;}
+.ttable tr.today td{background:var(--gold-soft); font-weight:700;}
+/* Ramadan */
+.ramadan-day{display:flex; align-items:center; gap:10px; padding:8px 2px; border-bottom:1px solid var(--border);}
 </style>
 </head>
 <body>
@@ -223,8 +253,51 @@ body.dark .mshare .amt{color:var(--gold);}
     <div class="note" id="prayerSrc">Loading prayer times…</div>
   </div>
   <div class="card">
-    <h3>🕋 Prayer Times • <span class="ur">نماز کے اوقات</span> <span class="note">(Lahore)</span></h3>
+    <h3>🕋 Prayer Times • <span class="ur">نماز کے اوقات</span> <span class="note" id="prayerCityNote">(Lahore)</span></h3>
     <div class="ptimes" id="ptimeGrid"></div>
+    <div class="btn-row" style="margin-top:8px">
+      <select id="citySel" title="City" style="flex:1">
+        <option value="Lahore">Lahore</option><option value="Karachi">Karachi</option>
+        <option value="Islamabad">Islamabad</option><option value="Rawalpindi">Rawalpindi</option>
+        <option value="Faisalabad">Faisalabad</option><option value="Multan">Multan</option>
+        <option value="Peshawar">Peshawar</option><option value="Quetta">Quetta</option>
+      </select>
+      <select id="asrSel" title="Asr method">
+        <option value="1">Asr: Hanafi</option><option value="0">Asr: Shafi'i</option>
+      </select>
+    </div>
+    <div class="note" style="margin-top:6px"><button class="tool-btn" id="timetableBtn">📅 Monthly Timetable</button></div>
+    <div id="timetableWrap" style="display:none"></div>
+  </div>
+  <div class="card" id="continueCard" style="display:none; border:2px solid var(--gold);">
+    <div class="label">Continue Reading • <span class="ur">جاری رکھیں</span></div>
+    <div style="font-weight:700" id="continueTxt"></div>
+    <button class="btn" id="continueBtn" style="margin-top:8px">📖 Continue</button>
+  </div>
+  <div class="card">
+    <h3>⚡ Quick Actions • <span class="ur">فوری رسائی</span></h3>
+    <div class="qa-grid">
+      <div class="qa-item" data-go="quran"><span class="ic">📖</span>Quran<br><span class="ur">قرآن</span></div>
+      <div class="qa-item" data-go="hadith"><span class="ic">📜</span>Hadith<br><span class="ur">حدیث</span></div>
+      <div class="qa-item" data-go="duas"><span class="ic">🤲</span>Duas<br><span class="ur">دعائیں</span></div>
+      <div class="qa-item" data-go="tasbeeh"><span class="ic">📿</span>Tasbeeh<br><span class="ur">تسبیح</span></div>
+      <div class="qa-item" data-go="kalima"><span class="ic">☪️</span>Kalimas<br><span class="ur">کلمات</span></div>
+      <div class="qa-item" data-go="namaz"><span class="ic">🕌</span>Namaz<br><span class="ur">نماز</span></div>
+      <div class="qa-item" data-go="qibla"><span class="ic">🧭</span>Qibla<br><span class="ur">قبلہ</span></div>
+      <div class="qa-item" data-go="ramadan"><span class="ic">🌙</span>Ramadan<br><span class="ur">رمضان</span></div>
+    </div>
+  </div>
+  <div class="card daily">
+    <div class="label">📜 Hadith of the Day • <span class="ur">آج کی حدیث</span></div>
+    <div class="ar" id="dailyHadithAr" style="font-size:1.15em"></div>
+    <div id="dailyHadithEn" style="font-size:.9em; margin-top:4px"></div>
+    <div class="note" id="dailyHadithRef"></div>
+  </div>
+  <div class="card daily">
+    <div class="label">🤲 Dua of the Day • <span class="ur">آج کی دعا</span></div>
+    <div class="ar" id="dailyDuaAr" style="font-size:1.15em"></div>
+    <div class="tr" id="dailyDuaTr" style="font-style:italic; color:var(--muted); margin:3px 0"></div>
+    <div id="dailyDuaEn" style="font-size:.9em"></div>
   </div>
   <div class="card">
     <h3>✅ Daily Checklist • <span class="ur">روزانہ چیک لسٹ</span></h3>
@@ -259,11 +332,21 @@ body.dark .mshare .amt{color:var(--gold);}
         <option value="1000">Target: 1000</option>
       </select>
     </div>
-    <div class="note">Lifetime total: <b id="lifeTotal">0</b></div>
+    <div class="note">Lifetime total: <b id="lifeTotal">0</b> • Today: <b id="todayTotal">0</b></div>
+    <label class="chkline"><input type="checkbox" id="vibTog" checked> Vibration on target • <span class="ur">وائبریشن</span></label>
   </div>
   <div class="card">
     <h3>Dhikr Presets • <span class="ur">اذکار</span></h3>
     <div id="presets"></div>
+    <div class="label" style="margin-top:10px">Custom Dhikr • <span class="ur">اپنا ذکر</span></div>
+    <div class="chatrow">
+      <input type="text" id="customDhikr" placeholder="Type your dhikr…">
+      <button class="btn" id="customDhikrBtn">Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📊 Daily History • <span class="ur">روزانہ ریکارڈ</span></h3>
+    <div id="tasbeehHist"><div class="note">No history yet.</div></div>
   </div>
 </section>
 
@@ -279,6 +362,31 @@ body.dark .mshare .amt{color:var(--gold);}
 <!-- ================= PAGE: MORE ================= -->
 <section class="page" id="pg-more">
   <div class="card">
+    <h3>🔗 Quick Links • <span class="ur">فوری لنکس</span></h3>
+    <div class="qa-grid">
+      <div class="qa-item" data-go="duas"><span class="ic">🤲</span>Duas<br><span class="ur">دعائیں</span></div>
+      <div class="qa-item" data-go="namaz"><span class="ic">🕌</span>Namaz<br><span class="ur">نماز</span></div>
+      <div class="qa-item" data-go="kalima"><span class="ic">☪️</span>Kalimas<br><span class="ur">کلمات</span></div>
+      <div class="qa-item" data-go="ramadan"><span class="ic">🌙</span>Ramadan<br><span class="ur">رمضان</span></div>
+    </div>
+  </div>
+  <div class="card" id="sec-kalima">
+    <h3>☪️ Six Kalimas • <span class="ur">چھے کلمات</span></h3>
+    <div class="maslak">📜 Memorize with Arabic, Urdu &amp; transliteration. <span class="ur">عربی، اردو اور تلفظ کے ساتھ یاد کریں۔</span></div>
+    <div id="kalimaList"></div>
+    <h3 style="margin-top:14px">💚 Iman-e-Mujmal &amp; Mufassal • <span class="ur">ایمان مجمل و مفصل</span></h3>
+    <div id="imanList"></div>
+    <div class="note">⚠️ Reviewed texts of the Kalimas; for detailed rulings consult a qualified scholar. <span class="ur">تفصیلی مسائل کے لیے مستند عالم سے رجوع کریں۔</span></div>
+  </div>
+  <div class="card" id="sec-ramadan">
+    <h3>🌙 Ramadan Tracker • <span class="ur">رمضان ٹریکر</span></h3>
+    <div class="note">Hijri date may vary by moon sighting. Sehri ends at Fajr, Iftar at Maghrib (from your prayer times above). <span class="ur">چاند نظر آنے پر تاریخ میں فرق ہو سکتا ہے۔</span></div>
+    <div class="ramadan-day"><b>🌅 Sehri ends (Fajr):</b><span class="pts" id="sehriTime">—</span></div>
+    <div class="ramadan-day"><b>🌇 Iftar (Maghrib):</b><span class="pts" id="iftarTime">—</span></div>
+    <div class="label" style="margin-top:8px">Fasting Checklist • <span class="ur">روزے کی چیک لسٹ</span></div>
+    <div id="ramadanChk"></div>
+  </div>
+  <div class="card" id="sec-qibla">
     <h3>🧭 Qibla Direction • <span class="ur">قبلہ</span></h3>
     <div id="dial"><div id="needle"><div class="n"></div><div class="s"></div></div></div>
     <div style="text-align:center">
@@ -289,6 +397,7 @@ body.dark .mshare .amt{color:var(--gold);}
         <button class="btn gold" id="compassBtn">🧭 Enable live compass</button>
       </div>
       <div class="note">Live compass needs motion-sensor permission on your phone. The green needle points toward the Kaaba.</div>
+      <div class="maslak">⚠️ <b>Calibration:</b> Wave your phone in a figure-8 motion before trusting the compass. If readings jump around, your sensor is unreliable — use the static bearing (<span id="qiblaDeg2">—</span>°) with a physical compass instead. <span class="ur">کمپاس درست نہ ہو تو اصل کمپاس استعمال کریں۔</span></div>
     </div>
   </div>
   <div class="card">
@@ -373,17 +482,36 @@ body.dark .mshare .amt{color:var(--gold);}
   <div id="rdrBody"></div>
 </div>
 
+<!-- ================= PAGE: QURAN ================= -->
+<section class="page" id="pg-quran">
+  <div class="card">
+    <h3>📖 Holy Quran • <span class="ur">قرآن کریم</span></h3>
+    <div class="note">Tarjuma: <b>Kanzul Iman</b> — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span></div>
+    <input type="text" id="surahSearchPg" placeholder="Search surah… / تلاش کریں">
+    <div id="surahListPg"><div class="note">Loading surahs…</div></div>
+  </div>
+</section>
+
+<!-- ================= PAGE: HADITH ================= -->
+<section class="page" id="pg-hadith">
+  <div class="card">
+    <h3>📜 Hadith Collections • <span class="ur">احادیث کے مجموعے</span></h3>
+    <div class="maslak">📜 Sahih collections — tap a book to read famous ahadith. <span class="ur">مستند مجموعے — پڑھنے کے لیے کتاب پر ٹیپ کریں۔</span></div>
+    <div id="hadithBooks"></div>
+  </div>
+</section>
+
 <!-- ================= BOTTOM NAV ================= -->
 <nav>
   <button class="on" data-pg="pg-home"><span class="ic">🏠</span>Home<span class="ur"><br>ہوم</span></button>
-  <button data-pg="pg-duas"><span class="ic">📖</span>Duas<span class="ur"><br>دعائیں</span></button>
+  <button data-pg="pg-quran"><span class="ic">📖</span>Quran<span class="ur"><br>قرآن</span></button>
+  <button data-pg="pg-hadith"><span class="ic">📜</span>Hadith<span class="ur"><br>حدیث</span></button>
   <button data-pg="pg-tasbeeh"><span class="ic">📿</span>Tasbeeh<span class="ur"><br>تسبیح</span></button>
-  <button data-pg="pg-namaz"><span class="ic">🕌</span>Namaz<span class="ur"><br>نماز</span></button>
   <button data-pg="pg-more"><span class="ic">☰</span>More<span class="ur"><br>مزید</span></button>
 </nav>
 <script>
 /* ================= App Update Checker ================= */
-const APP_VERSION='2.1';
+const APP_VERSION='2.3';
 async function checkUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now());
@@ -422,14 +550,20 @@ const ORDER=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
 function clean(t){return String(t).replace(/[^0-9:]/g,'').slice(0,5);}
 function toDate(hm){const[a,b]=hm.split(':').map(Number);const d=new Date();d.setHours(a,b,0,0);return d;}
 async function loadPrayers(){
+  const city=store.get('city','Lahore'), school=store.get('school','1');
+  const cityNote=$('prayerCityNote'); if(cityNote)cityNote.textContent='('+city+')';
   try{
-    const r=await fetch('https://api.aladhan.com/v1/timingsByCity?city=Lahore&country=Pakistan&method=1&school=1');
+    const r=await fetch('https://api.aladhan.com/v1/timingsByCity?city='+encodeURIComponent(city)+'&country=Pakistan&method=1&school='+school);
     const j=await r.json(); const t=j.data.data.timings;
     PT={Fajr:clean(t.Fajr),Sunrise:clean(t.Sunrise),Dhuhr:clean(t.Dhuhr),Asr:clean(t.Asr),Maghrib:clean(t.Maghrib),Isha:clean(t.Isha)};
-    ptOK=true; $('prayerSrc').textContent='Live times via Aladhan • Lahore';
-  }catch(e){$('prayerSrc').textContent='Offline — showing approximate Lahore times';}
+    ptOK=true; $('prayerSrc').textContent='Live times via Aladhan • '+city+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr';
+  }catch(e){$('prayerSrc').textContent='Offline — showing approximate times for '+city;}
   renderPrayers();
 }
+$('citySel').value=store.get('city','Lahore');
+$('asrSel').value=store.get('school','1');
+$('citySel').onchange=e=>{store.set('city',e.target.value);loadPrayers();};
+$('asrSel').onchange=e=>{store.set('school',e.target.value);loadPrayers();};
 function prayerState(){
   const now=new Date(), times=ORDER.map(k=>({k,d:toDate(PT[k])}));
   for(let i=0;i<times.length;i++){
@@ -448,6 +582,8 @@ function renderPrayers(){
   $('curPrayer').textContent=s.cur; $('nextPrayer').textContent=s.next;
   $('ptimeGrid').innerHTML=ORDER.map(k=>
     `<div class="ptime${k===s.next?' next':''}">${k}<span class="t">${fmt12(PT[k])}</span></div>`).join('');
+  const se=$('sehriTime'), it=$('iftarTime');
+  if(se)se.textContent=fmt12(PT.Fajr); if(it)it.textContent=fmt12(PT.Maghrib);
   const tickCd=()=>{const ms=prayerState().nextD-new Date();if(ms<0){renderPrayers();return;}
     const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),sec=Math.floor(ms%6e4/1e3);
     $('countdown').textContent=`⏳ ${h}h ${m}m ${sec}s left`;};
@@ -516,7 +652,7 @@ function renderTb(){$('tapBtn').textContent=tb.count;$('lifeTotal').textContent=
   $('presets').querySelectorAll('.preset').forEach(el=>el.onclick=()=>{tb.pi=+el.dataset.i;tb.count=0;store.set('tasbeeh',tb);renderTb();});
 }
 $('tapBtn').onclick=()=>{tb.count++;tb.total++;const tgt=+$('targetSel').value;
-  if(tb.count>=tgt){if(navigator.vibrate)navigator.vibrate(200);alert('🎉 Target '+tgt+' reached! MashaAllah');tb.count=0;}
+  if(tb.count>=tgt){const vb=$('vibTog');if((!vb||vb.checked)&&navigator.vibrate)navigator.vibrate(200);alert('🎉 Target '+tgt+' reached! MashaAllah');tb.count=0;}
   store.set('tasbeeh',tb);renderTb();};
 $('resetBtn').onclick=()=>{tb.count=0;store.set('tasbeeh',tb);renderTb();};
 renderTb();
@@ -873,6 +1009,256 @@ document.querySelectorAll('[data-book]').forEach(el=>el.onclick=()=>{
   const k=el.dataset.book;
   if(k==='quran') openQuran(); else openHadithBook(k);
 });
+
+/* ================= v2.3 UPGRADES ================= */
+/* ---- Quick navigation ---- */
+function goPage(pg){
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x.dataset.pg===pg));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById(pg); if(el)el.classList.add('active');
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{
+  const k=el.dataset.go;
+  if(k==='quran'){goPage('pg-quran');initQuranPage();}
+  else if(k==='hadith'){goPage('pg-hadith');}
+  else if(k==='duas')goPage('pg-duas');
+  else if(k==='tasbeeh')goPage('pg-tasbeeh');
+  else if(k==='namaz')goPage('pg-namaz');
+  else if(k==='kalima'){goPage('pg-more');setTimeout(()=>{const s=$('sec-kalima');if(s)s.scrollIntoView();},120);}
+  else if(k==='ramadan'){goPage('pg-more');setTimeout(()=>{const s=$('sec-ramadan');if(s)s.scrollIntoView();},120);}
+  else if(k==='qibla'){goPage('pg-more');setTimeout(()=>{const s=$('sec-qibla');if(s)s.scrollIntoView();},120);}
+});
+
+/* ---- Quran page (embedded surah list + bookmarks) ---- */
+let pendingAyah=null;
+function getBm(){return store.get('bm',[]);}
+async function initQuranPage(){
+  if(!surahListCache){
+    try{
+      const r=await fetch('https://api.alquran.cloud/v1/surah');
+      if(!r.ok)throw 0;
+      surahListCache=(await r.json()).data;
+    }catch(e){
+      $('surahListPg').innerHTML='<div class="note">Internet darkar hai. <span class="ur">سورۃ کی فہرست کے لیے انٹرنیٹ درکار ہے۔</span></div>';
+      return;
+    }
+  }
+  renderSurahListPg('');
+  const ss=$('surahSearchPg'); if(ss)ss.oninput=e=>renderSurahListPg(e.target.value);
+}
+function renderSurahListPg(q){
+  q=(q||'').toLowerCase();
+  let h='';
+  const bm=getBm();
+  if(bm.length){
+    h+='<div class="label">🔖 My Bookmarks</div>';
+    h+=bm.map(b=>{const p=b.split(':');
+      return '<div class="surah" data-bmgo="'+b+'"><div class="num">🔖</div><div><div class="nm">Surah '+p[0]+' • Ayah '+p[1]+'</div></div><div class="an">›</div></div>';}).join('');
+  }
+  const list=(surahListCache||[]).filter(s=>(s.englishName+' '+s.englishNameTranslation+' '+s.number).toLowerCase().includes(q));
+  h+=list.length?list.map(s=>
+    '<div class="surah" data-s="'+s.number+'"><div class="num">'+s.number+'</div><div><div class="nm">'+s.englishName+'</div>'+
+    '<div class="mt">'+s.englishNameTranslation+' • '+s.numberOfAyahs+' ayat • '+s.revelationType+'</div></div>'+
+    '<div class="an ar">'+s.name+'</div></div>').join('')
+    :'<div class="note">No surah found.</div>';
+  $('surahListPg').innerHTML=h;
+  $('surahListPg').querySelectorAll('[data-s]').forEach(el=>el.onclick=()=>openSurah(+el.dataset.s));
+  $('surahListPg').querySelectorAll('[data-bmgo]').forEach(el=>el.onclick=()=>{
+    const p=el.dataset.bmgo.split(':'); pendingAyah=+p[1]; openSurah(+p[0]);
+  });
+}
+
+/* ---- Reader upgrades: font size, night mode, audio, bookmarks, last-read ---- */
+let rdrFont=store.get('rdrFont',100), rdrNight=store.get('rdrNight',false);
+let curAudio=null, curAudioBtn=null;
+function ayahMp3(sn,an){
+  const s=String(sn).padStart(3,'0'), a=String(an).padStart(3,'0');
+  return 'https://everyayah.com/data/Alafasy_128kbps/'+s+a+'.mp3';
+}
+renderSurah=function(d){
+  const m=d.meta;
+  store.set('lastRead',{surah:m.number,name:m.englishName});
+  updateContinue();
+  const bm=getBm();
+  let h='<div class="rdr-tools">'
+    +'<button class="tool-btn" id="tFontDec">A-</button>'
+    +'<button class="tool-btn" id="tFontInc">A+</button>'
+    +'<button class="tool-btn'+(rdrNight?' on':'')+'" id="tNight">🌙 Night</button>'
+    +'<span class="note" style="margin:0">🔊 audio • 🔖 bookmark</span></div>';
+  h+='<div class="note" style="text-align:center">'+m.englishNameTranslation+' • '+m.numberOfAyahs+' Ayat • '+m.revelationType+'</div>';
+  h+='<div class="note" style="text-align:center;color:var(--gold)">Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span></div>';
+  h+=d.ayahs.map(a=>{
+    const key=m.number+':'+a.n, isbm=bm.indexOf(key)>=0;
+    return '<div class="ayah" id="ay'+a.n+'">'
+      +'<button class="audio-btn" data-mp3="'+ayahMp3(m.number,a.n)+'" title="Listen">🔊</button>'
+      +'<button class="bm-btn" data-bmk="'+key+'" title="Bookmark">'+(isbm?'📌':'🔖')+'</button>'
+      +'<span class="ar">'+a.ar+'</span><span class="an">'+a.n+'</span>'
+      +'<div class="ur" style="margin-top:6px;line-height:2">'+a.ur+'</div></div>';
+  }).join('');
+  rdrTitle('📖 '+m.englishName+' <span class="ar" style="font-size:.9em">'+m.name+'</span>');
+  rdrBody(h);
+  applyRdrStyle();
+  $('tFontDec').onclick=()=>{rdrFont=Math.max(70,rdrFont-10);store.set('rdrFont',rdrFont);applyRdrStyle();};
+  $('tFontInc').onclick=()=>{rdrFont=Math.min(160,rdrFont+10);store.set('rdrFont',rdrFont);applyRdrStyle();};
+  $('tNight').onclick=()=>{rdrNight=!rdrNight;store.set('rdrNight',rdrNight);applyRdrStyle();$('tNight').classList.toggle('on',rdrNight);};
+  $('rdrBody').onclick=e=>{
+    const ab=e.target.closest?e.target.closest('.audio-btn'):null;
+    if(ab){toggleAudio(ab.dataset.mp3,ab);return;}
+    const bb=e.target.closest?e.target.closest('.bm-btn'):null;
+    if(bb)toggleBm(bb.dataset.bmk,bb);
+  };
+  if(pendingAyah){
+    const t=document.getElementById('ay'+pendingAyah); pendingAyah=null;
+    if(t)setTimeout(()=>t.scrollIntoView({block:'center'}),150);
+  }
+};
+function applyRdrStyle(){
+  const b=$('rdrBody');
+  b.style.fontSize=rdrFont+'%';
+  b.classList.toggle('night',rdrNight);
+}
+function toggleAudio(url,btn){
+  try{
+    if(curAudio&&!curAudio.paused&&curAudioBtn===btn){curAudio.pause();btn.textContent='🔊';return;}
+    if(curAudio)curAudio.pause();
+    if(curAudioBtn)curAudioBtn.textContent='🔊';
+    curAudio=new Audio(url);curAudioBtn=btn;btn.textContent='⏸';
+    curAudio.onended=()=>{btn.textContent='🔊';};
+    curAudio.onerror=()=>{btn.textContent='🔊';};
+    const p=curAudio.play();
+    if(p&&p.catch)p.catch(()=>{btn.textContent='🔊';});
+  }catch(e){btn.textContent='🔊';}
+}
+function toggleBm(key,btn){
+  let bm=getBm();
+  if(bm.indexOf(key)>=0){bm=bm.filter(x=>x!==key);btn.textContent='🔖';}
+  else{bm.push(key);btn.textContent='📌';}
+  store.set('bm',bm);
+}
+function updateContinue(){
+  const lr=store.get('lastRead',null), c=$('continueCard');
+  if(!c)return;
+  if(lr&&lr.surah){c.style.display='block';
+    $('continueTxt').textContent='Surah '+lr.surah+' — '+lr.name;
+    $('continueBtn').onclick=()=>openSurah(lr.surah);
+  }else c.style.display='none';
+}
+updateContinue();
+
+/* ---- More verified ahadith (famous, authentic) ---- */
+HBOOKS.bukhari.hadith.push(
+{ar:'اَلْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ',en:'The Muslim is the one from whose tongue and hand other Muslims are safe.',ur:'مسلمان وہ ہے جس کی زبان اور ہاتھ سے دوسرے مسلمان محفوظ رہیں۔'},
+{ar:'لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى أَكُونَ أَحَبَّ إِلَيْهِ مِنْ وَالِدِهِ وَوَلَدِهِ وَالنَّاسِ أَجْمَعِينَ',en:'None of you truly believes until I am more beloved to him than his father, his children, and all mankind.',ur:'تم میں سے کوئی مومن نہیں ہو سکتا جب تک میں اسے اس کے والد، اس کی اولاد اور تمام لوگوں سے زیادہ محبوب نہ ہو جاؤں۔'}
+);
+HBOOKS.muslim.hadith.push(
+{ar:'مَنْ غَشَّنَا فَلَيْسَ مِنَّا',en:'Whoever deceives us is not of us.',ur:'جو ہمیں دھوکا دے وہ ہم میں سے نہیں۔'},
+{ar:'اَلدِّينُ النَّصِيحَةُ',en:'Religion is sincere counsel.',ur:'دین خیرخواہی کا نام ہے۔'}
+);
+HBOOKS.abudawud.hadith.push(
+{ar:'لَا يَحِلُّ لِمُسْلِمٍ أَنْ يَهْجُرَ أَخَاهُ فَوْقَ ثَلَاثٍ',en:'It is not lawful for a Muslim to cut off relations with his brother for more than three days.',ur:'کسی مسلمان کے لیے جائز نہیں کہ اپنے بھائی سے تین دن سے زیادہ قطع تعلق رکھے۔'}
+);
+const HBOOKS_PENDING=[
+{t:'Jami at-Tirmidhi',u:'جامع ترمذی',au:'Imam Muhammad at-Tirmidhi (824–892 CE)'},
+{t:'Sunan an-Nasa\u2019i',u:'سنن نسائی',au:'Imam Ahmad an-Nasa\u2019i (829–915 CE)'},
+{t:'Sunan Ibn Majah',u:'سنن ابن ماجہ',au:'Imam Ibn Majah (824–887 CE)'}
+];
+function renderHadithBooks(){
+  let h=Object.keys(HBOOKS).map(k=>{const b=HBOOKS[k];
+    return '<div class="book tappable" data-hbook="'+k+'"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span> <span class="tap-hint">›</span></div><div class="au">'+b.au+'</div><div class="d">'+b.count+' — '+b.hadith.length+' famous ahadith inside</div><span class="tag">Hadith</span></div>';}).join('');
+  h+='<div class="label" style="margin-top:10px">Coming Soon • <span class="ur">جلد آ رہا ہے</span></div>';
+  h+=HBOOKS_PENDING.map(b=>'<div class="book"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span></div><div class="au">'+b.au+'</div><div class="d"><span class="tag">⏳ Pending verified content</span> — full text will be added after verification.</div></div>').join('');
+  $('hadithBooks').innerHTML=h;
+  $('hadithBooks').querySelectorAll('[data-hbook]').forEach(el=>el.onclick=()=>openHadithBook(el.dataset.hbook));
+}
+renderHadithBooks();
+
+/* ---- Daily Hadith & Dua ---- */
+const ALL_HADITH=[];
+Object.keys(HBOOKS).forEach(k=>HBOOKS[k].hadith.forEach(x=>ALL_HADITH.push({ar:x.ar,en:x.en,ref:HBOOKS[k].t})));
+function dayIdx(n){const now=new Date(),s=new Date(now.getFullYear(),0,0);return Math.floor((now-s)/864e5)%n;}
+(function(){
+  const hd=ALL_HADITH[dayIdx(ALL_HADITH.length)];
+  $('dailyHadithAr').textContent=hd.ar; $('dailyHadithEn').textContent=hd.en; $('dailyHadithRef').textContent=hd.ref;
+  const dd=DUAS[dayIdx(DUAS.length)];
+  $('dailyDuaAr').textContent=dd.ar; $('dailyDuaTr').textContent=dd.tr; $('dailyDuaEn').textContent=dd.t+' — '+dd.en;
+})();
+
+/* ---- Six Kalimas + Iman ---- */
+const KALIMAS=[
+{n:'1st Kalima — Tayyab',u:'پہلا کلمہ — طیب',ar:'لَا إِلَهَ إِلَّا اللَّهُ مُحَمَّدٌ رَسُولُ اللَّهِ',tr:'La ilaha illallah, Muhammadur Rasulullah.',en:'There is no god but Allah, Muhammad is the Messenger of Allah.'},
+{n:'2nd Kalima — Shahadat',u:'دوسرا کلمہ — شہادت',ar:'أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ',tr:'Ash-hadu an la ilaha illallah, wahdahu la sharika lah, wa ash-hadu anna Muhammadan abduhu wa rasuluh.',en:'I bear witness that there is no god but Allah, alone without partner, and I bear witness that Muhammad is His servant and Messenger.'},
+{n:'3rd Kalima — Tamjeed',u:'تیسرا کلمہ — تمجید',ar:'سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ',tr:'SubhanAllahi walhamdulillahi wa la ilaha illallah, wallahu Akbar, wa la hawla wa la quwwata illa billahil-aliyyil-azim.',en:'Glory be to Allah, praise be to Allah, there is no god but Allah, Allah is Greatest; there is no power nor might except with Allah, the Most High, the Most Great.'},
+{n:'4th Kalima — Tauheed',u:'چوتھا کلمہ — توحید',ar:'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ حَيٌّ لَا يَمُوتُ أَبَدًا أَبَدًا ذُو الْجَلَالِ وَالْإِكْرَامِ بِيَدِهِ الْخَيْرُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',tr:'La ilaha illallah, wahdahu la sharika lah, lahul-mulku wa lahul-hamd, yuhyi wa yumit, wa huwa hayyul-la yamutu abadan abada, dhul-jalali wal-ikram, biyadihil-khair, wa huwa ala kulli shay\u2019in qadir.',en:'There is no god but Allah, alone without partner. His is the kingdom and His is the praise. He gives life and causes death. He is Ever-Living and never dies. Lord of majesty and honor; in His hand is all good, and He has power over all things.'},
+{n:'5th Kalima — Astaghfar',u:'پانچواں کلمہ — استغفار',ar:'أَسْتَغْفِرُ اللَّهَ رَبِّي مِنْ كُلِّ ذَنْبٍ أَذْنَبْتُهُ عَمْدًا أَوْ خَطَأً سِرًّا أَوْ عَلَانِيَةً وَأَتُوبُ إِلَيْهِ مِنَ الذَّنْبِ الَّذِي أَعْلَمُ وَمِنَ الذَّنْبِ الَّذِي لَا أَعْلَمُ إِنَّكَ أَنْتَ عَلَّامُ الْغُيُوبِ وَسَتَّارُ الْعُيُوبِ وَغَفَّارُ الذُّنُوبِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ',tr:'Astaghfirullaha rabbi min kulli dhambin adhnabtuhu amdan aw khata\u2019an, sirran aw alaniyah, wa atubu ilayhi minadh-dhambilladhi a\u2019lam, wa minadh-dhambilladhi la a\u2019lam, innaka anta allamul-ghuyub, wa sattarul-uyub, wa ghaffarudh-dhunub, wa la hawla wa la quwwata illa billahil-aliyyil-azim.',en:'I seek forgiveness from Allah, my Lord, for every sin I committed knowingly or unknowingly, secretly or openly, and I turn to Him in repentance from the sins I know and those I do not know. Indeed You are the Knower of the unseen, the Concealer of faults, the Forgiver of sins; there is no power nor might except with Allah, the Most High, the Most Great.'},
+{n:'6th Kalima — Radd-e-Kufr',u:'چھٹا کلمہ — ردِّ کفر',ar:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ شَيْئًا وَأَنَا أَعْلَمُ بِهِ وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ بِهِ تُبْتُ عَنْهُ وَتَبَرَّأْتُ مِنَ الْكُفْرِ وَالشِّرْكِ وَالْكِذْبِ وَالْغِيبَةِ وَالْبِدْعَةِ وَالنَّمِيمَةِ وَالْفَوَاحِشِ وَالْبُهْتَانِ وَالْمَعَاصِي كُلِّهَا وَأَسْلَمْتُ وَأَقُولُ لَا إِلَهَ إِلَّا اللَّهُ مُحَمَّدٌ رَسُولُ اللَّهِ',tr:'Allahumma inni a\u2019udhu bika min an ushrika bika shay\u2019an wa ana a\u2019lamu bihi, wa astaghfiruka lima la a\u2019lamu bihi, tubtu anhu wa tabarra\u2019tu minal-kufri wash-shirki wal-kidhbi wal-ghibati wal-bid\u2019ati wan-namimati wal-fawahishi wal-buhtani wal-ma\u2019asi kulliha, wa aslamtu wa aqulu: la ilaha illallah, Muhammadur Rasulullah.',en:'O Allah, I seek refuge in You from knowingly associating anything with You, and I seek Your forgiveness for what I do not know. I repent from it and disassociate from disbelief, polytheism, lying, backbiting, innovation, tale-bearing, indecency, slander and all sins. I submit, and I declare: there is no god but Allah, Muhammad is the Messenger of Allah.'}
+];
+const IMAN=[
+{n:'Iman-e-Mujmal',u:'ایمانِ مجمل',ar:'آمَنْتُ بِاللَّهِ كَمَا هُوَ بِأَسْمَائِهِ وَصِفَاتِهِ وَقَبِلْتُ جَمِيعَ أَحْكَامِهِ',tr:'Amantu billahi kama huwa bi-asma\u2019ihi wa sifatihi, wa qabiltu jami\u2019a ahkamih.',en:'I believe in Allah as He is, with His names and attributes, and I accept all His commandments.'},
+{n:'Iman-e-Mufassal',u:'ایمانِ مفصل',ar:'آمَنْتُ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ وَالْيَوْمِ الْآخِرِ وَالْقَدْرِ خَيْرِهِ وَشَرِّهِ مِنَ اللَّهِ تَعَالَى وَالْبَعْثِ بَعْدَ الْمَوْتِ',tr:'Amantu billahi wa mala\u2019ikatihi wa kutubihi wa rusulihi, wal-yawmil-akhiri, wal-qadri khairihi wa sharrihi minAllahi ta\u2019ala, wal-ba\u2019thi ba\u2019dal-mawt.',en:'I believe in Allah, His angels, His books, His messengers, the Last Day, destiny — its good and bad from Allah Almighty — and resurrection after death.'}
+];
+function kalimaHTML(k){
+  return '<div class="kalima"><div class="kn">'+k.n+' <span class="ur" style="font-weight:400">'+k.u+'</span></div>'
+    +'<div class="ar">'+k.ar+'</div>'
+    +'<div class="tr" style="font-style:italic;color:var(--muted);margin:4px 0">'+k.tr+'</div>'
+    +'<div style="font-size:.92em">'+k.en+'</div></div>';
+}
+$('kalimaList').innerHTML=KALIMAS.map(kalimaHTML).join('');
+$('imanList').innerHTML=IMAN.map(kalimaHTML).join('');
+
+/* ---- Ramadan checklist ---- */
+const RCHK=[['rSehri','Sehri','سحری'],['rIftar','Iftar','افطار'],['rTaraweeh','Taraweeh','تراویح'],['rQuran','Quran Tilawat','تلاوت قرآن']];
+function rchkState(){const s=store.get('rchk',{date:'',done:[]});const t=new Date().toDateString();if(s.date!==t)return{date:t,done:[]};return s;}
+function renderRchk(){const s=rchkState();
+  $('ramadanChk').innerHTML=RCHK.map(([id,en,ur])=>
+    '<label class="chk'+(s.done.includes(id)?' done':'')+'"><input type="checkbox" data-id="'+id+'" '+(s.done.includes(id)?'checked':'')+'>'
+    +'<span class="nm">'+en+' <span class="ur" style="font-size:.85em">'+ur+'</span></span></label>').join('');
+  $('ramadanChk').querySelectorAll('input').forEach(cb=>cb.onchange=()=>{const st=rchkState();
+    st.done=cb.checked?[...new Set([...st.done,cb.dataset.id])]:st.done.filter(x=>x!==cb.dataset.id);
+    store.set('rchk',st);renderRchk();});
+}
+renderRchk();
+
+/* ---- Monthly timetable ---- */
+$('timetableBtn').onclick=async()=>{
+  const w=$('timetableWrap');
+  if(w.style.display!=='none'){w.style.display='none';return;}
+  w.style.display='block'; w.innerHTML='<div class="note">Loading…</div>';
+  const now=new Date(), city=store.get('city','Lahore'), school=store.get('school','1');
+  try{
+    const r=await fetch('https://api.aladhan.com/v1/calendarByCity?city='+encodeURIComponent(city)+'&country=Pakistan&method=1&school='+school+'&month='+(now.getMonth()+1)+'&year='+now.getFullYear());
+    const j=await r.json(); const days=j.data; const today=now.getDate();
+    let h='<table class="ttable"><tr><th>Date</th><th>Fajr</th><th>Dhuhr</th><th>Asr</th><th>Magh</th><th>Isha</th></tr>';
+    days.forEach(d=>{const t=d.timings;const dd=parseInt(d.date.gregorian.day,10);
+      h+='<tr class="'+(dd===today?'today':'')+'"><td>'+dd+'</td><td>'+clean(t.Fajr)+'</td><td>'+clean(t.Dhuhr)+'</td><td>'+clean(t.Asr)+'</td><td>'+clean(t.Maghrib)+'</td><td>'+clean(t.Isha)+'</td></tr>';});
+    h+='</table><div class="note">Live via Aladhan • '+city+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr</div>';
+    w.innerHTML=h;
+  }catch(e){w.innerHTML='<div class="note">Internet darkar hai. <span class="ur">انٹرنیٹ درکار ہے۔</span></div>';}
+};
+
+/* ---- Tasbeeh Pro: custom dhikr + daily history ---- */
+store.get('customDhikr',[]).forEach(p=>PRESETS.push(p));
+$('customDhikrBtn').onclick=()=>{
+  const v=$('customDhikr').value.trim(); if(!v)return;
+  const p={ar:v,tr:v.length>24?v.slice(0,24)+'…':v,en:'Custom dhikr'};
+  PRESETS.push(p);
+  const c=store.get('customDhikr',[]); c.push(p); store.set('customDhikr',c);
+  $('customDhikr').value=''; renderTb();
+};
+function tbToday(){return new Date().toDateString();}
+const _tapBtnHandler=$('tapBtn').onclick;
+$('tapBtn').onclick=()=>{ _tapBtnHandler(); const h=store.get('tbHist',{}),t=tbToday(); h[t]=(h[t]||0)+1; store.set('tbHist',h); renderTbHist(); };
+function renderTbHist(){
+  const h=store.get('tbHist',{}), t=tbToday();
+  $('todayTotal').textContent=h[t]||0;
+  const days=Object.keys(h).sort().reverse().slice(0,7);
+  $('tasbeehHist').innerHTML=days.length?days.map(d=>'<div class="mshare"><span>'+d+'</span><span class="amt">'+h[d]+' tasbeeh</span></div>').join(''):'<div class="note">No history yet. <span class="ur">ابھی کوئی ریکارڈ نہیں۔</span></div>';
+}
+renderTbHist();
+
+/* ---- Qibla calibration bearing mirror ---- */
+const _setQiblaOrig=setQibla;
+setQibla=function(lat,lon,src){_setQiblaOrig(lat,lon,src);const e=$('qiblaDeg2');if(e)e.textContent=qibla.toFixed(1);};
 </script>
 </body>
 </html>
