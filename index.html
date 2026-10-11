@@ -254,7 +254,12 @@ body.dark .kalima .kn{color:var(--gold);}
   </div>
   <div class="card">
     <h3>🕋 Prayer Times • <span class="ur">نماز کے اوقات</span> <span class="note" id="prayerCityNote">(Lahore)</span></h3>
+    <div class="note" id="locBadge" style="margin-bottom:6px"></div>
     <div class="ptimes" id="ptimeGrid"></div>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="tool-btn" id="gpsBtn">📍 GPS se location</button>
+      <button class="tool-btn" id="chgLocBtn">🏙 Change Location</button>
+    </div>
     <div class="btn-row" style="margin-top:8px">
       <select id="citySel" title="City" style="flex:1">
         <option value="Lahore">Lahore</option><option value="Karachi">Karachi</option>
@@ -264,6 +269,10 @@ body.dark .kalima .kn{color:var(--gold);}
       </select>
       <select id="asrSel" title="Asr method">
         <option value="1">Asr: Hanafi</option><option value="0">Asr: Shafi'i</option>
+      </select>
+      <select id="methodSel" title="Calculation method">
+        <option value="1">Univ. of Islamic Sciences, Karachi</option>
+        <option value="3">Muslim World League</option>
       </select>
     </div>
     <div class="note" style="margin-top:6px"><button class="tool-btn" id="timetableBtn">📅 Monthly Timetable</button></div>
@@ -547,30 +556,84 @@ tick(); setInterval(tick,1000);
 const FALLBACK={Fajr:'04:52',Sunrise:'06:10',Dhuhr:'12:00',Asr:'16:11',Maghrib:'17:50',Isha:'19:08'};
 let PT=FALLBACK, ptOK=false;
 const ORDER=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+const PRAY5=['Fajr','Dhuhr','Asr','Maghrib','Isha'];
 function clean(t){return String(t).replace(/[^0-9:]/g,'').slice(0,5);}
 function toDate(hm){const[a,b]=hm.split(':').map(Number);const d=new Date();d.setHours(a,b,0,0);return d;}
+const METHODS={'1':'Univ. of Islamic Sciences, Karachi','3':'Muslim World League'};
+function updateLocBadge(){
+  const el=$('locBadge'); if(!el)return;
+  const mode=store.get('locMode','manual');
+  if(mode==='gps'){const c=store.get('coords',{});
+    el.innerHTML='📍 <b>GPS location</b> • '+(c.city||((c.lat||'')+','+(c.lon||'')));}
+  else el.innerHTML='🏙 <b>Manual:</b> '+store.get('city','Lahore');
+}
 async function loadPrayers(){
-  const city=store.get('city','Lahore'), school=store.get('school','1');
-  const cityNote=$('prayerCityNote'); if(cityNote)cityNote.textContent='('+city+')';
+  const school=store.get('school','1'), method=store.get('method','1');
+  const locMode=store.get('locMode','manual'), coords=store.get('coords',null);
+  let srcLabel=store.get('city','Lahore');
+  updateLocBadge();
   try{
-    const r=await fetch('https://api.aladhan.com/v1/timingsByCity?city='+encodeURIComponent(city)+'&country=Pakistan&method=1&school='+school);
-    const j=await r.json(); const t=j.data.data.timings;
+    let t;
+    if(locMode==='gps'&&coords&&coords.lat){
+      const now=new Date();
+      const r=await fetch('https://api.aladhan.com/v1/calendar?latitude='+coords.lat+'&longitude='+coords.lon+'&method='+method+'&school='+school+'&month='+(now.getMonth()+1)+'&year='+now.getFullYear());
+      const j=await r.json();
+      const day=j.data.find(d=>parseInt(d.date.gregorian.day,10)===now.getDate())||j.data[0];
+      t=day.timings;
+      srcLabel=coords.city||('GPS '+coords.lat+','+coords.lon);
+    }else{
+      const city=store.get('city','Lahore');
+      const r=await fetch('https://api.aladhan.com/v1/timingsByCity?city='+encodeURIComponent(city)+'&country=Pakistan&method='+method+'&school='+school);
+      const j=await r.json(); t=j.data.timings;
+      srcLabel=city;
+    }
     PT={Fajr:clean(t.Fajr),Sunrise:clean(t.Sunrise),Dhuhr:clean(t.Dhuhr),Asr:clean(t.Asr),Maghrib:clean(t.Maghrib),Isha:clean(t.Isha)};
-    ptOK=true; $('prayerSrc').textContent='Live times via Aladhan • '+city+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr';
-  }catch(e){$('prayerSrc').textContent='Offline — showing approximate times for '+city;}
+    ptOK=true;
+    $('prayerSrc').textContent='✅ Live via Aladhan • '+srcLabel+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr • '+METHODS[method]+(locMode==='gps'?' • 📍GPS':' • 🏙manual');
+  }catch(e){
+    ptOK=false;
+    $('prayerSrc').textContent='⚠️ Offline — approximate times for '+srcLabel+' (internet par live update hoga)';
+  }
+  const cityNote=$('prayerCityNote'); if(cityNote)cityNote.textContent='('+srcLabel+')';
   renderPrayers();
 }
 $('citySel').value=store.get('city','Lahore');
 $('asrSel').value=store.get('school','1');
-$('citySel').onchange=e=>{store.set('city',e.target.value);loadPrayers();};
+$('methodSel').value=store.get('method','1');
+$('citySel').onchange=e=>{store.set('city',e.target.value);store.set('locMode','manual');loadPrayers();};
 $('asrSel').onchange=e=>{store.set('school',e.target.value);loadPrayers();};
+$('methodSel').onchange=e=>{store.set('method',e.target.value);loadPrayers();};
+$('chgLocBtn').onclick=()=>{store.set('locMode','manual');loadPrayers();
+  const s=$('citySel'); if(s){try{s.focus();s.scrollIntoView({block:'nearest'});}catch(e){}}};
+$('gpsBtn').onclick=()=>{
+  if(!navigator.geolocation){alert('⚠️ Is browser me GPS supported nahi hai. Neeche se apna sheher select karein.');return;}
+  alert('📍 Location ki ijazat maangi jayegi taake aap ke ilaqe ke namaz ke auqat maloom ho saken.\n(Aap ki location sirf auqat ke liye istemal hoti hai, kahin bheji ya save nahi ki jati.)');
+  const btn=$('gpsBtn'); btn.textContent='⏳ Locating…'; btn.disabled=true;
+  const done=()=>{btn.innerHTML='📍 GPS se location'; btn.disabled=false;};
+  navigator.geolocation.getCurrentPosition(async p=>{
+    const lat=+p.coords.latitude.toFixed(4), lon=+p.coords.longitude.toFixed(4);
+    let city='';
+    try{
+      const r=await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+lat+'&longitude='+lon+'&localityLanguage=en');
+      const j=await r.json(); city=j.city||j.locality||'';
+    }catch(e){}
+    store.set('coords',{lat:lat,lon:lon,city:city||'GPS location'});
+    store.set('locMode','gps'); done(); loadPrayers();
+  },err=>{
+    done();
+    let m='⚠️ Location nahi mil saki. ';
+    if(err.code===1)m+='Aap ne ijazat deny kar di hai — neeche se apna sheher select karein.';
+    else if(err.code===2)m+='GPS unavailable hai — phone ki Location ON karein aur khuli jagah dobara try karein.';
+    else m+='Waqt khatam ho gaya — dobara koshish karein ya neeche se sheher select karein.';
+    alert(m);
+  },{timeout:20000,maximumAge:600000,enableHighAccuracy:false});
+};
 function prayerState(){
-  const now=new Date(), times=ORDER.map(k=>({k,d:toDate(PT[k])}));
+  const now=new Date(), times=PRAY5.map(k=>({k,d:toDate(PT[k])}));
   for(let i=0;i<times.length;i++){
     if(now<times[i].d){
       const prev=i===0?{k:'Isha',d:toDate(PT.Isha)}:times[i-1];
-      const cur=i===0?'Isha (night)':prev.k;
-      return{cur,next:times[i].k,nextD:times[i].d};
+      return{cur:prev.k,next:times[i].k,nextD:times[i].d};
     }
   }
   const f=toDate(PT.Fajr); f.setDate(f.getDate()+1);
@@ -1224,14 +1287,23 @@ $('timetableBtn').onclick=async()=>{
   const w=$('timetableWrap');
   if(w.style.display!=='none'){w.style.display='none';return;}
   w.style.display='block'; w.innerHTML='<div class="note">Loading…</div>';
-  const now=new Date(), city=store.get('city','Lahore'), school=store.get('school','1');
+  const now=new Date(), city=store.get('city','Lahore'), school=store.get('school','1'), method=store.get('method','1');
+  const locMode=store.get('locMode','manual'), coords=store.get('coords',null);
   try{
-    const r=await fetch('https://api.aladhan.com/v1/calendarByCity?city='+encodeURIComponent(city)+'&country=Pakistan&method=1&school='+school+'&month='+(now.getMonth()+1)+'&year='+now.getFullYear());
+    let url,lbl;
+    if(locMode==='gps'&&coords&&coords.lat){
+      url='https://api.aladhan.com/v1/calendar?latitude='+coords.lat+'&longitude='+coords.lon+'&method='+method+'&school='+school+'&month='+(now.getMonth()+1)+'&year='+now.getFullYear();
+      lbl=coords.city||'GPS location';
+    }else{
+      url='https://api.aladhan.com/v1/calendarByCity?city='+encodeURIComponent(city)+'&country=Pakistan&method='+method+'&school='+school+'&month='+(now.getMonth()+1)+'&year='+now.getFullYear();
+      lbl=city;
+    }
+    const r=await fetch(url);
     const j=await r.json(); const days=j.data; const today=now.getDate();
     let h='<table class="ttable"><tr><th>Date</th><th>Fajr</th><th>Dhuhr</th><th>Asr</th><th>Magh</th><th>Isha</th></tr>';
     days.forEach(d=>{const t=d.timings;const dd=parseInt(d.date.gregorian.day,10);
       h+='<tr class="'+(dd===today?'today':'')+'"><td>'+dd+'</td><td>'+clean(t.Fajr)+'</td><td>'+clean(t.Dhuhr)+'</td><td>'+clean(t.Asr)+'</td><td>'+clean(t.Maghrib)+'</td><td>'+clean(t.Isha)+'</td></tr>';});
-    h+='</table><div class="note">Live via Aladhan • '+city+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr</div>';
+    h+='</table><div class="note">Live via Aladhan • '+lbl+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr • '+METHODS[method]+'</div>';
     w.innerHTML=h;
   }catch(e){w.innerHTML='<div class="note">Internet darkar hai. <span class="ur">انٹرنیٹ درکار ہے۔</span></div>';}
 };
