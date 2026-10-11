@@ -244,27 +244,41 @@ body.dark .book-info h4{color:var(--gold);}
 .badge{display:inline-block; font-size:.68em; background:var(--gold-soft); color:var(--text); border:1px solid var(--gold); border-radius:10px; padding:2px 9px; margin:2px 3px 2px 0;}
 .badge.pdf{background:#b3261e; color:#fff; border-color:#b3261e;}
 .book-desc{font-size:.85em; color:var(--muted); margin:6px 0;}
-/* PDF reader */
+/* PDF reader — full-screen Islamic reading experience */
 #bookReader{display:none;}
-#bookReader.open{display:block;}
-.pdf-toolbar{position:sticky; top:0; z-index:5; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:8px; margin-bottom:8px;}
+#bookReader.open{display:block; position:fixed; inset:0; z-index:60; background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch;}
+body.reader-open nav{display:none;}
+body.reader-open header{display:none;}
+.book-cover.clickable{cursor:pointer; transition:transform .2s;}
+.book-cover.clickable:active{transform:scale(.97);}
+.pdf-readhead{position:sticky; top:0; z-index:6; background:linear-gradient(135deg,var(--green-deep),var(--green)); color:#fff; padding:10px 12px; border-radius:0 0 18px 18px; box-shadow:var(--shadow);}
+.pdf-readhead .t{font-weight:700; font-size:.95em; line-height:1.3;}
+.pdf-readhead .p{font-size:.78em; opacity:.9; margin-top:2px;}
+.pdf-readhead .geom{font-size:.7em; opacity:.55; letter-spacing:6px; margin-top:2px;}
+.pdf-toolbar{position:sticky; top:0; z-index:5; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:8px; margin:10px 12px 8px;}
 .pdf-toolbar .row1{display:flex; align-items:center; gap:6px; justify-content:space-between;}
 .pdf-toolbar .row2{display:flex; align-items:center; gap:6px; justify-content:center; margin-top:8px; flex-wrap:wrap;}
-.tool-btn{background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:8px 12px; font-size:.9em; cursor:pointer; font-family:inherit;}
+.tool-btn{background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:8px 12px; font-size:.9em; cursor:pointer; font-family:inherit; min-height:42px;}
 .tool-btn:active{transform:scale(.95);}
 .tool-btn.on{background:var(--green); color:#fff; border-color:var(--green);}
-#pdfPageNum{font-weight:700; font-size:.95em; min-width:110px; text-align:center;}
+#pdfPageNum{font-weight:700; font-size:.95em; min-width:110px; text-align:center; cursor:pointer; text-decoration:underline dotted; padding:6px 4px; border-radius:8px;}
+#pdfPageNum:active{background:var(--gold-soft);}
 #pdfGo{width:64px; padding:8px 6px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-size:.9em; text-align:center;}
-#pdfCanvasWrap{position:relative; background:#fff; border:1px solid var(--border); border-radius:12px; overflow:auto; max-height:72vh; display:flex; justify-content:center;}
-#pdfCanvas{max-width:100%; height:auto; display:block;}
+#pdfCanvasWrap{position:relative; background:#fdf9ef; border:1px solid var(--border); border-radius:12px; overflow:auto; max-height:62vh; display:flex; justify-content:center; margin:0 12px;}
+body.dark #pdfCanvasWrap{background:#1e1a12;}
+#pdfCanvas{max-width:100%; height:auto; display:block; box-shadow:0 4px 18px rgba(0,0,0,.18); border-radius:4px;}
 #pdfCanvas.night{filter:invert(0.92) hue-rotate(180deg) brightness(1.05);}
-#pdfLoading{position:absolute; inset:0; display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center; background:rgba(255,253,246,.85); z-index:2; border-radius:12px;}
-body.dark #pdfLoading{background:rgba(20,17,11,.88);}
+#pdfCanvas.turn{animation:pageturn .28s ease;}
+@keyframes pageturn{from{opacity:.25; transform:translateX(24px);} to{opacity:1; transform:none;}}
+@media (prefers-reduced-motion:reduce){#pdfCanvas.turn{animation:none;}}
+#pdfLoading{position:absolute; inset:0; display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center; background:rgba(255,253,246,.92); z-index:2; border-radius:12px; padding:16px; text-align:center;}
+body.dark #pdfLoading{background:rgba(20,17,11,.92);}
 .spinner{width:42px; height:42px; border:4px solid var(--gold-soft); border-top-color:var(--gold); border-radius:50%; animation:usp .8s linear infinite;}
-.pdf-nav{display:flex; gap:10px; margin-top:10px;}
-.pdf-nav .btn{flex:1;}
+.pdf-nav{display:flex; gap:10px; margin:10px 12px 0;}
+.pdf-nav .btn{flex:1; min-height:48px; font-size:1.02em;}
+#pdfReader{padding-bottom:26px;}
 #pdfReader:fullscreen{background:var(--bg); padding:12px; overflow:auto;}
-#pdfReader:fullscreen #pdfCanvasWrap{max-height:86vh;}
+#pdfReader:fullscreen #pdfCanvasWrap{max-height:80vh; margin:0;}
 </style>
 </head>
 <body>
@@ -593,7 +607,7 @@ body.dark #pdfLoading{background:rgba(20,17,11,.88);}
     <div class="card">
       <h3>📚 Islamic Books • <span class="ur">اسلامی کتابیں</span></h3>
       <div class="book-card" style="margin-top:0">
-        <div class="book-cover lg" aria-label="Book cover">
+        <div class="book-cover lg clickable" id="bookCoverBtn" role="button" tabindex="0" aria-label="Kitab kholein — Read book">
           <div class="bc-orn">☪️</div>
           <div class="bc-title ur">تحفظِ عقیدۂ ختمِ نبوت<br>اور فتنۂ قادیانیت</div>
           <div class="bc-author">ڈاکٹر محمد آصف امین عطاری</div>
@@ -618,10 +632,15 @@ body.dark #pdfLoading{background:rgba(20,17,11,.88);}
   </div>
   <div id="bookReader">
     <div id="pdfReader">
+      <div class="pdf-readhead">
+        <div class="t">📚 تحفظِ عقیدۂ ختمِ نبوت <span style="font-weight:400">• اسلامی کتاب</span></div>
+        <div class="p" id="pdfHeadPage">Page — of 516</div>
+        <div class="geom">✦ ✦ ✦</div>
+      </div>
       <div class="pdf-toolbar">
         <div class="row1">
           <button class="tool-btn" id="pdfBack">← <span class="ur">واپس</span></button>
-          <b id="pdfPageNum">Page — of 516</b>
+          <b id="pdfPageNum" title="Tap to jump to a page">Page — of 516</b>
           <button class="tool-btn" id="pdfFull">⛶</button>
         </div>
         <div class="row2">
@@ -641,7 +660,7 @@ body.dark #pdfLoading{background:rgba(20,17,11,.88);}
         <button class="btn" id="pdfPrev">‹ Prev <span class="ur">پچھلا</span></button>
         <button class="btn" id="pdfNext">Next <span class="ur">اگلا</span> ›</button>
       </div>
-      <div class="note" style="text-align:center;margin-top:6px">Swipe left/right to turn pages. Progress saves automatically. <span class="ur">انگلی سے صفحہ پلٹیں۔</span></div>
+      <div class="note" style="text-align:center;margin:8px 12px 0">Swipe left/right to turn pages • Tap page number to jump • Progress saves automatically. <span class="ur">انگلی سے صفحہ پلٹیں۔</span></div>
     </div>
   </div>
 </section>
@@ -1690,29 +1709,62 @@ $('homeContinueBook').onclick=()=>{goPage('pg-books');initBooksPage();setTimeout
 $('bookReadNow').onclick=()=>openBookReader(1);
 $('bookContinue').onclick=()=>openBookReader(bookProgress());
 $('bookFavBtn').onclick=()=>{store.set('bookFav:'+BOOK.id,!bookFav());refreshBookUI();};
+(function(){
+  const cv=$('bookCoverBtn'); if(!cv)return;
+  cv.addEventListener('click',()=>openBookReader(bookProgress()>1?bookProgress():1));
+  cv.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openBookReader(bookProgress()>1?bookProgress():1);}});
+})();
 
 /* ---- PDF.js reader ---- */
-let pdfDoc=null,pdfPage=1,pdfScale=1.2,pdfRendering=false,pdfPending=null,pdfNight=false;
+let pdfDoc=null,pdfPage=1,pdfScale=1.2,pdfRendering=false,pdfPending=null,pdfNight=false,pdfLastTarget=1;
+const PDFJS_CDNS=[
+  {js:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',worker:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'},
+  {js:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',worker:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'}
+];
 function loadPdfJs(){
   return new Promise((res,rej)=>{
     if(window.pdfjsLib)return res();
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-    s.onload=()=>{try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';res();}catch(e){rej(e);}};
-    s.onerror=()=>rej(new Error('PDF engine failed to load'));
-    document.head.appendChild(s);
+    let i=0;
+    const attempt=()=>{
+      if(i>=PDFJS_CDNS.length)return rej(new Error('PDF engine failed to load'));
+      const c=PDFJS_CDNS[i++];
+      const s=document.createElement('script');
+      s.src=c.js;
+      s.onload=()=>{try{pdfjsLib.GlobalWorkerOptions.workerSrc=c.worker;res();}catch(e){attempt();}};
+      s.onerror=()=>{s.remove();attempt();};
+      document.head.appendChild(s);
+    };
+    attempt();
   });
 }
-function pdfShowLoading(show,msg){
+function pdfShowLoading(show,msg,retry){
   const l=$('pdfLoading'); if(!l)return;
   l.style.display=show?'flex':'none';
-  if(msg)l.querySelector('div:last-child').innerHTML=msg;
+  if(!show)return;
+  if(msg||retry){
+    l.innerHTML='<div class="spinner"'+(retry?' style="display:none"':'')+'></div>'
+      +'<div>'+(msg||'')+'</div>'
+      +(retry?'<button class="btn gold" id="pdfRetryBtn" style="margin-top:6px">🔄 Retry <span class="ur">دوبارہ کوشش</span></button>':'');
+    const rb=$('pdfRetryBtn');
+    if(rb)rb.onclick=()=>openBookReader(pdfLastTarget);
+  }else{
+    l.innerHTML='<div class="spinner"></div><div>Loading page… <span class="ur">صفحہ کھل رہا ہے…</span></div>';
+  }
+}
+function pdfSetPageLabel(n,total){
+  const t='Page '+n+' of '+total;
+  const a=$('pdfPageNum'); if(a)a.textContent=t;
+  const b=$('pdfHeadPage'); if(b)b.textContent=t;
 }
 async function openBookReader(page){
+  pdfLastTarget=page||bookProgress()||1;
   $('bookDetails').style.display='none';
   $('bookReader').classList.add('open');
-  window.scrollTo(0,0);
+  document.body.classList.add('reader-open');
+  try{if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();}catch(e){}
+  const br=$('bookReader'); if(br)br.scrollTop=0; window.scrollTo(0,0);
   pdfShowLoading(true,'Loading book… <span class="ur">کتاب کھل رہی ہے…</span>');
+  try{history.pushState({rnReader:1},'');}catch(e){}
   try{
     await loadPdfJs();
     if(!pdfDoc){
@@ -1720,9 +1772,10 @@ async function openBookReader(page){
       pdfDoc=await pdfjsLib.getDocument(BOOK.url).promise;
     }
     pdfShowLoading(false);
-    renderPdfPage(page||bookProgress());
+    fitPdfScale();
+    renderPdfPage(pdfLastTarget);
   }catch(e){
-    pdfShowLoading(true,'⚠️ Could not open the PDF. Check your internet, or use the Download button. <span class="ur">انٹرنیٹ چیک کریں۔</span>');
+    pdfShowLoading(true,'⚠️ Could not open the book. Check your internet connection and try again. <span class="ur">انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں۔</span>',true);
   }
 }
 function fitPdfScale(){
@@ -1743,12 +1796,13 @@ async function renderPdfPage(n){
     canvas.width=Math.floor(vp.width*dpr); canvas.height=Math.floor(vp.height*dpr);
     canvas.style.width=Math.floor(vp.width)+'px'; canvas.style.height=Math.floor(vp.height)+'px';
     canvas.classList.toggle('night',pdfNight);
+    canvas.classList.remove('turn'); void canvas.offsetWidth; canvas.classList.add('turn');
     await page.render({canvasContext:ctx,viewport:page.getViewport({scale:pdfScale*dpr})}).promise;
     pdfPage=n; setBookProgress(n); refreshBookUI();
-    $('pdfPageNum').textContent='Page '+n+' of '+pdfDoc.numPages;
+    pdfSetPageLabel(n,pdfDoc.numPages);
     const g=$('pdfGo'); g.max=pdfDoc.numPages;
   }catch(e){
-    pdfShowLoading(true,'⚠️ Page failed to load. Try again.');
+    pdfShowLoading(true,'⚠️ Page failed to load. <span class="ur">صفحہ نہیں کھلا۔</span>',true);
   }
   pdfShowLoading(false);
   pdfRendering=false;
@@ -1756,10 +1810,23 @@ async function renderPdfPage(n){
 }
 function closeBookReader(){
   $('bookReader').classList.remove('open');
+  document.body.classList.remove('reader-open');
   $('bookDetails').style.display='';
   refreshBookUI(); window.scrollTo(0,0);
+  try{if(history.state&&history.state.rnReader)history.back();}catch(e){}
+}
+window.addEventListener('popstate',()=>{
+  if(document.body.classList.contains('reader-open'))closeBookReader();
+});
+function pdfJumpPrompt(){
+  const total=pdfDoc?pdfDoc.numPages:BOOK.pages;
+  const v=prompt('Go to page (1–'+total+'):',''+pdfPage);
+  if(v===null)return;
+  const n=parseInt(v,10);
+  if(n>=1&&n<=total)renderPdfPage(n);
 }
 $('pdfBack').onclick=closeBookReader;
+$('pdfPageNum').onclick=pdfJumpPrompt;
 $('pdfPrev').onclick=()=>renderPdfPage(pdfPage-1);
 $('pdfNext').onclick=()=>renderPdfPage(pdfPage+1);
 $('pdfZoomIn').onclick=()=>{pdfScale=Math.min(3,pdfScale+0.25);renderPdfPage(pdfPage);};
