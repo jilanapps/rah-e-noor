@@ -1654,8 +1654,8 @@ function renderSurah(d){
   let h='';
   h+='<div class="note" style="text-align:center">'+m.englishNameTranslation+' • '+m.numberOfAyahs+' Ayat • '+m.revelationType+'</div>';
   h+='<div class="note" style="text-align:center;color:var(--gold)">'+(d.offline
-    ?'Tarjuma: Fateh Muhammad Jalandhry <span class="ur">فتح محمد جالندھری</span> • 📴 offline'
-    :'Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span>')+'</div>';
+    ?'Tarjuma: Fateh Muhammad Jalandhry (Tanzil.net) • Arabic: Tanzil Project <span class="ur">فتح محمد جالندھری</span> • 📴 offline'
+    :'Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span> • Arabic: Tanzil.net')+'</div>';
   h+=d.ayahs.map(a=>'<div class="ayah"><span class="ar">'+a.ar+'</span><span class="an">'+a.n+'</span><div class="ur" style="margin-top:6px;line-height:2">'+a.ur+'</div></div>').join('');
   rdrBody(h);
 }
@@ -1810,8 +1810,8 @@ renderSurah=function(d){
     +'<span class="note" style="margin:0">🔊 audio • 🔖 bookmark</span></div>';
   h+='<div class="note" style="text-align:center">'+m.englishNameTranslation+' • '+m.numberOfAyahs+' Ayat • '+m.revelationType+'</div>';
   h+='<div class="note" style="text-align:center;color:var(--gold)">'+(d.offline
-    ?'Tarjuma: Fateh Muhammad Jalandhry <span class="ur">فتح محمد جالندھری</span> • 📴 offline'
-    :'Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span>')+'</div>';
+    ?'Tarjuma: Fateh Muhammad Jalandhry (Tanzil.net) • Arabic: Tanzil Project <span class="ur">فتح محمد جالندھری</span> • 📴 offline'
+    :'Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span> • Arabic: Tanzil.net')+'</div>';
   h+=d.ayahs.map(a=>{
     const key=m.number+':'+a.n, isbm=bm.indexOf(key)>=0;
     return '<div class="ayah" id="ay'+a.n+'">'
