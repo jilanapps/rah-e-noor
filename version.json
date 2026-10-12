@@ -1,6 +1,6 @@
 {
- "apkVersionCode": 4,
- "notes": "Rah-e-Noor v2.5 — Home screen redesign: mosque header with live countdown ring, prayer-times card with seconds + azan toggles, Fard/Other times pill, shortcut cards, newsfeed, new bottom nav (Rohani/Donation/Qibla/Silent/Calendar), 3 themes (light/dark/green), Hijri date adjust, GPS + elevation",
+ "apkVersionCode": 5,
+ "notes": "Rah-e-Noor v2.11 — new official logo/app icon (green-gold circular), PWA manifest + icons, hadith order Bukhari/Muslim/Mirat, Urdu translations, Listen audio, Mirat-ul-Manajih 8 volumes",
  "url": "https://jilanapps.github.io/rah-e-noor/rah-e-noor.apk",
- "version": "2.5"
+ "version": "2.11"
 }
