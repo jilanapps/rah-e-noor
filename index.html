@@ -1422,6 +1422,7 @@ const BOOKS=[
 {t:'Riyad-us-Saliheen',au:'Imam Yahya al-Nawawi',c:'Ethics',d:'Beloved hadith collection on worship, morals, and everyday Muslim life.'},
 {t:'Hisn-ul-Muslim',au:"Sa'id al-Qahtani",c:'Duas',d:'Fortress of the Muslim — authentic daily duas and supplications for every occasion.'},
 {t:'Tafheem-ul-Quran',au:'Syed Abul Ala Maududi',c:'Tafsir',d:'Six-volume Urdu commentary explaining the Quran as practical guidance for life.'},
+{t:'Sirat-ul-Jinan',au:'Mufti Muhammad Qasim Attari',c:'Tafsir',d:'Dawat-e-Islami ki mustanad Urdu tafseer-e-Quran — Kanz-ul-Irfan tarjume ke sath, 10 jildon me. Official Dawat-e-Islami library se parhein.',u:'https://dawateislami.net/bookslibrary/ur/sirat-ul-jinan-jild-1'},
 {t:'Bahar-e-Shariat',au:'Mufti Amjad Ali Aazmi',c:'Fiqh',d:'Comprehensive Hanafi fiqh encyclopedia in Urdu, widely referenced by scholars.'},
 {t:'Faizan-e-Sunnat',au:'Dawat-e-Islami',c:'Sunnah',d:'Practical guide to living by the Sunnah in daily life, published by Dawat-e-Islami.'},
 {t:'Seerat-un-Nabi',au:'Shibli Nomani & S. Sulaiman Nadvi',c:'Seerah',d:'Classic Urdu biography of the Prophet Muhammad ﷺ, rich in history and lessons.'},
@@ -1432,8 +1433,10 @@ function renderLib(q=''){q=q.toLowerCase();
   const list=BOOKS.filter(b=>(b.t+b.au+b.c+b.d).toLowerCase().includes(q));
   $('libList').innerHTML=list.length?list.map(b=>
     `<div class="book"><div class="t">${b.t}</div><div class="au">${b.au}</div>
-     <div class="d">${b.d}</div><span class="tag">${b.c}</span></div>`).join('')
+     <div class="d">${b.d}</div><span class="tag">${b.c}</span>`+
+     (b.u?`<div style="margin-top:8px"><button class="tool-btn" data-bookurl="${b.u}">📖 Read Online • <span class="ur">آن لائن پڑھیں</span></button></div>`:'')+`</div>`).join('')
     :'<div class="note">No books found. <span class="ur">کوئی کتاب نہیں ملی۔</span></div>';
+  document.querySelectorAll('[data-bookurl]').forEach(el=>el.onclick=()=>window.open(el.dataset.bookurl,'_blank'));
 }
 renderLib();
 $('libSearch').oninput=e=>renderLib(e.target.value);
