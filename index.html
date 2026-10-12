@@ -1918,6 +1918,18 @@ function renderHChapters(key,q){
     },30);
   };
 }
+/* v2.9: 🇵🇰 Urdu tarjuma — lazy load from local data files */
+const URDU={};
+async function loadUrdu(key){
+  if(URDU[key])return URDU[key];
+  if(key!=='bukhari'&&key!=='muslim')return null;
+  try{
+    const r=await fetch('data/urdu-'+key+'.json');
+    if(!r.ok)throw 0;
+    URDU[key]=await r.json();
+    return URDU[key];
+  }catch(e){return null;}
+}
 function hadithHTML(key,L,hh){
   const saved=hbmHas(key,hh.idInBook);
   const en=((hh.english.narrator||'')+' '+(hh.english.text||'')).trim();
@@ -1926,6 +1938,7 @@ function hadithHTML(key,L,hh){
     +'<div class="ar htx">'+hh.arabic+'</div>'
     +(en?'<div class="en htx"><b>'+escHtml(hh.english.narrator||'')+'</b> '+escHtml(hh.english.text||'')+'</div>'
         :'<div class="note">English translation not available in this dataset.</div>')
+    +'<div class="ur htx" data-urdu="'+hh.idInBook+'" style="margin-top:6px;line-height:2">⏳ Urdu tarjuma load ho raha…</div>'
     +'<div class="btn-row" style="margin-top:8px">'
     +'<button class="tool-btn" data-act="bm">'+(saved?'📌 Saved':'🔖 Save')+'</button>'
     +'<button class="tool-btn" data-act="copy">📋 Copy</button>'
@@ -1958,6 +1971,20 @@ function hSpeak(L,hh,btn){
   }catch(e){alert('⚠️ Audio error: '+e.message);}
 }
 function bindHadithBtns(key,L){
+  /* v2.9: fill Urdu translations */
+  if(key==='bukhari'||key==='muslim'){
+    loadUrdu(key).then(ud=>{
+      $('rdrBody').querySelectorAll('[data-urdu]').forEach(div=>{
+        const n=div.dataset.urdu;
+        const txt=ud&&ud[n];
+        div.innerHTML=txt?escHtml(txt):'<span class="note">Urdu tarjuma dastiyab nahi.</span>';
+      });
+    });
+  }else{
+    $('rdrBody').querySelectorAll('[data-urdu]').forEach(div=>{
+      div.innerHTML='<span class="note">Urdu tarjuma sirf Bukhari/Muslim me.</span>';
+    });
+  }
   $('rdrBody').querySelectorAll('.hadith').forEach(el=>{
     const id=+el.dataset.hid;
     const hh=L.hadiths.find(x=>x.idInBook===id);
