@@ -834,7 +834,7 @@ body.dark nav button.on{color:#f06292;}
 <!-- ================= BOTTOM NAV (v2.5) ================= -->
 <nav id="mainNav">
   <button class="on" data-pg="pg-home"><span class="ic">📿</span>Rohani<span class="ur"><br>روحانی</span></button>
-  <button data-toast="🎁 Donation section jald aa raha hai • Coming soon"><span class="ic">🎁</span>Donation<span class="ur"><br>عطیہ</span></button>
+
   <button data-pg="pg-more" data-scroll="sec-qibla"><span class="ic">🧭</span>Qibla<span class="ur"><br>قبلہ</span></button>
   <button data-toast="🔇 Silent mode jald aa raha hai • Coming soon"><span class="ic">🔇</span>Silent<span class="ur"><br>خاموش</span></button>
   <button data-toast="📅 Calendar jald aa raha hai • Coming soon"><span class="ic">📅</span>Calendar<span class="ur"><br>کیلنڈر</span></button>
@@ -1805,10 +1805,14 @@ const HBOOKS_PENDING=[
 const HLIB_FILES={bukhari:'data/bukhari.json',muslim:'data/muslim.json'};
 const HLIB_COUNTS={bukhari:7277,muslim:7459};
 function renderHadithBooks(){
-  let h='<div class="book tappable" data-miratbook="1"><div class="t">📚 مرآۃ المناجیح <span class="ur">شرح مشکوٰۃ المصابیح</span> <span class="tap-hint">›</span></div><div class="au">مفتی احمد یار خان نعیمی رحمۃ اللہ علیہ</div><div class="d">6,294 احادیث • 295 ابواب • 8 جلدیں — مکمل اردو شرح</div><span class="tag">Ahle Sunnat</span></div>';
-  h+=Object.keys(HBOOKS).map(k=>{const b=HBOOKS[k];
+  /* v2.10: tarteeb — Bukhari, Muslim, Mirat, phir baqi */
+  const miratCard='<div class="book tappable" data-miratbook="1"><div class="t">📚 مرآۃ المناجیح <span class="ur">شرح مشکوٰۃ المصابیح</span> <span class="tap-hint">›</span></div><div class="au">مفتی احمد یار خان نعیمی رحمۃ اللہ علیہ</div><div class="d">6,294 احادیث • 295 ابواب • 8 جلدیں — مکمل اردو شرح</div><span class="tag">Ahle Sunnat</span></div>';
+  const bookCard=k=>{const b=HBOOKS[k];
     const lib=HLIB_FILES[k]?'<div style="margin-top:8px"><button class="tool-btn" data-hlib="'+k+'">📚 Full Library — '+HLIB_COUNTS[k].toLocaleString()+' ahadith</button></div>':'';
-    return '<div class="book tappable" data-hbook="'+k+'"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span> <span class="tap-hint">›</span></div><div class="au">'+b.au+'</div><div class="d">'+b.count+' — '+b.hadith.length+' famous ahadith inside</div>'+lib+'<span class="tag">Hadith</span></div>';}).join('');
+    return '<div class="book tappable" data-hbook="'+k+'"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span> <span class="tap-hint">›</span></div><div class="au">'+b.au+'</div><div class="d">'+b.count+' — '+b.hadith.length+' famous ahadith inside</div>'+lib+'<span class="tag">Hadith</span></div>';};
+  const first=['bukhari','muslim'].filter(k=>HBOOKS[k]);
+  const rest=Object.keys(HBOOKS).filter(k=>first.indexOf(k)<0);
+  let h=first.map(bookCard).join('')+miratCard+rest.map(bookCard).join('');
   h+='<div class="label" style="margin-top:10px">Coming Soon • <span class="ur">جلد آ رہا ہے</span></div>';
   h+=HBOOKS_PENDING.map(b=>'<div class="book"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span></div><div class="au">'+b.au+'</div><div class="d"><span class="tag">⏳ Pending verified content</span> — full text will be added after verification.</div></div>').join('');
   $('hadithBooks').innerHTML=h;
