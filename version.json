@@ -1,6 +1,6 @@
 {
- "apkVersionCode": 11,
- "notes": "Rah-e-Noor v2.17 — 5 naye features: Durood Sharif (tap counter), Rozana Rahnumai (daily tip), Question & Answer (Hanafi), Hijri Calendar (Gregorian dates), Silent Mode (namaz ke auqat me auto-silent)",
+ "apkVersionCode": 12,
+ "notes": "Rah-e-Noor v2.18 — Back button fix: ab back dabane par app band hone ki bajaye pechle screen par jata hai",
  "url": "https://jilanapps.github.io/rah-e-noor/rah-e-noor.apk",
- "version": "2.17"
+ "version": "2.18"
 }

@@ -1561,8 +1561,12 @@ function setTheme(t){
 function applyDark(d){setTheme(d?'dark':'light');} // backward-compat
 setTheme(store.get('theme',store.get('dark',false)?'dark':'light'));
 // Dialogs
-function openDlg(id){$(id).classList.add('open');}
+function openDlg(id){$(id).classList.add('open');__pushBack();}
 function closeDlg(id){$(id).classList.remove('open');}
+/* ---- Back-button fix (v2.18): har naya screen ek history entry banata hai,
+   taake Android back dabane par app band hone ki bajaye pechle screen par jaye ---- */
+let __backGuard=false;
+function __pushBack(){if(__backGuard)return;try{history.pushState({rnb:Date.now()},'');}catch(e){}}
 document.querySelectorAll('.dlg-ov').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');}));
 $('themePill').onclick=()=>openDlg('themeDlg');
 $('fab').onclick=()=>openDlg('themeDlg');
@@ -1589,7 +1593,7 @@ document.querySelectorAll('[data-toast]').forEach(el=>{if(el.closest('#mainNav')
   el.addEventListener('click',()=>toast(el.dataset.toast));});
 
 /* ================= Reader Overlay ================= */
-function openOv(){$('readerOv').classList.add('open');document.body.style.overflow='hidden';}
+function openOv(){$('readerOv').classList.add('open');document.body.style.overflow='hidden';__pushBack();}
 function closeOv(){$('readerOv').classList.remove('open');document.body.style.overflow='';}
 function rdrTitle(h){$('rdrTitle').innerHTML=h;}
 function rdrBody(h){$('rdrBody').innerHTML=h;$('rdrBody').scrollTop=0;}
@@ -1754,10 +1758,13 @@ document.querySelectorAll('[data-book]').forEach(el=>el.onclick=()=>{
 /* ================= v2.3 UPGRADES ================= */
 /* ---- Quick navigation ---- */
 function goPage(pg){
+  const cur=document.querySelector('.page.active');
+  const changed=!cur||cur.id!==pg;
   document.querySelectorAll('#mainNav button').forEach(x=>x.classList.toggle('on',x.dataset.pg===pg));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(pg); if(el)el.classList.add('active');
   window.scrollTo(0,0);
+  if(changed)__pushBack();
 }
 document.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{
   const k=el.dataset.go;
@@ -2448,7 +2455,7 @@ async function openBookReader(page){
   try{if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();}catch(e){}
   const br=$('bookReader'); if(br)br.scrollTop=0; window.scrollTo(0,0);
   pdfShowLoading(true,'Loading book… <span class="ur">کتاب کھل رہی ہے…</span>');
-  try{history.pushState({rnReader:1},'');}catch(e){}
+  if(!__backGuard){try{history.pushState({rnReader:1},'');}catch(e){}}
   try{
     await loadPdfJs();
     if(!pdfDoc){
@@ -2497,12 +2504,23 @@ function closeBookReader(){
   document.body.classList.remove('reader-open');
   $('bookDetails').style.display='';
   refreshBookUI(); window.scrollTo(0,0);
-  try{if(history.state&&history.state.rnReader)history.back();}catch(e){}
+  /* v2.18: stale history entry rehne do — agla back dabane par popstate use sambhal lega */
 }
 window.addEventListener('popstate',()=>{
-  const t=$('tocOverlay');
-  if(t&&t.classList.contains('open')){t.classList.remove('open');return;}
-  if(document.body.classList.contains('reader-open'))closeBookReader();
+  /* Back dabane par: sab se upar wali cheez band karo, warna home par jao.
+     Home par aur kuch khula na ho to kuch na karo — agla back app band karega. */
+  __backGuard=true;
+  try{
+    const t=$('tocOverlay');
+    if(t&&t.classList.contains('open')){t.classList.remove('open');return;}
+    if(document.body.classList.contains('reader-open')){closeBookReader();return;}
+    const ro=$('readerOv');
+    if(ro&&ro.classList.contains('open')){closeOv();return;}
+    const od=document.querySelector('#infoDlg.open,#silentDlg.open,#themeDlg.open');
+    if(od){od.classList.remove('open');return;}
+    const cur=document.querySelector('.page.active');
+    if(cur&&cur.id!=='pg-home'){goPage('pg-home');return;}
+  }finally{__backGuard=false;}
 });
 function pdfJumpPrompt(){
   const total=pdfDoc?pdfDoc.numPages:BOOK.pages;
@@ -2574,7 +2592,7 @@ function openToc(){
   $('tocSearch').value='';
   renderTocList('');
   $('tocOverlay').classList.add('open');
-  try{history.pushState({rnToc:1},'');}catch(e){}
+  if(!__backGuard){try{history.pushState({rnToc:1},'');}catch(e){}}
 }
 function closeToc(){
   $('tocOverlay').classList.remove('open');
