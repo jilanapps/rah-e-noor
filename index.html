@@ -452,7 +452,6 @@ body.dark nav button.on{color:#f06292;}
   <!-- Prayer times card -->
   <div class="pcard" id="prayerCard">
     <div id="ptimeRows"></div>
-    <div class="pt-src" id="prayerSrc">Loading prayer times…</div>
   </div>
 
   <!-- Fard / Other toggle -->
@@ -1031,7 +1030,6 @@ async function loadPrayers(){
     if(hj&&hj.day)apiHijri={day:hj.day,month:(hj.month&&hj.month.en)||'',year:String(hj.year).replace(/[^0-9]/g,'')};
     PT={Fajr:clean(t.Fajr),Sunrise:clean(t.Sunrise),Dhuhr:clean(t.Dhuhr),Asr:clean(t.Asr),Maghrib:clean(t.Maghrib),Isha:clean(t.Isha)};
     ptOK=true;
-    $('prayerSrc').textContent='✅ Live via Aladhan • '+srcLabel+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr • '+METHODS[method]+(locMode==='gps'?' • 📍GPS':' • 🏙manual');
     const cl=$('cityLine'); if(cl)cl.textContent=cityName+', Pakistan';
     if(lat!=null&&lon!=null)fetchElevation(lat,lon);
   }catch(e){
@@ -1044,12 +1042,10 @@ async function loadPrayers(){
       try{
         offT=calcOfflineTimes(offLat,offLon,method,school);
         PT=offT;ptOK=true;
-        $('prayerSrc').textContent='📴 Offline hisaab • '+offName+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr • '+METHODS[method]+' (internet par live auqat milenge)';
         const cl2=$('cityLine');if(cl2)cl2.textContent=offName+', Pakistan';
       }catch(e2){offT=null;}
     }
     if(!offT){
-      $('prayerSrc').textContent='⚠️ Offline — namaz ke auqat ke liye internet ya GPS location chahiye';
       const cl=$('cityLine'); if(cl)cl.textContent=cityName+', Pakistan';
     }
   }
@@ -1583,9 +1579,22 @@ async function openQuran(){
   openOv();
   if(!surahListCache){
     try{
-      const r=await fetch('https://api.alquran.cloud/v1/surah');
-      if(!r.ok) throw 0;
-      surahListCache=(await r.json()).data;
+      // v2.13: pehle local offline file, phir API
+      let loaded=null;
+      try{
+        const rl=await fetch('data/quran/meta.json');
+        if(rl.ok){
+          const lm=await rl.json();
+          loaded=lm.map(s=>({number:s.n,name:s.name,englishName:s.en,
+            englishNameTranslation:s.tr,numberOfAyahs:s.ayas,revelationType:s.rev}));
+        }
+      }catch(e){}
+      if(!loaded){
+        const r=await fetch('https://api.alquran.cloud/v1/surah');
+        if(!r.ok) throw 0;
+        loaded=(await r.json()).data;
+      }
+      surahListCache=loaded;
     }catch(e){
       $('surahList').innerHTML='<div class="note">Internet darkar hai. <span class="ur">سورۃ کی فہرست کے لیے انٹرنیٹ درکار ہے۔</span></div>';
       return;
@@ -1610,6 +1619,20 @@ async function openSurah(n){
   if(surahCache[n]){renderSurah(surahCache[n]);return;}
   rdrBody('<div class="note">Loading… <span class="ur">لوڈ ہو رہا ہے…</span></div>');
   try{
+    // v2.13: pehle local offline file (Arabic + Jalandhry tarjuma), phir API (Kanzul Iman)
+    let local=null;
+    try{
+      const rl=await fetch('data/quran/'+n+'.json');
+      if(rl.ok) local=await rl.json();
+    }catch(e){}
+    if(local&&local.ayahs){
+      const meta=(surahListCache||[]).find(s=>s.number===n)||{};
+      surahCache[n]={meta:{englishName:meta.englishName||('Surah '+n),name:meta.name||'',
+        englishNameTranslation:meta.englishNameTranslation||'',numberOfAyahs:local.ayahs.length,
+        revelationType:meta.revelationType||''},
+        ayahs:local.ayahs,offline:true};
+      renderSurah(surahCache[n]);return;
+    }
     const[ra,ru]=await Promise.all([
       fetch('https://api.alquran.cloud/v1/surah/'+n+'/quran-uthmani'),
       fetch('https://api.alquran.cloud/v1/surah/'+n+'/ur.kanzuliman')
@@ -1627,7 +1650,9 @@ function renderSurah(d){
   rdrTitle('📖 '+m.englishName+' <span class="ar" style="font-size:.9em">'+m.name+'</span>');
   let h='';
   h+='<div class="note" style="text-align:center">'+m.englishNameTranslation+' • '+m.numberOfAyahs+' Ayat • '+m.revelationType+'</div>';
-  h+='<div class="note" style="text-align:center;color:var(--gold)">Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span></div>';
+  h+='<div class="note" style="text-align:center;color:var(--gold)">'+(d.offline
+    ?'Tarjuma: Fateh Muhammad Jalandhry <span class="ur">فتح محمد جالندھری</span> • 📴 offline'
+    :'Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span>')+'</div>';
   h+=d.ayahs.map(a=>'<div class="ayah"><span class="ar">'+a.ar+'</span><span class="an">'+a.n+'</span><div class="ur" style="margin-top:6px;line-height:2">'+a.ur+'</div></div>').join('');
   rdrBody(h);
 }
@@ -1781,7 +1806,9 @@ renderSurah=function(d){
     +'<button class="tool-btn'+(rdrNight?' on':'')+'" id="tNight">🌙 Night</button>'
     +'<span class="note" style="margin:0">🔊 audio • 🔖 bookmark</span></div>';
   h+='<div class="note" style="text-align:center">'+m.englishNameTranslation+' • '+m.numberOfAyahs+' Ayat • '+m.revelationType+'</div>';
-  h+='<div class="note" style="text-align:center;color:var(--gold)">Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span></div>';
+  h+='<div class="note" style="text-align:center;color:var(--gold)">'+(d.offline
+    ?'Tarjuma: Fateh Muhammad Jalandhry <span class="ur">فتح محمد جالندھری</span> • 📴 offline'
+    :'Tarjuma: Kanzul Iman — Imam Ahmed Raza Khan <span class="ur">کنزالایمان</span>')+'</div>';
   h+=d.ayahs.map(a=>{
     const key=m.number+':'+a.n, isbm=bm.indexOf(key)>=0;
     return '<div class="ayah" id="ay'+a.n+'">'
