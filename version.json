@@ -1,6 +1,6 @@
 {
- "apkVersionCode": 5,
- "notes": "Rah-e-Noor v2.11 — new official logo/app icon (green-gold circular), PWA manifest + icons, hadith order Bukhari/Muslim/Mirat, Urdu translations, Listen audio, Mirat-ul-Manajih 8 volumes",
+ "apkVersionCode": 6,
+ "notes": "Rah-e-Noor v2.12 — OFFLINE support: app baghair net ke khulti hai, namaz ke auqat ka built-in hisaab (Karachi/MWL + Hanafi/Shafi Asr), Tasbeeh/Qibla/Zakat/Duas offline; Hadith library, Quran (uncached), Mirat PDFs aur audio ke liye internet chahiye",
  "url": "https://jilanapps.github.io/rah-e-noor/rah-e-noor.apk",
- "version": "2.11"
+ "version": "2.12"
 }

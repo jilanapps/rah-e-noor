@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}</script>
 <meta name="theme-color" content="#0d3b2e">
 <meta name="theme-color" content="#0d5c3f">
 <style>
@@ -966,6 +967,45 @@ async function fetchElevation(lat,lon){
   }catch(e){/* graceful: stays '—' */}
   tick();
 }
+/* ---- Offline prayer-time calculator (built-in fallback) ----
+   Standard astronomical method (same angles as the selected fiqh method):
+   Karachi board = Fajr 18°, Isha 18° · MWL = Fajr 18°, Isha 17°
+   Hanafi Asr = shadow factor 2, Shafi'i = 1.
+   Used only when the Aladhan API is unreachable. */
+function calcOfflineTimes(lat,lon,method,school){
+  const D2R=Math.PI/180,R2D=180/Math.PI;
+  const fixA=a=>{a%=360;return a<0?a+360:a;};
+  const fixH=h=>{h%=24;return h<0?h+24:h;};
+  const d=new Date();let y=d.getFullYear(),m=d.getMonth()+1,day=d.getDate();
+  if(m<=2){y-=1;m+=12;}
+  const A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+  const JD=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+day+B-1524.5;
+  const D=JD-2451545.0;
+  const g=(fixA(357.529+0.98560028*D))*D2R;
+  const q=fixA(280.459+0.98564736*D);
+  const L=(fixA(q+1.915*Math.sin(g)+0.020*Math.sin(2*g)))*D2R;
+  const e=(23.439-0.00000036*D)*D2R;
+  let RA=Math.atan2(Math.cos(e)*Math.sin(L),Math.cos(L))*R2D/15;RA=fixH(RA);
+  const decl=Math.asin(Math.sin(e)*Math.sin(L))*R2D;
+  const eqt=fixH(q/15-RA);
+  const tz=-d.getTimezoneOffset()/60;
+  const noon=fixH(12+tz-lon/15-eqt);
+  const latR=lat*D2R,declR=decl*D2R;
+  const angT=(ang,morning)=>{
+    const c=(-Math.sin(ang*D2R)-Math.sin(latR)*Math.sin(declR))/(Math.cos(latR)*Math.cos(declR));
+    const H=Math.acos(Math.min(1,Math.max(-1,c)))*R2D/15;
+    return fixH(noon+(morning?-H:H));
+  };
+  const f=((school==='1')?2:1)+Math.tan(Math.abs(latR-declR));
+  const asrAng=Math.atan(1/f)*R2D;
+  const cA=(Math.sin(asrAng*D2R)-Math.sin(latR)*Math.sin(declR))/(Math.cos(latR)*Math.cos(declR));
+  const asr=fixH(noon+Math.acos(Math.min(1,Math.max(-1,cA)))*R2D/15);
+  const fajrA=18,ishaA=(method==='3'?17:18);
+  const fmt=h=>{h=fixH(h+0.5/60);const H=Math.floor(h),M=Math.floor((h-H)*60);
+    return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0');};
+  return{Fajr:fmt(angT(fajrA,true)),Sunrise:fmt(angT(0.833,true)),Dhuhr:fmt(noon),
+    Asr:fmt(asr),Maghrib:fmt(angT(0.833,false)),Isha:fmt(angT(ishaA,false))};
+}
 async function loadPrayers(){
   const school=store.get('school','1'), method=store.get('method','1');
   const locMode=store.get('locMode','manual'), coords=store.get('coords',null);
@@ -996,8 +1036,22 @@ async function loadPrayers(){
     if(lat!=null&&lon!=null)fetchElevation(lat,lon);
   }catch(e){
     ptOK=false;
-    $('prayerSrc').textContent='⚠️ Offline — approximate times for '+srcLabel+' (internet par live update hoga)';
-    const cl=$('cityLine'); if(cl)cl.textContent=cityName+', Pakistan';
+    // OFFLINE FALLBACK: built-in astronomical calculation (Karachi/MWL angles + Hanafi/Shafi'i Asr)
+    let offT=null,offLat=null,offLon=null,offName=null;
+    if(locMode==='gps'&&coords&&coords.lat){offLat=coords.lat;offLon=coords.lon;offName=coords.city||'GPS location';}
+    else{const ll=CITY_LL[store.get('city','Lahore')];if(ll){offLat=ll[0];offLon=ll[1];offName=store.get('city','Lahore');}}
+    if(offLat!=null){
+      try{
+        offT=calcOfflineTimes(offLat,offLon,method,school);
+        PT=offT;ptOK=true;
+        $('prayerSrc').textContent='📴 Offline hisaab • '+offName+' • '+(school==='1'?'Hanafi':'Shafi\u2019i')+' Asr • '+METHODS[method]+' (internet par live auqat milenge)';
+        const cl2=$('cityLine');if(cl2)cl2.textContent=offName+', Pakistan';
+      }catch(e2){offT=null;}
+    }
+    if(!offT){
+      $('prayerSrc').textContent='⚠️ Offline — namaz ke auqat ke liye internet ya GPS location chahiye';
+      const cl=$('cityLine'); if(cl)cl.textContent=cityName+', Pakistan';
+    }
   }
   tick();
   renderPrayers();
