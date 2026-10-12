@@ -1,7 +1,7 @@
 /* Rah-e-Noor service worker — offline-first app shell.
    Caches the core files so the app opens without internet.
    Live data (prayer API, Quran, Hadith, PDFs) still needs internet. */
-const CACHE='rahenoor-v2-14';
+const CACHE='rahenoor-v2-17';
 const SHELL=[
   './','./index.html','./book-toc.js','./manifest.json',
   './privacy-policy.html','./icon-192.png','./icon-512.png',

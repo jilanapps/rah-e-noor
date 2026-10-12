@@ -211,6 +211,19 @@ body.dark .mshare .amt{color:var(--gold);}
 .hcal .hd{padding:7px 2px;border:1px solid var(--border);border-radius:8px;background:var(--bg)}
 .hcal .hd.today{background:var(--green);color:#fff;font-weight:700;border-color:var(--green)}
 .hcal .hsp{visibility:hidden}
+.hcal .hd small{display:block;font-size:.62em;color:var(--muted);font-weight:400}
+/* v2.17: Durood, Q&A accordion, Rahnumai */
+.dcard{border:1px solid var(--border);border-radius:12px;padding:14px;margin:10px 0;background:var(--bg);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dcard .ar{font-size:1.35em;line-height:2.1;text-align:right;display:block}
+.dcard .cnt{font-weight:700;color:var(--green);font-size:1.1em}
+.dcard .tap-hint{font-size:.78em;color:var(--muted)}
+.acc{border:1px solid var(--border);border-radius:10px;margin:8px 0;background:var(--bg);overflow:hidden}
+.acc-q{padding:12px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.acc-q .pm{color:var(--green);font-size:1.2em}
+.acc-a{display:none;padding:0 12px 12px;color:var(--fg);line-height:1.9}
+.acc.open .acc-a{display:block}
+.acc.open .acc-q .pm{transform:rotate(45deg)}
+.tip-card{border:2px solid var(--gold);border-radius:12px;padding:16px;margin:10px 0;background:var(--bg);font-size:1.05em;line-height:1.9}
 /* Daily cards */
 .daily{border-right:4px solid var(--gold);}
 /* Kalima cards */
@@ -470,9 +483,9 @@ body.dark nav button.on{color:#f06292;}
     <div class="scard c-green" data-go="quran"><span class="st">Quran</span><span class="sur ur">قرآن</span><span class="sic">📖</span></div>
     <div class="scard c-orange" data-go="hadith"><span class="st">Hadees</span><span class="sur ur">حدیث</span><span class="sic">📜</span></div>
     <div class="scard c-purple" data-toast="🕋 Hajj &amp; Umrah guide jald aa raha hai • Coming soon"><span class="st">Hajj &amp; Umrah</span><span class="sur ur">حج و عمرہ</span><span class="sic">🕋</span></div>
-    <div class="scard c-purple" data-toast="❓ Question &amp; Answer jald aa raha hai • Coming soon"><span class="st">Question &amp; Answer</span><span class="sur ur">سوال جواب</span><span class="sic">💬</span></div>
-    <div class="scard c-orange" data-toast="📿 Durood Sharif section jald aa raha hai • Coming soon"><span class="st">Durood Sharif</span><span class="sur ur">درود شریف</span><span class="sic">📿</span></div>
-    <div class="scard c-brown" data-toast="🧭 Rozana Rahnumai jald aa rahi hai • Coming soon"><span class="st">Rahnumai</span><span class="sur ur">رہنمائی</span><span class="sic">🧭</span></div>
+    <div class="scard c-purple" data-go="qa"><span class="st">Question &amp; Answer</span><span class="sur ur">سوال جواب</span><span class="sic">💬</span></div>
+    <div class="scard c-orange" data-go="durood"><span class="st">Durood Sharif</span><span class="sur ur">درود شریف</span><span class="sic">📿</span></div>
+    <div class="scard c-brown" data-go="rahnumai"><span class="st">Rahnumai</span><span class="sur ur">رہنمائی</span><span class="sic">🧭</span></div>
     <div class="scard c-green" data-go="tasbeeh"><span class="st">Tasbeeh</span><span class="sur ur">تسبیح</span><span class="sic">📿</span></div>
     <div class="scard c-orange" data-go="duas"><span class="st">Duas</span><span class="sur ur">دعائیں</span><span class="sic">🤲</span></div>
   </div>
@@ -480,7 +493,7 @@ body.dark nav button.on{color:#f06292;}
   <!-- Newsfeed -->
   <div class="sec-head">Newsfeed</div>
   <div id="newsfeed">
-    <div class="nf-card"><span class="nic">🌙</span><div><div class="nt">Aaj ki naseehat</div><div class="nd">Namaz deen ka sutoon hai — waqt par ada karein. <span class="ur">نماز دین کا ستون ہے۔</span></div></div></div>
+    <div class="nf-card"><span class="nic">🌙</span><div><div class="nt">Aaj ki naseehat</div><div class="nd" id="naseehatTxt">Namaz deen ka sutoon hai — waqt par ada karein. <span class="ur">نماز دین کا ستون ہے۔</span></div></div></div>
     <div class="nf-card"><span class="nic">📖</span><div><div class="nt">Quran ki tilawat</div><div class="nd">Rozana chand ayaat parhein aur samjhein — dil ko sukoon milega.</div></div></div>
     <div class="nf-card"><span class="nic">🤲</span><div><div class="nt">Dua ki qubooliyat ke auqat</div><div class="nd">Tahajjud, azan-o-iqamat ke darmiyan aur Jumuah ke din dua qubool hoti hai.</div></div></div>
   </div>
@@ -839,8 +852,8 @@ body.dark nav button.on{color:#f06292;}
   <button class="on" data-pg="pg-home"><span class="ic">📿</span>Rohani<span class="ur"><br>روحانی</span></button>
 
   <button data-pg="pg-more" data-scroll="sec-qibla"><span class="ic">🧭</span>Qibla<span class="ur"><br>قبلہ</span></button>
-  <button data-toast="🔇 Silent mode jald aa raha hai • Coming soon"><span class="ic">🔇</span>Silent<span class="ur"><br>خاموش</span></button>
-  <button data-toast="📅 Calendar jald aa raha hai • Coming soon"><span class="ic">📅</span>Calendar<span class="ur"><br>کیلنڈر</span></button>
+  <button id="silentNavBtn"><span class="ic">🔇</span>Silent<span class="ur"><br>خاموش</span></button>
+  <button id="calNavBtn"><span class="ic">📅</span>Calendar<span class="ur"><br>کیلنڈر</span></button>
 </nav>
 
 <!-- Floating settings button -->
@@ -894,6 +907,14 @@ body.dark nav button.on{color:#f06292;}
     <div class="theme-opt" data-theme="dark"><span class="theme-dot" style="background:#14110b"></span>Dark <span class="ur">تاریک</span></div>
     <div class="theme-opt" data-theme="green"><span class="theme-dot" style="background:#0a6b45"></span>Green <span class="ur">سبز</span></div>
     <div class="btn-row" style="margin-top:12px"><button class="btn" id="themeClose" style="flex:1">← Band karein</button></div>
+  </div>
+</div>
+<div class="dlg-ov" id="silentDlg">
+  <div class="dlg" role="dialog" aria-label="Silent mode">
+    <h3>🔇 Silent Mode • <span class="ur">خاموش موڈ</span></h3>
+    <label class="theme-opt" style="cursor:pointer"><input type="checkbox" id="silentToggle" style="width:20px;height:20px;margin-right:10px"> <span>Namaz ke auqat me silent <span class="ur">نماز کے اوقات میں خاموش</span></span></label>
+    <div class="note" style="margin-top:8px">Namaz ka waqt shuru hone par phone khud silent ho jayega, 35 minute baad wapas normal. <span class="ur">یہ سہولت ایپ کھلی ہونے پر کام کرتی ہے۔</span></div>
+    <div class="btn-row" style="margin-top:12px"><button class="btn" id="silentClose" style="flex:1">← Band karein</button></div>
   </div>
 </div>
 <script src="book-toc.js"></script>
@@ -1750,6 +1771,9 @@ document.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{
   else if(k==='ramadan'){goPage('pg-more');setTimeout(()=>{const s=$('sec-ramadan');if(s)s.scrollIntoView();},120);}
   else if(k==='qibla'){goPage('pg-more');setTimeout(()=>{const s=$('sec-qibla');if(s)s.scrollIntoView();},120);}
   else if(k==='books'){goPage('pg-books');initBooksPage();}
+  else if(k==='durood')openDurood();
+  else if(k==='rahnumai')openRahnumai();
+  else if(k==='qa')openQA();
 });
 
 /* ---- Quran page (embedded surah list + bookmarks) ---- */
@@ -2161,6 +2185,99 @@ function renderRchk(){const s=rchkState();
 }
 renderRchk();
 
+/* ================= v2.17: Durood Sharif (offline tap counter) ================= */
+const DUROODS=[
+ {id:'ibrahimi',t:'Durood-e-Ibrahimi',u:'درودِ ابراہیمی',
+  ar:'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ — اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ',
+  note:'Namaz me parha jane wala durood <span class="ur">نماز میں پڑھا جانے والا درود</span>'},
+ {id:'short',t:'Mukhtasar Durood',u:'مختصر درود',
+  ar:'صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ',note:''}
+];
+function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function getDuroodCounts(){
+  const all=store.get('duroodCounts',{}),k=todayKey();
+  if(!all[k])all[k]={ibrahimi:0,short:0};
+  return{all:all,k:k,c:all[k]};
+}
+function openDurood(){
+  openOv();
+  rdrTitle('📿 Durood Sharif • <span class="ur">درود شریف</span>');
+  const g=getDuroodCounts();
+  let h='<div class="note" style="text-align:center">Aaj ka total: <b id="dTotal" style="font-size:1.4em;color:var(--green)">'+(g.c.ibrahimi+g.c.short)+'</b> <span class="ur">آج کا کُل درود</span></div>';
+  h+=DUROODS.map(d=>'<div class="dcard" data-did="'+d.id+'"><div style="font-weight:700">'+d.t+' <span class="ur">'+d.u+'</span></div>'
+    +'<span class="ar" dir="rtl" lang="ar">'+d.ar+'</span>'
+    +(d.note?'<div class="note" style="margin-top:6px">'+d.note+'</div>':'')
+    +'<div style="margin-top:8px">🔢 <span class="cnt" id="cnt-'+d.id+'">'+g.c[d.id]+'</span> <span class="tap-hint">— card par tap karein, ginti barhegi</span></div></div>').join('');
+  h+='<div class="note" style="text-align:center">Ginti rozana save hoti hai. <span class="ur">روزانہ کی تعداد محفوظ رہتی ہے۔</span></div>';
+  rdrBody(h);
+  $('rdrBody').querySelectorAll('[data-did]').forEach(el=>el.onclick=()=>{
+    const id=el.dataset.did,gg=getDuroodCounts();
+    gg.c[id]=(gg.c[id]||0)+1; gg.all[gg.k]=gg.c; store.set('duroodCounts',gg.all);
+    $('cnt-'+id).textContent=gg.c[id];
+    $('dTotal').textContent=gg.c.ibrahimi+gg.c.short;
+  });
+}
+
+/* ================= v2.17: Rozana Rahnumai (daily tip, offline) ================= */
+const RAHNUMAI=["Aaj paanchon namazein waqt par parhein — namaz deen ka sutoon hai.","Waliden se narmi se baat karein aur unki khidmat karein.","Aaj kam az kam 100 martaba Durood Sharif parhein.","Kisi gharib ki madad karein — chhoti neki bhi qeemti hai.","Quran ki tilawat karein, chahe sirf chand aayatein hon.","Jhoot se bachein — sach bolna momin ki nishani hai.","Kisi se narazgi hai to aaj sulah kar lein.","Subah uth kar Allah ka shukr ada karein.","Rizq-e-halal kamayein aur haram se bachein.","Padosiyon ka khayal rakhein.","Ghusse par qabu payein — narmi ikhtiyar karein.","Ilm-e-deen seekhne ke liye roz thora waqt nikalein.","Masjid me namaz parhne ki koshish karein.","Aaj kisi bhooke ko khana khilayein.","Apne aamaal ka muhasiba karein — aaj kya achha kiya?","Zikr-e-Ilahi ki aadat banayein — SubhanAllah, Alhamdulillah.","Amanat me khayanat na karein.","Chughli aur gheebat se bachein.","Wudu ka ehtimam karein — taharat iman ka hissa hai.","Jumma ke din kasrat se Durood Sharif parhein.","Apne bachon ko achhi deeni taleem dein.","Sadqa dein — musibat ko talta hai.","Waqt ki qadr karein — use fazool kaamon me zaya na karein.","Dusron ke liye wahi pasand karein jo apne liye pasand karte hain.","Museebat me sabr karein aur Allah se madad mangein.","Khane se pehle Bismillah aur baad me Alhamdulillah kahein.","Raat ko sone se pehle apne gunahon ki maafi mangein.","Aaj kisi ki ghalti maaf kar dein.","Halal rizq par shukr karein.","Apne maa-baap ke liye dua karein — zinda hon ya wafat pa gaye hon."];
+function dayOfYear(d){const s=new Date(d.getFullYear(),0,0);return Math.floor((d-s)/864e5);}
+function todayTipIdx(){return dayOfYear(new Date())%RAHNUMAI.length;}
+function todayTip(){return RAHNUMAI[todayTipIdx()];}
+try{const nt=$('naseehatTxt');if(nt)nt.textContent=todayTip();}catch(e){}
+function openRahnumai(){
+  openOv();
+  rdrTitle('🧭 Rozana Rahnumai • <span class="ur">روزانہ رہنمائی</span>');
+  const idx=todayTipIdx();
+  let h='<div class="tip-card">🌟 <b>Aaj ki rahnumai • <span class="ur">آج کی رہنمائی</span></b><br>'+RAHNUMAI[idx]+'</div>';
+  h+='<div class="label" style="margin-top:10px">30 din ki rahnumai • <span class="ur">مکمل فہرست</span></div>';
+  h+='<div class="card" style="padding:4px 14px">'+RAHNUMAI.map((t,i)=>'<div style="padding:8px 0;border-bottom:1px solid var(--border);line-height:1.8;'+(i===idx?'font-weight:700;color:var(--green)':'')+'">'+(i+1)+'. '+t+'</div>').join('')+'</div>';
+  rdrBody(h);
+}
+
+/* ================= v2.17: Question & Answer accordion (Hanafi, offline) ================= */
+const QALIST=[
+ {q:'Wudu ke faraiz kitne hain?',a:'4 — chehra dhona, kohniyon samet haath dhona, sar ke chauthai hisse ka masah, takhnon samet paon dhona.'},
+ {q:'Wudu kin cheezon se toot-ta hai?',a:'Peshab, pakhana, hawa kharij hona, khoon ya peep ka beh kar nikalna, gehri neend ya behoshi.'},
+ {q:'Tayammum kab jaiz hai?',a:'Jab paani na mile ya paani ke istemal se beemari ka khadsha ho.'},
+ {q:'Qibla kis taraf hai?',a:'Pakistan se maghrib (west) ki taraf — app ka Qibla compass istemal karein.'},
+ {q:'Asr Hanafi me der se kyun hoti hai?',a:'Hanafi fiqh me Asr us waqt hoti hai jab har cheez ka saya (zawal ke saye ke ilawa) dugna ho jaye.'},
+ {q:'Vitr ki namaz kab parhte hain?',a:'Isha ke baad — 3 rakatein, Hanafi me wajib hain.'},
+ {q:'Jumma me kitne farz hain?',a:'2 farz, khutbe ke baad.'},
+ {q:'Sajda-e-sahw kab karte hain?',a:'Namaz me bhool-chook ho jaye to aakhri qa\u2019de me.'},
+ {q:'Zakat ka nisab kya hai?',a:'Sona 7.5 tola (87.48g), chandi 52.5 tola (612.36g) — itna maal ho aur saal guzre to zakat farz. App me Zakat calculator maujood hai.'},
+ {q:'Roza kin cheezon se toot-ta hai?',a:'Jan boojh kar khana-peena ya humbistari se.'}
+];
+function openQA(){
+  openOv();
+  rdrTitle('💬 Question & Answer • <span class="ur">سوال جواب</span>');
+  let h='<div class="note">Tafseeli masail ke liye qareebi mufti / Dar-ul-Ifta se ruju karein. <span class="ur">تفصیلی مسائل کے لیے قریبی مفتی یا دارالافتاء سے رجوع کریں۔</span></div>';
+  h+=QALIST.map(x=>'<div class="acc"><div class="acc-q"><span>❓ '+x.q+'</span><span class="pm">+</span></div><div class="acc-a">✅ '+x.a+'</div></div>').join('');
+  rdrBody(h);
+  $('rdrBody').querySelectorAll('.acc-q').forEach(el=>el.onclick=()=>el.parentElement.classList.toggle('open'));
+}
+
+/* ================= v2.17: Silent mode at prayer times ================= */
+function evalSilent(){
+  try{
+    if(!store.get('silentAtPrayer',false))return;
+    if(!(window.Android&&Android.setSilentMode))return;
+    const now=new Date().getTime();
+    let inWin=false;
+    for(const p of PRAY5){
+      const t=PT&&PT[p]; if(!t||t.indexOf(':')<0)continue;
+      const diff=now-toDate(t).getTime();
+      if(diff>=0&&diff<=35*60*1000){inWin=true;break;}
+    }
+    Android.setSilentMode(inWin);
+  }catch(e){}
+}
+setInterval(evalSilent,30000);
+setTimeout(evalSilent,8000);
+$('silentNavBtn').onclick=()=>{const t=$('silentToggle');if(t)t.checked=!!store.get('silentAtPrayer',false);openDlg('silentDlg');};
+$('silentClose').onclick=()=>closeDlg('silentDlg');
+$('silentToggle').onchange=e=>{store.set('silentAtPrayer',!!e.target.checked);toast(e.target.checked?'🔇 Namaz ke auqat me silent ON':'🔇 Silent mode OFF');evalSilent();};
+$('calNavBtn').onclick=()=>{goPage('pg-more');setTimeout(()=>{const s=$('sec-hijrical');if(s)s.scrollIntoView({block:'start'});},150);};
+
 /* ---- Hijri Calendar (offline, via Intl islamic-umalqura) ---- */
 const HNAMES=['','Muharram','Safar','Rabi-ul-Awwal','Rabi-ul-Aakhir','Jumada-ul-Ula','Jumada-ul-Ukhra','Rajab',"Sha'ban",'Ramadan','Shawwal',"Zil-Qadah",'Zil-Hajj'];
 const _hfmt=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'});
@@ -2191,7 +2308,9 @@ function renderHCal(){
   for(let i=0;i<first.getDay();i++)h+='<div class="hsp">.</div>';
   for(let d=1;d<=days;d++){
     const isT=(todayH.y===hcY&&todayH.m===hcM&&todayH.d===d);
-    h+='<div class="hd'+(isT?' today':'')+'">'+d+'</div>';
+    let gs='';
+    try{gs=gregOfHijri(hcY,hcM,d).getDate();}catch(e){}
+    h+='<div class="hd'+(isT?' today':'')+'">'+d+(gs?'<small>'+gs+'</small>':'')+'</div>';
   }
   $('hcGrid').innerHTML=h;
 }
