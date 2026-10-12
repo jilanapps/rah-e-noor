@@ -1899,7 +1899,32 @@ function hadithHTML(key,L,hh){
     +'<button class="tool-btn" data-act="bm">'+(saved?'📌 Saved':'🔖 Save')+'</button>'
     +'<button class="tool-btn" data-act="copy">📋 Copy</button>'
     +'<button class="tool-btn" data-act="share">📤 Share</button>'
+    +'<button class="tool-btn" data-act="speak">🔊 Listen</button>'
     +'</div></div>';
+}
+/* v2.7: 🔊 Audio — phone ki built-in awaz se hadith suniye */
+let hSpeaking=false;
+function hSpeak(L,hh,btn){
+  try{
+    if(!('speechSynthesis' in window)){alert('⚠️ Is device me audio support nahi hai.');return;}
+    const synth=window.speechSynthesis;
+    if(hSpeaking){synth.cancel();hSpeaking=false;
+      document.querySelectorAll('[data-act="speak"]').forEach(b=>b.textContent='🔊 Listen');return;}
+    const en=((hh.english.narrator||'')+' '+(hh.english.text||'')).trim();
+    const txt=en||hh.arabic;
+    if(!txt){alert('⚠️ Text nahi mila.');return;}
+    synth.cancel();
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang=en?'en-US':'ar-SA'; u.rate=0.9;
+    document.querySelectorAll('[data-act="speak"]').forEach(b=>b.textContent='🔊 Listen');
+    if(btn)btn.textContent='⏹ Stop';
+    hSpeaking=true;
+    u.onend=()=>{hSpeaking=false;
+      document.querySelectorAll('[data-act="speak"]').forEach(b=>b.textContent='🔊 Listen');};
+    u.onerror=()=>{hSpeaking=false;
+      document.querySelectorAll('[data-act="speak"]').forEach(b=>b.textContent='🔊 Listen');};
+    synth.speak(u);
+  }catch(e){alert('⚠️ Audio error: '+e.message);}
 }
 function bindHadithBtns(key,L){
   $('rdrBody').querySelectorAll('.hadith').forEach(el=>{
@@ -1909,6 +1934,7 @@ function bindHadithBtns(key,L){
     el.querySelector('[data-act="bm"]').onclick=e=>hbmToggle(key,id,e.target);
     el.querySelector('[data-act="copy"]').onclick=()=>hCopy(L,hh);
     el.querySelector('[data-act="share"]').onclick=()=>hShare(L,hh);
+    el.querySelector('[data-act="speak"]').onclick=e=>hSpeak(L,hh,e.target);
   });
 }
 function openHChapter(key,chId,page){
