@@ -1548,6 +1548,7 @@ function renderSurahList(q){
   document.querySelectorAll('#surahList .surah').forEach(el=>el.onclick=()=>openSurah(+el.dataset.s));
 }
 async function openSurah(n){
+  openOv(); // v2.6 FIX: reader overlay kholo
   rdrTitle('📖 Surah '+n);
   if(surahCache[n]){renderSurah(surahCache[n]);return;}
   rdrBody('<div class="note">Loading… <span class="ur">لوڈ ہو رہا ہے…</span></div>');
