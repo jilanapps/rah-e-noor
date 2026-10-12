@@ -1576,6 +1576,35 @@ function renderSurah(d){
 }
 
 /* ---- Hadith book readers ---- */
+/* v2.8: Mirat-ul-Manajih (Mufti Ahmed Yar Khan Naeemi) — 8 volumes via archive.org */
+const MIRAT_VOLS=[
+ {v:1,id:'MiraatSharhMishkatVol1',pdf:'Miraat-Sharh-Mishkat-vol-1.pdf'},
+ {v:2,id:'MiraatSharhMishkatVol2',pdf:'Miraat-Sharh-Mishkat-vol-2.pdf'},
+ {v:3,id:'45611162MiraatSharhMishkatVol31',pdf:'45611162-Miraat-Sharh-Mishkat-vol-3(1).pdf'},
+ {v:4,id:'MiraatSharhMishkatVol4',pdf:'Miraat-Sharh-Mishkat-vol-4.pdf'},
+ {v:5,id:'MiraatSharhMishkatVol5',pdf:'Miraat-Sharh-Mishkat-vol-5.pdf'},
+ {v:6,id:'MiraatSharhMishkatVol6',pdf:'Miraat-Sharh-Mishkat-vol-6.pdf'},
+ {v:7,id:'MiraatSharhMishkatVol7',pdf:null},
+ {v:8,id:'MiraatSharhMishkatVol8',pdf:'Miraat-Sharh-Mishkat-vol-8.pdf'},
+];
+function miratURL(vol){
+  const base='https://archive.org/download/'+vol.id+'/';
+  return vol.pdf?base+encodeURIComponent(vol.pdf):'https://archive.org/details/'+vol.id;
+}
+function openMirat(){
+  openOv();
+  rdrTitle('📚 مرآۃ المناجیح <span style="font-size:.85em">شرح مشکوٰۃ المصابیح</span>');
+  let h='<div class="note">مصنف: <b>مفتی احمد یار خان نعیمی</b> <span class="ur">رحمۃ اللہ علیہ</span></div>';
+  h+='<div class="maslak" style="margin-top:8px">مشکوٰۃ المصابیح کی مستند اردو شرح — 6,294 احادیث، 295 ابواب، 8 جلدیں۔ <span class="ur">اہل سنت کی معتبر شرح۔</span></div>';
+  h+='<div class="label" style="margin-top:10px">جلدیں • Volumes <span class="ur">(پڑھنے کے لیے ٹیپ کریں)</span></div>';
+  h+=MIRAT_VOLS.map(v=>'<div class="book tappable" data-mirat="'+v.v+'"><div class="t">📖 جلد '+v.v+' <span class="ur">Volume '+v.v+'</span> <span class="tap-hint">›</span></div><div class="d">PDF — آن لائن پڑھیں</div></div>').join('');
+  h+='<div class="note" style="margin-top:8px">🌐 انٹرنیٹ درکار ہے — PDF archive.org سے لوڈ ہوگی۔</div>';
+  rdrBody(h);
+  $('rdrBody').querySelectorAll('[data-mirat]').forEach(el=>el.onclick=()=>{
+    const v=MIRAT_VOLS.find(x=>x.v===+el.dataset.mirat);
+    window.open(miratURL(v),'_blank');
+  });
+}
 const HBOOKS={
 bukhari:{t:'Sahih al-Bukhari',u:'صحیح بخاری',au:'Imam Muhammad al-Bukhari (810–870 CE)',count:'7,563 Ahadith',
  desc:'Compiled over sixteen years of travel and research, selected from more than 600,000 narrations. The most authentic book after the Holy Quran. <span class="ur">قرآن کریم کے بعد سب سے مستند کتاب۔</span>',
@@ -1776,13 +1805,15 @@ const HBOOKS_PENDING=[
 const HLIB_FILES={bukhari:'data/bukhari.json',muslim:'data/muslim.json'};
 const HLIB_COUNTS={bukhari:7277,muslim:7459};
 function renderHadithBooks(){
-  let h=Object.keys(HBOOKS).map(k=>{const b=HBOOKS[k];
+  let h='<div class="book tappable" data-miratbook="1"><div class="t">📚 مرآۃ المناجیح <span class="ur">شرح مشکوٰۃ المصابیح</span> <span class="tap-hint">›</span></div><div class="au">مفتی احمد یار خان نعیمی رحمۃ اللہ علیہ</div><div class="d">6,294 احادیث • 295 ابواب • 8 جلدیں — مکمل اردو شرح</div><span class="tag">Ahle Sunnat</span></div>';
+  h+=Object.keys(HBOOKS).map(k=>{const b=HBOOKS[k];
     const lib=HLIB_FILES[k]?'<div style="margin-top:8px"><button class="tool-btn" data-hlib="'+k+'">📚 Full Library — '+HLIB_COUNTS[k].toLocaleString()+' ahadith</button></div>':'';
     return '<div class="book tappable" data-hbook="'+k+'"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span> <span class="tap-hint">›</span></div><div class="au">'+b.au+'</div><div class="d">'+b.count+' — '+b.hadith.length+' famous ahadith inside</div>'+lib+'<span class="tag">Hadith</span></div>';}).join('');
   h+='<div class="label" style="margin-top:10px">Coming Soon • <span class="ur">جلد آ رہا ہے</span></div>';
   h+=HBOOKS_PENDING.map(b=>'<div class="book"><div class="t">📜 '+b.t+' • <span class="ur">'+b.u+'</span></div><div class="au">'+b.au+'</div><div class="d"><span class="tag">⏳ Pending verified content</span> — full text will be added after verification.</div></div>').join('');
   $('hadithBooks').innerHTML=h;
   $('hadithBooks').querySelectorAll('[data-hbook]').forEach(el=>el.onclick=()=>openHadithBook(el.dataset.hbook));
+  $('hadithBooks').querySelectorAll('[data-miratbook]').forEach(el=>el.onclick=()=>openMirat());
   $('hadithBooks').querySelectorAll('[data-hlib]').forEach(el=>el.onclick=e=>{e.stopPropagation();openHadithLibrary(el.dataset.hlib);});
 }
 renderHadithBooks();
