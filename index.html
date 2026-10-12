@@ -2279,6 +2279,7 @@ $('bookFavBtn').onclick=()=>{store.set('bookFav:'+BOOK.id,!bookFav());refreshBoo
 /* ---- PDF.js reader ---- */
 let pdfDoc=null,pdfPage=1,pdfScale=1.2,pdfRendering=false,pdfPending=null,pdfNight=false,pdfLastTarget=1;
 const PDFJS_CDNS=[
+  {js:'js/pdf.min.js',worker:'js/pdf.worker.min.js'}, // v2.14: local (offline) pehle
   {js:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',worker:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'},
   {js:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',worker:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'}
 ];

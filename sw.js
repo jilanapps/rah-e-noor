@@ -1,10 +1,11 @@
 /* Rah-e-Noor service worker — offline-first app shell.
    Caches the core files so the app opens without internet.
    Live data (prayer API, Quran, Hadith, PDFs) still needs internet. */
-const CACHE='rahenoor-v2-12';
+const CACHE='rahenoor-v2-14';
 const SHELL=[
   './','./index.html','./book-toc.js','./manifest.json',
-  './privacy-policy.html','./icon-192.png','./icon-512.png'
+  './privacy-policy.html','./icon-192.png','./icon-512.png',
+  './js/pdf.min.js','./js/pdf.worker.min.js'
 ];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));
