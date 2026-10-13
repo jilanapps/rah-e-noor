@@ -482,7 +482,7 @@ body.dark nav button.on{color:#f06292;}
   <div class="scrl" id="shortcutRow">
     <div class="scard c-green" data-go="quran"><span class="st">Quran</span><span class="sur ur">قرآن</span><span class="sic">📖</span></div>
     <div class="scard c-orange" data-go="hadith"><span class="st">Hadees</span><span class="sur ur">حدیث</span><span class="sic">📜</span></div>
-    <div class="scard c-purple" data-toast="🕋 Hajj &amp; Umrah guide jald aa raha hai • Coming soon"><span class="st">Hajj &amp; Umrah</span><span class="sur ur">حج و عمرہ</span><span class="sic">🕋</span></div>
+    <div class="scard c-purple" data-go="hajj"><span class="st">Hajj & Umrah</span><span class="sur ur">حج و عمرہ</span><span class="sic">🕋</span></div>
     <div class="scard c-purple" data-go="qa"><span class="st">Question &amp; Answer</span><span class="sur ur">سوال جواب</span><span class="sic">💬</span></div>
     <div class="scard c-orange" data-go="durood"><span class="st">Durood Sharif</span><span class="sur ur">درود شریف</span><span class="sic">📿</span></div>
     <div class="scard c-brown" data-go="rahnumai"><span class="st">Rahnumai</span><span class="sur ur">رہنمائی</span><span class="sic">🧭</span></div>
@@ -1781,6 +1781,7 @@ document.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{
   else if(k==='durood')openDurood();
   else if(k==='rahnumai')openRahnumai();
   else if(k==='qa')openQA();
+  else if(k==='hajj')openHajj();
 });
 
 /* ---- Quran page (embedded surah list + bookmarks) ---- */
@@ -2272,6 +2273,48 @@ function openQA(){
   rdrTitle('💬 Question & Answer • <span class="ur">سوال جواب</span>');
   let h='<div class="note">Tafseeli masail ke liye qareebi mufti / Dar-ul-Ifta se ruju karein. <span class="ur">تفصیلی مسائل کے لیے قریبی مفتی یا دارالافتاء سے رجوع کریں۔</span></div>';
   h+=QALIST.map(x=>'<div class="acc"><div class="acc-q"><span>❓ '+x.q+'</span><span class="pm">+</span></div><div class="acc-a">✅ '+x.a+'</div></div>').join('');
+  rdrBody(h);
+  $('rdrBody').querySelectorAll('.acc-q').forEach(el=>el.onclick=()=>el.parentElement.classList.toggle('open'));
+}
+
+/* ================= v2.20: Hajj & Umrah Guide (Hanafi, offline) ================= */
+function openHajj(){
+  openOv();
+  rdrTitle('🕋 Hajj & Umrah Guide • <span class="ur">حج و عمرہ گائیڈ</span>');
+  let h='<div class="note">Hanafi fiqh ke mutabiq khulasa. Tafseeli masail ke liye qareebi mufti / Dar-ul-Ifta se ruju karein.</div>';
+
+  h+='<div class="label" style="margin-top:10px">🤲 Talbiyah • <span class="ur">تلبیہ</span></div>';
+  h+='<div class="dcard"><span class="ar" dir="rtl" lang="ar">لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لاَ شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لاَ شَرِيكَ لَكَ</span>'
+    +'<div class="ur" style="margin-top:8px;line-height:2">حاضر ہوں اے اللہ حاضر ہوں، حاضر ہوں تیرا کوئی شریک نہیں حاضر ہوں، بیشک تمام تعریف اور نعمت تیرے لیے ہے اور بادشاہت، تیرا کوئی شریک نہیں۔</div>'
+    +'<div class="note" style="margin-top:6px">Ihram bandhne ke baad kasrat se parhein; mard buland awaz se kahein.</div></div>';
+
+  h+='<div class="label" style="margin-top:10px">🕋 Umrah ka tareeqa (step by step)</div>';
+  const umrah=[
+    ['1. Ihram','Meeqat se pehle ghusl karein, khushbu lagayein. Mard 2 unsi hui chadrein (tehband aur chadar) pehnein; khawateen apne aam kapre pehnein, chehra khula rakhein. 2 rakat nafl parh kar Umrah ki niyyat karein aur Talbiyah kahein — ab ihram ki pabandiyan shuru.'],
+    ['2. Tawaf (7 chakkar)','Hajr-e-Aswad se shuru karein (istilam — choona ya ishara). Har chakkar me Kaaba aapke bayein haath ho. Pehle 3 chakkar me mard ramal karein (tez qadam). Rukn-e-Yamani se Hajr-e-Aswad tak ye dua parhein: <span class="ar">رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ</span>'],
+    ['3. Maqam-e-Ibrahim','Tawaf ke baad Maqam-e-Ibrahim ke peeche 2 rakat namaz parhein (pehli me Surah Kafirun, doosri me Surah Ikhlas mustahab).'],
+    ['4. Zamzam','Zamzam khoob piyein, dua mangein.'],
+    ['5. Sa\u2019i (Safa-Marwa, 7 chakkar)','Safa se shuru karein, Marwa par khatam. Dono sabz battiyon ke darmiyan mard tez chalein. Har chakkar me zikr-o-dua karein.'],
+    ['6. Halq ya Taqsir','Mard sar mundwayein (afzal) ya baal katwayein; khawateen ungli ke pore ke barabar baal katwayein. Iske baad ihram khul gaya — Umrah mukammal.']
+  ];
+  h+=umrah.map(s=>'<div class="acc"><div class="acc-q"><span>'+s[0]+'</span><span class="pm">+</span></div><div class="acc-a">'+s[1]+'</div></div>').join('');
+
+  h+='<div class="label" style="margin-top:10px">📅 Hajj ke 5 din</div>';
+  const hajj=[
+    ['8 Zil-Hajj — Yaum-e-Tarwiyah','Subah Hajj ka ihram bandhein (niyyat + Talbiyah), Mina rawana hon. Wahan Zohar, Asr, Maghrib, Isha aur agle din Fajr parhein.'],
+    ['9 Zil-Hajj — Arafat (Hajj ka rukn-e-azam)','Suraj nikalne ke baad Arafat jayein. Zawal ke baad se ghurub-e-aftab tak Wuquf-e-Arafat — ye Hajj ka sab se bara rukn hai; jo isse reh gaya uska Hajj nahi. Zohar-Asr jama karke parhein, khoob dua mangein. Ghurub ke baad Muzdalifah rawangi; wahan Maghrib-Isha jama karein, raat qiyam karein aur rami ke liye kankariyan chun lein.'],
+    ['10 Zil-Hajj — Yaum-e-Nahr','Jamrat-ul-Aqaba (bare shaitan) ko 7 kankariyan marein. Phir qurbani, phir halq/taqsir. Ab ihram ki bari pabandiyan khatam (tawaf-e-ziyarat tak miyan-biwi wala talluq halal nahi). Phir Makkah ja kar Tawaf-e-Ziyarat (Hajj ka farz) aur Sa\u2019i karein.'],
+    ['11 aur 12 Zil-Hajj','Zawal ke baad tarteeb se teeno jamrat (Sughra, Wusta, Aqaba) ko 7-7 kankariyan marein. 12 ko ghurub se pehle Mina se nikalna chahein to jaiz hai.'],
+    ['13 Zil-Hajj (agar thehre hon)','Phir teeno jamrat ki rami karein.'],
+    ['Tawaf-e-Wida','Makkah se rawangi se pehle Tawaf-e-Wida karein — Hanafi me wajib hai (khawateen haiz ki surat me maazur hain).']
+  ];
+  h+=hajj.map(s=>'<div class="acc"><div class="acc-q"><span>'+s[0]+'</span><span class="pm">+</span></div><div class="acc-a">'+s[1]+'</div></div>').join('');
+
+  h+='<div class="label" style="margin-top:10px">⚠️ Zaroori baatein</div>';
+  h+='<div class="tip-card">🕌 Tawaf ke liye <b>wudu shart</b> hai; Sa\u2019i ke liye wudu mustahab hai.<br>'
+    +'🤲 Wuquf-e-Arafat aur Tawaf-e-Ziyarat ke baghair Hajj nahi hota.<br>'
+    +'📵 Ihram me khushbu, nakhun/baal katna, shikar aur jhagra mana hai.<br>'
+    +'❓ Koi ghalti ho jaye to dam ya sadqa lazim aa sakta hai — apne mufti se zaroor poochein.</div>';
   rdrBody(h);
   $('rdrBody').querySelectorAll('.acc-q').forEach(el=>el.onclick=()=>el.parentElement.classList.toggle('open'));
 }
