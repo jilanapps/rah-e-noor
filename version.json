@@ -1,6 +1,6 @@
 {
- "apkVersionCode": 12,
- "notes": "Rah-e-Noor v2.18 — Back button fix: ab back dabane par app band hone ki bajaye pechle screen par jata hai",
+ "apkVersionCode": 13,
+ "notes": "Rah-e-Noor v2.19 — Hadith library ab app me offline hai (Bukhari+Muslim full library), Quran list bhi offline khulti hai",
  "url": "https://jilanapps.github.io/rah-e-noor/rah-e-noor.apk",
- "version": "2.18"
+ "version": "2.19"
 }

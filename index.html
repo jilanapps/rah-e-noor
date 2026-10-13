@@ -1789,9 +1789,22 @@ function getBm(){return store.get('bm',[]);}
 async function initQuranPage(){
   if(!surahListCache){
     try{
-      const r=await fetch('https://api.alquran.cloud/v1/surah');
-      if(!r.ok)throw 0;
-      surahListCache=(await r.json()).data;
+      // v2.19: pehle local offline file, phir API
+      let loaded=null;
+      try{
+        const rl=await fetch('data/quran/meta.json');
+        if(rl.ok){
+          const lm=await rl.json();
+          loaded=lm.map(s=>({number:s.n,name:s.name,englishName:s.en,
+            englishNameTranslation:s.tr,numberOfAyahs:s.ayas,revelationType:s.rev}));
+        }
+      }catch(e){}
+      if(!loaded){
+        const r=await fetch('https://api.alquran.cloud/v1/surah');
+        if(!r.ok)throw 0;
+        loaded=(await r.json()).data;
+      }
+      surahListCache=loaded;
     }catch(e){
       $('surahListPg').innerHTML='<div class="note">Internet darkar hai. <span class="ur">سورۃ کی فہرست کے لیے انٹرنیٹ درکار ہے۔</span></div>';
       return;
