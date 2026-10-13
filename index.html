@@ -532,12 +532,14 @@ body.dark nav button.on{color:#f06292;}
     <div class="ar" id="dailyHadithAr" style="font-size:1.15em"></div>
     <div id="dailyHadithEn" style="font-size:.9em; margin-top:4px"></div>
     <div class="note" id="dailyHadithRef"></div>
+    <div style="margin-top:8px"><button class="tool-btn" id="shareHadithBtn">📤 Share <span class="ur">شیئر کریں</span></button></div>
   </div>
   <div class="card daily">
     <div class="label">🤲 Dua of the Day • <span class="ur">آج کی دعا</span></div>
     <div class="ar" id="dailyDuaAr" style="font-size:1.15em"></div>
     <div class="tr" id="dailyDuaTr" style="font-style:italic; color:var(--muted); margin:3px 0"></div>
     <div id="dailyDuaEn" style="font-size:.9em"></div>
+    <div style="margin-top:8px"><button class="tool-btn" id="shareDuaBtn">📤 Share <span class="ur">شیئر کریں</span></button></div>
   </div>
   <div class="card">
     <h3>✅ Daily Checklist • <span class="ur">روزانہ چیک لسٹ</span></h3>
@@ -2164,11 +2166,28 @@ function openHChapter(key,chId,page){
 const ALL_HADITH=[];
 Object.keys(HBOOKS).forEach(k=>HBOOKS[k].hadith.forEach(x=>ALL_HADITH.push({ar:x.ar,en:x.en,ref:HBOOKS[k].t})));
 function dayIdx(n){const now=new Date(),s=new Date(now.getFullYear(),0,0);return Math.floor((now-s)/864e5)%n;}
+let dailyHD=null,dailyDD=null;
+/* v2.21: share helper — pehle system share sheet, warna copy */
+function shareText(title,text){
+  if(navigator.share){navigator.share({title:title,text:text}).catch(()=>{});}
+  else if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast('✅ Copied! <span class="ur">کاپی ہو گیا — اب WhatsApp par paste kar ke bhejein</span>')).catch(()=>{});
+  }
+  else toast('Sharing is device par supported nahi');
+}
 (function(){
-  const hd=ALL_HADITH[dayIdx(ALL_HADITH.length)];
+  const hd=ALL_HADITH[dayIdx(ALL_HADITH.length)]; dailyHD=hd;
   $('dailyHadithAr').textContent=hd.ar; $('dailyHadithEn').textContent=hd.en; $('dailyHadithRef').textContent=hd.ref;
-  const dd=DUAS[dayIdx(DUAS.length)];
+  const dd=DUAS[dayIdx(DUAS.length)]; dailyDD=dd;
   $('dailyDuaAr').textContent=dd.ar; $('dailyDuaTr').textContent=dd.tr; $('dailyDuaEn').textContent=dd.t+' — '+dd.en;
+  $('shareHadithBtn').onclick=()=>{
+    if(!dailyHD)return;
+    shareText('Hadith of the Day','📜 Hadith of the Day • آج کی حدیث\n\n'+dailyHD.ar+'\n\n'+dailyHD.en+'\n\n— '+dailyHD.ref+'\n\nvia Rah-e-Noor');
+  };
+  $('shareDuaBtn').onclick=()=>{
+    if(!dailyDD)return;
+    shareText('Dua of the Day','🤲 Dua of the Day • آج کی دعا\n\n'+dailyDD.ar+'\n'+dailyDD.tr+'\n\n'+dailyDD.t+' — '+dailyDD.en+'\n\nvia Rah-e-Noor');
+  };
 })();
 
 /* ---- Six Kalimas + Iman ---- */
