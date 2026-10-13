@@ -531,6 +531,7 @@ body.dark nav button.on{color:#f06292;}
     <div class="label">📜 Hadith of the Day • <span class="ur">آج کی حدیث</span></div>
     <div class="ar" id="dailyHadithAr" style="font-size:1.15em"></div>
     <div id="dailyHadithEn" style="font-size:.9em; margin-top:4px"></div>
+    <div class="ur" id="dailyHadithUr" style="margin-top:6px;line-height:2"></div>
     <div class="note" id="dailyHadithRef"></div>
     <div style="margin-top:8px"><button class="tool-btn" id="shareHadithBtn">📤 Share <span class="ur">شیئر کریں</span></button></div>
   </div>
@@ -539,6 +540,7 @@ body.dark nav button.on{color:#f06292;}
     <div class="ar" id="dailyDuaAr" style="font-size:1.15em"></div>
     <div class="tr" id="dailyDuaTr" style="font-style:italic; color:var(--muted); margin:3px 0"></div>
     <div id="dailyDuaEn" style="font-size:.9em"></div>
+    <div class="ur" id="dailyDuaUr" style="margin-top:6px;line-height:2"></div>
     <div style="margin-top:8px"><button class="tool-btn" id="shareDuaBtn">📤 Share <span class="ur">شیئر کریں</span></button></div>
   </div>
   <div class="card">
@@ -1264,21 +1266,21 @@ renderChk();
 
 /* ================= Dua Library ================= */
 const DUAS=[
-{t:'Rabbana Atina',c:'Quranic',ar:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',tr:'Rabbana atina fid-dunya hasanah, wa fil-akhirati hasanah, wa qina adhab an-nar.',en:'Our Lord, give us good in this world and good in the Hereafter, and shield us from the punishment of the Fire. (2:201)'},
-{t:'Beneficial Knowledge',c:'Morning',ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا',tr:"Allahumma inni as'aluka 'ilman nafi'an, wa rizqan tayyiban, wa 'amalan mutaqabbala.",en:'O Allah, I ask You for beneficial knowledge, wholesome provision, and accepted deeds.'},
-{t:'Before Eating',c:'Food',ar:'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ',tr:"Allahumma barik lana fima razaqtana wa qina adhab an-nar.",en:'O Allah, bless for us what You have provided and shield us from the punishment of the Fire.'},
-{t:'After Eating',c:'Food',ar:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ',tr:'Alhamdulillahilladhi at\'amana wa saqana wa ja\'alana muslimin.',en:'Praise be to Allah who fed us, gave us drink, and made us Muslims.'},
-{t:'Leaving Home',c:'Home',ar:'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',tr:"Bismillahi tawakkaltu 'alallah, wa la hawla wa la quwwata illa billah.",en:'In the name of Allah, I place my trust in Allah; there is no power nor might except with Allah.'},
-{t:'Entering Home',c:'Home',ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ',tr:"Allahumma inni as'aluka khairal-mawlaji wa khairal-makhraji.",en:'O Allah, I ask You for the best of entering and the best of leaving.'},
-{t:'For Parents',c:'Family',ar:'رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',tr:'Rabbir-hamhuma kama rabbayani saghira.',en:'My Lord, have mercy on them both as they raised me when I was small. (17:24)'},
-{t:'Dua of Yunus',c:'Hardship',ar:'لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ',tr:'La ilaha illa anta, subhanaka, inni kuntu minaz-zalimin.',en:'There is no god but You; glory be to You; indeed I have been of the wrongdoers. (21:87)'},
-{t:'Before Sleep',c:'Sleep',ar:'اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا',tr:'Allahumma bismika amutu wa ahya.',en:'O Allah, in Your name I die and I live.'},
-{t:'Waking Up',c:'Sleep',ar:'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',tr:"Alhamdulillahilladhi ahyana ba'da ma amatana wa ilaihin-nushur.",en:'Praise be to Allah who gave us life after death, and to Him is the resurrection.'},
-{t:'Increase in Knowledge',c:'Knowledge',ar:'رَبِّ زِدْنِي عِلْمًا',tr:"Rabbi zidni 'ilma.",en:'My Lord, increase me in knowledge. (20:114)'},
-{t:'Ease in Difficulty',c:'Hardship',ar:'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا',tr:"Allahumma la sahla illa ma ja'altahu sahla.",en:'O Allah, there is no ease except what You make easy.'},
-{t:'Istighfar',c:'Repentance',ar:'أَسْتَغْفِرُ اللَّهَ',tr:'Astaghfirullah.',en:"I seek Allah's forgiveness."},
-{t:'SubhanAllahi wa Bihamdihi',c:'Dhikr',ar:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',tr:'SubhanAllahi wa bihamdihi.',en:'Glory be to Allah and praise Him. (100x — sins forgiven)'},
-{t:'For All Believers',c:'Family',ar:'اللَّهُمَّ اغْفِرْ لِلْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ',tr:"Allahummaghfir lil-mu'minina wal-mu'minat.",en:'O Allah, forgive the believing men and believing women.'}
+{t:'Rabbana Atina',c:'Quranic',ar:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',tr:'Rabbana atina fid-dunya hasanah, wa fil-akhirati hasanah, wa qina adhab an-nar.',en:'Our Lord, give us good in this world and good in the Hereafter, and shield us from the punishment of the Fire. (2:201)',ur:'اے ہمارے رب! ہمیں دنیا میں بھلائی عطا فرما اور آخرت میں بھلائی عطا فرما، اور ہمیں دوزخ کے عذاب سے بچا۔'},
+{t:'Beneficial Knowledge',c:'Morning',ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا',tr:"Allahumma inni as'aluka 'ilman nafi'an, wa rizqan tayyiban, wa 'amalan mutaqabbala.",en:'O Allah, I ask You for beneficial knowledge, wholesome provision, and accepted deeds.',ur:'اے اللہ! میں تجھ سے نفع بخش علم، پاکیزہ رزق اور قبول ہونے والے عمل کا سوال کرتا ہوں۔'},
+{t:'Before Eating',c:'Food',ar:'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ',tr:"Allahumma barik lana fima razaqtana wa qina adhab an-nar.",en:'O Allah, bless for us what You have provided and shield us from the punishment of the Fire.',ur:'اے اللہ! جو رزق تو نے ہمیں عطا کیا اس میں برکت دے اور ہمیں دوزخ کے عذاب سے بچا۔'},
+{t:'After Eating',c:'Food',ar:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ',tr:'Alhamdulillahilladhi at\'amana wa saqana wa ja\'alana muslimin.',en:'Praise be to Allah who fed us, gave us drink, and made us Muslims.',ur:'تمام تعریفیں اللہ کے لیے ہیں جس نے ہمیں کھلایا، پلایا اور مسلمان بنایا۔'},
+{t:'Leaving Home',c:'Home',ar:'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',tr:"Bismillahi tawakkaltu 'alallah, wa la hawla wa la quwwata illa billah.",en:'In the name of Allah, I place my trust in Allah; there is no power nor might except with Allah.',ur:'اللہ کے نام سے، میں اللہ پر توکل کرتا ہوں؛ اللہ کے سوا نہ کوئی طاقت ہے نہ قوت۔'},
+{t:'Entering Home',c:'Home',ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ',tr:"Allahumma inni as'aluka khairal-mawlaji wa khairal-makhraji.",en:'O Allah, I ask You for the best of entering and the best of leaving.',ur:'اے اللہ! میں تجھ سے بہتر داخلے اور بہتر نکلنے کا سوال کرتا ہوں۔'},
+{t:'For Parents',c:'Family',ar:'رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',tr:'Rabbir-hamhuma kama rabbayani saghira.',en:'My Lord, have mercy on them both as they raised me when I was small. (17:24)',ur:'اے میرے رب! ان دونوں پر رحم فرما جیسا کہ انہوں نے بچپن میں میری پرورش کی۔'},
+{t:'Dua of Yunus',c:'Hardship',ar:'لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ',tr:'La ilaha illa anta, subhanaka, inni kuntu minaz-zalimin.',en:'There is no god but You; glory be to You; indeed I have been of the wrongdoers. (21:87)',ur:'تیرے سوا کوئی معبود نہیں، تو پاک ہے؛ بیشک میں ظالموں میں سے ہوں۔'},
+{t:'Before Sleep',c:'Sleep',ar:'اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا',tr:'Allahumma bismika amutu wa ahya.',en:'O Allah, in Your name I die and I live.',ur:'اے اللہ! تیرے نام کے ساتھ میں مرتا ہوں اور جیتا ہوں۔'},
+{t:'Waking Up',c:'Sleep',ar:'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',tr:"Alhamdulillahilladhi ahyana ba'da ma amatana wa ilaihin-nushur.",en:'Praise be to Allah who gave us life after death, and to Him is the resurrection.',ur:'تمام تعریفیں اللہ کے لیے ہیں جس نے ہمیں موت (نیند) کے بعد زندگی بخشی اور اسی کی طرف لوٹنا ہے۔'},
+{t:'Increase in Knowledge',c:'Knowledge',ar:'رَبِّ زِدْنِي عِلْمًا',tr:"Rabbi zidni 'ilma.",en:'My Lord, increase me in knowledge. (20:114)',ur:'اے میرے رب! میرے علم میں اضافہ فرما۔'},
+{t:'Ease in Difficulty',c:'Hardship',ar:'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا',tr:"Allahumma la sahla illa ma ja'altahu sahla.",en:'O Allah, there is no ease except what You make easy.',ur:'اے اللہ! کوئی آسانی نہیں مگر جسے تو آسان کر دے۔'},
+{t:'Istighfar',c:'Repentance',ar:'أَسْتَغْفِرُ اللَّهَ',tr:'Astaghfirullah.',en:"I seek Allah's forgiveness.",ur:'میں اللہ تعالیٰ سے بخشش طلب کرتا ہوں۔'},
+{t:'SubhanAllahi wa Bihamdihi',c:'Dhikr',ar:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',tr:'SubhanAllahi wa bihamdihi.',en:'Glory be to Allah and praise Him. (100x — sins forgiven)',ur:'اللہ پاک ہے اور تمام تعریف اسی کے لیے ہے۔ (100 مرتبہ پڑھنے سے گناہ معاف ہوتے ہیں)'},
+{t:'For All Believers',c:'Family',ar:'اللَّهُمَّ اغْفِرْ لِلْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ',tr:"Allahummaghfir lil-mu'minina wal-mu'minat.",en:'O Allah, forgive the believing men and believing women.',ur:'اے اللہ! مومن مردوں اور مومن عورتوں کی مغفرت فرما۔'}
 ];
 function renderDuas(q=''){q=q.toLowerCase();
   const list=DUAS.filter(d=>(d.t+d.tr+d.en+d.c).toLowerCase().includes(q));
@@ -2164,7 +2166,7 @@ function openHChapter(key,chId,page){
 
 /* ---- Daily Hadith & Dua ---- */
 const ALL_HADITH=[];
-Object.keys(HBOOKS).forEach(k=>HBOOKS[k].hadith.forEach(x=>ALL_HADITH.push({ar:x.ar,en:x.en,ref:HBOOKS[k].t})));
+Object.keys(HBOOKS).forEach(k=>HBOOKS[k].hadith.forEach(x=>ALL_HADITH.push({ar:x.ar,en:x.en,ur:x.ur||'',ref:HBOOKS[k].t})));
 function dayIdx(n){const now=new Date(),s=new Date(now.getFullYear(),0,0);return Math.floor((now-s)/864e5)%n;}
 let dailyHD=null,dailyDD=null;
 /* v2.21: share helper — pehle system share sheet, warna copy */
@@ -2178,15 +2180,17 @@ function shareText(title,text){
 (function(){
   const hd=ALL_HADITH[dayIdx(ALL_HADITH.length)]; dailyHD=hd;
   $('dailyHadithAr').textContent=hd.ar; $('dailyHadithEn').textContent=hd.en; $('dailyHadithRef').textContent=hd.ref;
+  if($('dailyHadithUr'))$('dailyHadithUr').textContent=hd.ur||'';
   const dd=DUAS[dayIdx(DUAS.length)]; dailyDD=dd;
   $('dailyDuaAr').textContent=dd.ar; $('dailyDuaTr').textContent=dd.tr; $('dailyDuaEn').textContent=dd.t+' — '+dd.en;
+  if($('dailyDuaUr'))$('dailyDuaUr').textContent=dd.ur||'';
   $('shareHadithBtn').onclick=()=>{
     if(!dailyHD)return;
-    shareText('Hadith of the Day','📜 Hadith of the Day • آج کی حدیث\n\n'+dailyHD.ar+'\n\n'+dailyHD.en+'\n\n— '+dailyHD.ref+'\n\nvia Rah-e-Noor');
+    shareText('Hadith of the Day','📜 Hadith of the Day • آج کی حدیث\n\n'+dailyHD.ar+'\n\n'+dailyHD.en+'\n\n'+(dailyHD.ur?dailyHD.ur+'\n\n':'')+'— '+dailyHD.ref+'\n\nvia Rah-e-Noor');
   };
   $('shareDuaBtn').onclick=()=>{
     if(!dailyDD)return;
-    shareText('Dua of the Day','🤲 Dua of the Day • آج کی دعا\n\n'+dailyDD.ar+'\n'+dailyDD.tr+'\n\n'+dailyDD.t+' — '+dailyDD.en+'\n\nvia Rah-e-Noor');
+    shareText('Dua of the Day','🤲 Dua of the Day • آج کی دعا\n\n'+dailyDD.ar+'\n'+dailyDD.tr+'\n\n'+dailyDD.t+' — '+dailyDD.en+(dailyDD.ur?'\n\n'+dailyDD.ur:'')+'\n\nvia Rah-e-Noor');
   };
 })();
 
