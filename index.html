@@ -462,6 +462,13 @@ body.dark nav button.on{color:#f06292;}
     <a href="https://jilanapps.github.io/rah-e-noor/rah-e-noor.apk" class="btn gold" style="display:inline-block;margin-top:8px;text-decoration:none">📥 Update Download Karein</a>
   </div>
 
+  <!-- Dedication: Rani ke esal-e-sawab ke liye -->
+  <div class="card" style="text-align:center;border:2px solid var(--gold);background:#fff8e1">
+    <div style="font-weight:700">🤲 Ye app <b>Rani</b> ke esal-e-sawab ke liye waqf hai</div>
+    <div class="ur" style="margin-top:4px">یہ ایپ رانی کے ایصالِ ثواب کے لیے وقف ہے</div>
+    <div class="note" style="margin-top:4px">Allah unki maghfirat farmaye aur unhein Jannat-ul-Firdous me aala muqam ata farmaye. <span class="ur">آمین</span></div>
+  </div>
+
   <!-- Prayer times card -->
   <div class="pcard" id="prayerCard">
     <div id="ptimeRows"></div>
@@ -1281,7 +1288,8 @@ const DUAS=[
 {t:'Istighfar',c:'Repentance',ar:'أَسْتَغْفِرُ اللَّهَ',tr:'Astaghfirullah.',en:"I seek Allah's forgiveness.",ur:'میں اللہ تعالیٰ سے بخشش طلب کرتا ہوں۔'},
 {t:'SubhanAllahi wa Bihamdihi',c:'Dhikr',ar:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',tr:'SubhanAllahi wa bihamdihi.',en:'Glory be to Allah and praise Him. (100x — sins forgiven)',ur:'اللہ پاک ہے اور تمام تعریف اسی کے لیے ہے۔ (100 مرتبہ پڑھنے سے گناہ معاف ہوتے ہیں)'},
 {t:'For All Believers',c:'Family',ar:'اللَّهُمَّ اغْفِرْ لِلْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ',tr:"Allahummaghfir lil-mu'minina wal-mu'minat.",en:'O Allah, forgive the believing men and believing women.',ur:'اے اللہ! مومن مردوں اور مومن عورتوں کی مغفرت فرما۔'}
-];
+,
+{t:'Janaza Dua for a Child',c:'Janaza',ar:'اَللّٰھُمَّ اجْعَلْھَا لَنَا فَرَطًا وَّاجْعَلْھَا لَنَا اَجْرًا وَّذُخْرًا وَّاجْعَلْھَا لَنَا شَافِعَۃً وَّمُشَفَّعَۃً',tr:"Allahumma-j'al-ha lana faratan, waj-'al-ha lana ajran wa dhukhran, waj-'al-ha lana shafi-'atan wa mushaffa-'ah.",en:'O Allah, make her a forerunner for us (in Paradise), make her a source of reward and a treasure for us in the Hereafter, and make her an intercessor for us whose intercession is accepted. (Janaza dua for a deceased minor child)',ur:'اے اللہ! اس ننھی بچی کو ہمارے لیے (جنت میں) پیش رو بنا، اور اسے ہمارے لیے اجر اور آخرت کا ذخیرہ بنا، اور اسے ہمارے حق میں شفاعت کرنے والی بنا جس کی شفاعت قبول ہو۔'}];
 function renderDuas(q=''){q=q.toLowerCase();
   const list=DUAS.filter(d=>(d.t+d.tr+d.en+d.c).toLowerCase().includes(q));
   $('duaList').innerHTML=list.length?list.map(d=>
