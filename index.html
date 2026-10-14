@@ -387,6 +387,8 @@ body.dark .prow.cur{background:#233527;}
 .nf-card .nic{font-size:1.6em; flex-shrink:0;}
 .nf-card .nt{font-weight:700; font-size:.95em;}
 .nf-card .nd{font-size:.85em; color:var(--muted); margin-top:2px;}
+.nf-card .nf-body{flex:1; min-width:0;}
+.nf-share{flex-shrink:0; padding:6px 10px; font-size:.85em;}
 /* Bottom nav v2 */
 nav button.on{color:#C2185B;}
 body.dark nav button.on{color:#f06292;}
@@ -422,6 +424,7 @@ body.dark nav button.on{color:#f06292;}
   <div class="hdr-top">
     <button class="icon-btn" id="menuBtn" title="Menu">☰</button>
     <div class="hdr-actions">
+      <span style="font-size:11px;opacity:.65;align-self:center">v2.25</span>
       <button class="theme-pill" id="themePill">🎨 Change Theme</button>
       <button class="info-btn" id="infoBtn" title="Info">i</button>
     </div>
@@ -495,9 +498,9 @@ body.dark nav button.on{color:#f06292;}
   <!-- Newsfeed -->
   <div class="sec-head">Newsfeed</div>
   <div id="newsfeed">
-    <div class="nf-card"><span class="nic">🌙</span><div><div class="nt">Aaj ki naseehat</div><div class="nd" id="naseehatTxt">Namaz deen ka sutoon hai — waqt par ada karein. <span class="ur">نماز دین کا ستون ہے۔</span></div></div></div>
-    <div class="nf-card"><span class="nic">📖</span><div><div class="nt">Aaj ki Ayat</div><div class="nd" id="ayatTxt"></div></div></div>
-    <div class="nf-card"><span class="nic">🤲</span><div><div class="nt">Dua ki qubooliyat ka waqt</div><div class="nd" id="duaTimeTxt"></div></div></div>
+    <div class="nf-card"><span class="nic">🌙</span><div class="nf-body"><div class="nt">Aaj ki naseehat</div><div class="nd" id="naseehatTxt">Namaz deen ka sutoon hai — waqt par ada karein. <span class="ur">نماز دین کا ستون ہے۔</span></div></div><button class="tool-btn nf-share" data-nf="naseehat" title="Share">📤</button></div>
+    <div class="nf-card"><span class="nic">📖</span><div class="nf-body"><div class="nt">Aaj ki Ayat</div><div class="nd" id="ayatTxt"></div></div><button class="tool-btn nf-share" data-nf="ayat" title="Share">📤</button></div>
+    <div class="nf-card"><span class="nic">🤲</span><div class="nf-body"><div class="nt">Dua ki qubooliyat ka waqt</div><div class="nd" id="duaTimeTxt"></div></div><button class="tool-btn nf-share" data-nf="duatime" title="Share">📤</button></div>
   </div>
 
   <div class="card" id="continueCard" style="display:none; border:2px solid var(--gold);">
@@ -572,9 +575,9 @@ body.dark nav button.on{color:#f06292;}
     <div class="btn-row" style="justify-content:center;margin-top:10px">
       <button class="btn gold" id="diNew">🔄 <span class="ur">نئی تصویر</span></button>
       <button class="btn" id="diDownload">📥 Download</button>
-      <button class="btn" id="diShare" style="background:#25D366">💬 <span class="ur">واٹس ایپ پر شیئر</span></button>
+      <button class="btn" id="diShare" style="background:#1a7a4a">📤 <span class="ur">شیئر کریں</span> • Share</button>
     </div>
-    <div class="note"><span class="ur">تصویر صرف ایپ کھلنے پر بنتی ہے۔ شیئر دبانے پر واٹس ایپ کھلے گا — آپ خود بھیجیں گے۔</span><br>Image generates when the app is open. Share opens WhatsApp — you send it yourself.</div>
+    <div class="note"><span class="ur">تصویر صرف ایپ کھلنے پر بنتی ہے۔ شیئر دبانے پر سسٹم شیئر شیٹ کھلے گی — واٹس ایپ، فیس بک، ٹیلیگرام یا کوئی بھی ایپ منتخب کریں۔</span><br>Image generates when the app is open. Share opens the system share sheet — pick WhatsApp, Facebook, Telegram or any app.</div>
   </div>
 </section>
 
@@ -862,7 +865,11 @@ body.dark nav button.on{color:#f06292;}
   <button id="calNavBtn"><span class="ic">📅</span>Calendar<span class="ur"><br>کیلنڈر</span></button>
 </nav>
 
-<!-- Floating settings button -->
+<!-- v2.25: Floating settings gear FAB PERMANENTLY REMOVED (Dr Asif: "setting wala button nishan mita do").
+     Theme sirf header ke "🎨 Change Theme" button se khulta hai. Neeche ka guard kisi stale/cached copy se
+     bachne ke liye hai — agar kabhi koi gear FAB ban bhi jaye to foran chhup jayega. -->
+<style>#settingsFab,.settings-fab,.fab-settings,#floatingSettingsBtn{display:none!important}</style>
+<script>(function(){function killFab(){try{document.querySelectorAll('#settingsFab,.settings-fab,.fab-settings,#floatingSettingsBtn').forEach(function(e){e.remove();});}catch(e){}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',killFab);}else{killFab();}setTimeout(killFab,1500);})();</script>
 
 <!-- Toast -->
 <div id="toast"></div>
@@ -1984,9 +1991,8 @@ function hCopy(L,hh){
   else alert(t);
 }
 function hShare(L,hh){
-  const t=hText(L,hh);
-  if(navigator.share){navigator.share({title:L.meta.t+' #'+hh.idInBook,text:t}).catch(()=>{});}
-  else hCopy(L,hh);
+  /* v2.25: generic share sheet (bridge → navigator.share → copy) */
+  shareText(L.meta.t+' #'+hh.idInBook,hText(L,hh));
 }
 function applyHFont(){
   document.querySelectorAll('#rdrBody .htx.ar').forEach(el=>el.style.fontSize=(1.35*hlibFont/100)+'em');
@@ -2170,11 +2176,15 @@ const ALL_HADITH=[];
 Object.keys(HBOOKS).forEach(k=>HBOOKS[k].hadith.forEach(x=>ALL_HADITH.push({ar:x.ar,en:x.en,ur:x.ur||'',ref:HBOOKS[k].t})));
 function dayIdx(n){const now=new Date(),s=new Date(now.getFullYear(),0,0);return Math.floor((now-s)/864e5)%n;}
 let dailyHD=null,dailyDD=null;
-/* v2.21: share helper — pehle system share sheet, warna copy */
+/* v2.25: share helper — GENERIC system share sheet (WhatsApp sirf aik option hai).
+   WebView me navigator.share nahi hota, is liye pehle Android bridge. */
 function shareText(title,text){
+  if(window.Android && typeof Android.shareText==='function'){
+    try{Android.shareText(title,text);return;}catch(e){/* neeche fallback */}
+  }
   if(navigator.share){navigator.share({title:title,text:text}).catch(()=>{});}
   else if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>toast('✅ Copied! <span class="ur">کاپی ہو گیا — اب WhatsApp par paste kar ke bhejein</span>')).catch(()=>{});
+    navigator.clipboard.writeText(text).then(()=>toast('✅ Copied! <span class="ur">کاپی ہو گیا — اب کسی بھی ایپ میں پیسٹ کر کے بھیجیں</span>')).catch(()=>{});
   }
   else toast('Sharing is device par supported nahi');
 }
@@ -2280,6 +2290,21 @@ function renderNewsfeed(){
 function todayTip(){return RAHNUMAI[todayTipIdx()];}
 try{const nt=$('naseehatTxt');if(nt)nt.textContent=todayTip();}catch(e){}
 try{renderNewsfeed();}catch(e){}
+/* v2.25: har newsfeed card ka apna Share button — usi card ka content, generic share sheet se */
+function shareNewsfeed(kind){
+  try{
+    if(kind==='naseehat'){
+      shareText('Aaj ki Naseehat','🌙 Aaj ki Naseehat • آج کی نصیحت\n\n'+todayTip()+'\n\nvia Rah-e-Noor');
+    }else if(kind==='ayat'){
+      const a=todayAyat();
+      shareText('Aaj ki Ayat','📖 Aaj ki Ayat • آج کی آیت\n\n'+a.ar+'\n\n'+a.ur+'\n\n— '+a.ref+'\n\nvia Rah-e-Noor');
+    }else if(kind==='duatime'){
+      const t=todayDuaTime();
+      shareText('Dua ki Qubooliyat ka Waqt','🤲 Dua ki Qubooliyat ka Waqt • دعا کی قبولیت کا وقت\n\n'+t.t+' — '+t.d+'\n\nvia Rah-e-Noor');
+    }
+  }catch(e){}
+}
+try{document.querySelectorAll('.nf-share').forEach(b=>{b.onclick=()=>shareNewsfeed(b.dataset.nf);});}catch(e){}
 function openRahnumai(){
   openOv();
   rdrTitle('🧭 Rozana Rahnumai • <span class="ur">روزانہ رہنمائی</span>');
@@ -2870,8 +2895,15 @@ function diRender(idx){
 
 function diDownload(){
   const cv=$('diCanvas');if(!cv)return;
+  /* v2.25: WebView me blob-URL download kaam nahi karta — pehle Android bridge try karo */
+  if(window.Android && typeof Android.saveImage==='function'){
+    try{
+      Android.saveImage(cv.toDataURL('image/png'),'rah-e-noor-daily-'+diTodayStr()+'.png');
+      return;
+    }catch(e){/* neeche fallback */}
+  }
   cv.toBlob(function(blob){
-    if(!blob){alert('Download failed');return;}
+    if(!blob){toast('Download failed — dobara koshish karein');return;}
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
     a.download='rah-e-noor-daily-'+diTodayStr()+'.png';
@@ -2884,6 +2916,13 @@ async function diShare(){
   const cv=$('diCanvas');if(!cv)return;
   const item=DI_POOL[diGetIndex()];
   const text='🖼️ *Rah-e-Noor* — '+DI_TYPE_LABEL[item.t]+'\n'+item.ar+'\n'+item.ur+'\n('+item.ref+')';
+  /* v2.25: pehle Android bridge (native share sheet me TASVEER + text dono jate hain) */
+  if(window.Android && typeof Android.shareImage==='function'){
+    try{
+      Android.shareImage(cv.toDataURL('image/png'),text);
+      return;
+    }catch(e){/* neeche fallback */}
+  }
   const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
   try{
     if(blob&&navigator.canShare){
@@ -2894,11 +2933,17 @@ async function diShare(){
       }
     }
   }catch(e){/* user cancelled or unsupported — fall through */}
-  /* fallback: download + open WhatsApp with text (user attaches image manually) */
+  /* aakhri fallback: pehle tasveer save karo (bridge se), phir GENERIC share sheet se
+     text bhejo (WhatsApp sirf aik option hai). Text-only kabhi chup-chap nahi bhejna. */
   diDownload();
+  toast('Tasveer save ho gayi — share sheet se app choose karein, tasveer attach karke bhejein 📎');
   setTimeout(()=>{
-    window.open('https://wa.me/?text='+encodeURIComponent(text+'\n\n(تصویر ڈاؤن لوڈ ہو گئی ہے — چیٹ میں منسلک کر کے بھیجیں)'),'_blank');
-  },800);
+    if(window.Android && typeof Android.shareText==='function'){
+      try{Android.shareText('Rah-e-Noor — Rozana Tasveer',text+'\n\n(تصویر ڈاؤن لوڈ ہو گئی ہے — چیٹ میں منسلک کر کے بھیجیں)');return;}catch(e){}
+    }
+    if(navigator.share){navigator.share({title:'Rah-e-Noor — Rozana Tasveer',text:text+'\n\n(تصویر ڈاؤن لوڈ ہو گئی ہے — چیٹ میں منسلک کر کے بھیجیں)'}).catch(()=>{});return;}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>toast('✅ Text copy ho gaya — kisi bhi app me paste karein')).catch(()=>{});}
+  },1200);
 }
 
 let diInitDone=false;
